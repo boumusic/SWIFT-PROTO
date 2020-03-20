@@ -14,6 +14,7 @@ public class CharacterMovement : ScriptableObject
     public float jumpStrength = 5f;
     public float jumpProgressSpeed = 2f;
     public AnimationCurve jumpCurve = new AnimationCurve();
+    public bool resetVelocityOnJump = false;
 
     [Header("Fall")]
     public float fallStrength = 2f;
@@ -27,8 +28,10 @@ public class CharacterMovement : ScriptableObject
     public float castBoxWidth = 0.2f;
     public LayerMask groundMask;
 
-    [Header("Desired Direction")]
-    public float desiredCastLength;
+    [Header("Slide Against Walls")]
+    public bool slideAgainstWalls = true;
+    public float slideWallCastLength;
+    public AnimationCurve curveWallSlide;
     public float minSlideWallSpeed = 0.15f;
     public float maxSlideWallSpeed = 0.5f;
 }

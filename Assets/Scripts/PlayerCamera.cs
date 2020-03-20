@@ -56,6 +56,16 @@ public class PlayerCamera : MonoBehaviour
         transform.rotation = x * y;
     }
 
+    public void Land()
+    {
+        animator.SetTrigger("Land");
+    }
+
+    public void Jump()
+    {
+        animator.SetTrigger("Jump");
+    }
+
     public void InputMouse(Vector2 mouse)
     {
         this.mouse = mouse;
