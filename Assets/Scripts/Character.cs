@@ -17,6 +17,7 @@ public class Character : MonoBehaviour
     private Vector3 currentVel;
     private bool isRunning;
     private float yVelocity;
+    private bool spacebar;
 
     private float jumpProgress = 0f;
     private float fallProgress = 0f;
@@ -77,8 +78,9 @@ public class Character : MonoBehaviour
         CalculateHorizontalVelocity();
 
         isRunning = axis.magnitude != 0f;
+        CheckWallClimb();
     }
-
+    
     private void CalculateHorizontalVelocity()
     {
         Vector2 usedAxis = IsinAir ? lastAxis : axis;
@@ -107,6 +109,13 @@ public class Character : MonoBehaviour
             lastAxis = axis;
         }
     }
+
+    public void InputSpacebar(bool space)
+    {
+        spacebar = space;
+    }
+
+    #region Ground
 
     private void Grounded_Enter()
     {
@@ -145,10 +154,9 @@ public class Character : MonoBehaviour
             WallSlideRotation = Quaternion.identity;
     }
 
-    private void ResetJumpCount()
-    {
-        jumpLeft = m.jumpCount;
-    }
+    #endregion
+
+    #region Jump
 
     public void Jump()
     {
@@ -164,7 +172,7 @@ public class Character : MonoBehaviour
     private void Jumping_Enter()
     {
         jumpProgress = 0f;
-        playerCamera.Land();
+        playerCamera.Jump();
     }
 
     private void Jumping_Update()
@@ -176,6 +184,13 @@ public class Character : MonoBehaviour
             stateMachine.ChangeState(CharacterState.Falling);
         }
     }
+
+    private void ResetJumpCount()
+    {
+        jumpLeft = m.jumpCount;
+    }
+
+    #endregion
 
     private void Falling_Enter()
     {
@@ -213,6 +228,43 @@ public class Character : MonoBehaviour
         velocity = Vector3.zero;
         yVelocity = 0f;
     }
+
+    #region Wall
+    
+    private void CheckWallClimb()
+    {
+        if (CastWall())
+        {
+            if (CurrentState != CharacterState.WallClimbing && spacebar)
+            {
+                stateMachine.ChangeState(CharacterState.WallClimbing);
+            }
+        }
+    }
+
+    private void WallClimbing_Enter()
+    {
+        playerCamera.WallClimb(true);
+        jumpLeft++;
+    }
+
+    private void WallClimbing_Update()
+    {
+        if(!spacebar)
+        {
+            stateMachine.ChangeState(CharacterState.Falling);
+        }
+
+        yVelocity = m.wallClimbSpeed;
+        velocity = Vector3.zero;
+    }
+
+    private void WallClimbing_Exit()
+    {
+        playerCamera.WallClimb(false);
+    }
+
+    #endregion
 
     public bool CastWall()
     {

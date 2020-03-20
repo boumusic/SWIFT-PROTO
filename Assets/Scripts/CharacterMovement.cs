@@ -34,4 +34,7 @@ public class CharacterMovement : ScriptableObject
     public AnimationCurve curveWallSlide;
     public float minSlideWallSpeed = 0.15f;
     public float maxSlideWallSpeed = 0.5f;
+
+    [Header("Wall Climb")]
+    public float wallClimbSpeed = 1f;
 }

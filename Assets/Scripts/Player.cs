@@ -18,6 +18,8 @@ public class Player : MonoBehaviour
         UpdateAxis();
         UpdateMouse();
 
+        character.InputSpacebar(Input.GetKey(KeyCode.Space));
+
         if(Input.GetKeyDown(KeyCode.Space))
         {
             character.Jump();
