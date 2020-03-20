@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu]
-public class CharacterMovement : ScriptableObject
+public class CharacterSettings : ScriptableObject
 {
+    #region Movement
+
     [Header("Run")]
     public float runSpeed = 5f;
     public float acceleration = 0.5f;
@@ -37,4 +39,16 @@ public class CharacterMovement : ScriptableObject
 
     [Header("Wall Climb")]
     public float wallClimbSpeed = 1f;
+
+    #endregion
+
+    [Header("Health")]
+    public int healthPoints = 1;
+
+    [Header("Attack")]
+    public int damage = 1;
+    public float attackWidth = 2f;
+    public float attackLength = 2f;
+    public float attackHeight = 2f;
+    public float attackDuration = 0.7f;
 }

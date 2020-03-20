@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7fc0041c472b09c42abbf9790ff77b54, type: 3}
-  m_Name: Movement
+  m_Name: Character
   m_EditorClassIdentifier: 
   runSpeed: 10
   acceleration: 0.1
@@ -149,3 +149,9 @@ MonoBehaviour:
   minSlideWallSpeed: 0
   maxSlideWallSpeed: 80
   wallClimbSpeed: 15
+  healthPoints: 1
+  damage: 1
+  attackWidth: 2
+  attackLength: 2
+  attackHeight: 2
+  attackDuration: 0.7

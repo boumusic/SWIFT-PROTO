@@ -9,8 +9,15 @@ public class Player : MonoBehaviour
 
     [Header("Mouse")]
     public float sensitivity = 1f;
+    public float attackSensitivity = 0.2f;
+
+    public float CurrentSensitivity => character.IsAttacking ? attackSensitivity : sensitivity;
     public bool cursor = true;
     private Vector2 mouse;
+
+    [Header("Inputs")]
+    public KeyCode jump = KeyCode.Space;
+    public KeyCode attack = KeyCode.Mouse0;
     
     private void Update()
     {
@@ -18,11 +25,16 @@ public class Player : MonoBehaviour
         UpdateAxis();
         UpdateMouse();
 
-        character.InputSpacebar(Input.GetKey(KeyCode.Space));
+        character.InputSpacebar(Input.GetKey(jump));
 
-        if(Input.GetKeyDown(KeyCode.Space))
+        if(Input.GetKeyDown(jump))
         {
             character.Jump();
+        }
+
+        if (Input.GetKeyDown(attack))
+        {
+            character.TryAttack();
         }
     }
 
@@ -38,7 +50,7 @@ public class Player : MonoBehaviour
     {
         float x = Input.GetAxis("Mouse X");
         float y = Input.GetAxis("Mouse Y");
-        mouse += new Vector2(x, y) * Time.deltaTime * 1000 * sensitivity;
+        mouse += new Vector2(x, y) * Time.deltaTime * 1000 * CurrentSensitivity;
         mouse.y = Mathf.Clamp(mouse.y, -90, 90);
         character.playerCamera.InputMouse(mouse);
     }
