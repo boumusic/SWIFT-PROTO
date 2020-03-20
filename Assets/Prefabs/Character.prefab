@@ -1106,8 +1106,8 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   smoothnessRoll: 0.3
-  minFov: 90
-  maxFov: 105
+  minFov: 80
+  maxFov: 95
   fovSmooth: 0.5
 --- !u!1 &7145732498090539426
 GameObject:

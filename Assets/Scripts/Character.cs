@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using MonsterLove.StateMachine;
+using System;
 
 public class Character : MonoBehaviour
 {
@@ -55,7 +56,7 @@ public class Character : MonoBehaviour
     private bool isAttacking;
     public bool IsAttacking { get => isAttacking; set => isAttacking = value; }
     private int healthPointsLeft;
-
+    public Action OnAttack;
 
     private void OnDrawGizmos()
     {
@@ -314,6 +315,7 @@ public class Character : MonoBehaviour
     {
         if (CurrentState != CharacterState.WallClimbing && !isAttacking)
         {
+            OnAttack?.Invoke();
             playerCamera.Attack();
             isAttacking = true;
             StartCoroutine(AttackDuration());
