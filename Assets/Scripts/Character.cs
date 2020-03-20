@@ -7,8 +7,10 @@ public class Character : MonoBehaviour
 {
     [Header("Components")]
     public Rigidbody body;
-    public CharacterMovement m;
+    public CharacterSettings m;
     public PlayerCamera playerCamera;
+
+    #region Movement
 
     private Vector2 lastAxis;
     private Vector2 axis;
@@ -17,6 +19,7 @@ public class Character : MonoBehaviour
     private Vector3 currentVel;
     private bool isRunning;
     private float yVelocity;
+    private bool spacebar;
 
     private float jumpProgress = 0f;
     private float fallProgress = 0f;
@@ -43,7 +46,16 @@ public class Character : MonoBehaviour
     public Vector3 FeetOrigin => transform.position + Vector3.up * m.groundRaycastUp;
     public Vector3 FeetDestination => FeetOrigin - Vector3.up * m.groundRaycastDown;
     public Vector3 CastBox => new Vector3(m.castBoxWidth, 1f, m.castBoxWidth);
+
+
     private Quaternion WallSlideRotation = Quaternion.identity;
+
+    #endregion
+
+    private bool isAttacking;
+    public bool IsAttacking { get => isAttacking; set => isAttacking = value; }
+    private int healthPointsLeft;
+
 
     private void OnDrawGizmos()
     {
@@ -77,6 +89,7 @@ public class Character : MonoBehaviour
         CalculateHorizontalVelocity();
 
         isRunning = axis.magnitude != 0f;
+        CheckWallClimb();
     }
 
     private void CalculateHorizontalVelocity()
@@ -102,11 +115,18 @@ public class Character : MonoBehaviour
     public void InputAxis(Vector2 axis)
     {
         this.axis = axis;
-        if(axis.magnitude != 0)
+        if (axis.magnitude != 0)
         {
             lastAxis = axis;
         }
     }
+
+    public void InputSpacebar(bool space)
+    {
+        spacebar = space;
+    }
+
+    #region Ground
 
     private void Grounded_Enter()
     {
@@ -145,10 +165,9 @@ public class Character : MonoBehaviour
             WallSlideRotation = Quaternion.identity;
     }
 
-    private void ResetJumpCount()
-    {
-        jumpLeft = m.jumpCount;
-    }
+    #endregion
+
+    #region Jump
 
     public void Jump()
     {
@@ -164,7 +183,7 @@ public class Character : MonoBehaviour
     private void Jumping_Enter()
     {
         jumpProgress = 0f;
-        playerCamera.Land();
+        playerCamera.Jump();
     }
 
     private void Jumping_Update()
@@ -176,6 +195,13 @@ public class Character : MonoBehaviour
             stateMachine.ChangeState(CharacterState.Falling);
         }
     }
+
+    private void ResetJumpCount()
+    {
+        jumpLeft = m.jumpCount;
+    }
+
+    #endregion
 
     private void Falling_Enter()
     {
@@ -214,11 +240,110 @@ public class Character : MonoBehaviour
         yVelocity = 0f;
     }
 
+    #region Wall
+
+    private void CheckWallClimb()
+    {
+        if (CastWall())
+        {
+            if (CurrentState != CharacterState.WallClimbing && spacebar)
+            {
+                stateMachine.ChangeState(CharacterState.WallClimbing);
+            }
+        }
+    }
+
+    private void WallClimbing_Enter()
+    {
+        playerCamera.WallClimb(true);
+        jumpLeft++;
+    }
+
+    private void WallClimbing_Update()
+    {
+        if (!spacebar)
+        {
+            stateMachine.ChangeState(CharacterState.Falling);
+        }
+
+        yVelocity = m.wallClimbSpeed;
+        velocity = Vector3.zero;
+    }
+
+    private void WallClimbing_Exit()
+    {
+        playerCamera.WallClimb(false);
+    }
+
+    #endregion
+
     public bool CastWall()
     {
         hits = Physics.RaycastAll(transform.position + Vector3.up, Forward, m.slideWallCastLength);
         return hits.Length > 0;
     }
+
+    #region Health
+
+    private void ResetHealth()
+    {
+        healthPointsLeft = m.healthPoints;
+    }
+
+    public void TakeDamage(int damage)
+    {
+        healthPointsLeft -= damage;
+
+        if (healthPointsLeft <= 0)
+        {
+            healthPointsLeft = 0;
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        gameObject.SetActive(false);
+    }
+
+    #endregion
+
+    #region Attack
+    
+    public void TryAttack()
+    {
+        if (CurrentState != CharacterState.WallClimbing && !isAttacking)
+        {
+            playerCamera.Attack();
+            isAttacking = true;
+            StartCoroutine(AttackDuration());
+            Debug.Log("Attack");
+            Vector3 center = transform.position + Vector3.up * 1.8f + Forward * m.attackLength / 2f;
+            Vector3 halfExtents = new Vector3(m.attackWidth, m.attackHeight, m.attackLength) / 2f;
+            RaycastHit[] hits = Physics.BoxCastAll(center, halfExtents, Vector3.forward, Quaternion.identity, m.attackLength);
+
+            if (hits.Length > 0)
+            {
+                for (int i = 0; i < hits.Length; i++)
+                {
+                    Character chara;
+                    if (hits[i].collider.gameObject.TryGetComponent(out chara))
+                    {
+                        if(chara != this)
+                            chara.TakeDamage(m.damage);
+                    }
+                }
+            }
+        }
+    }
+
+    private IEnumerator AttackDuration()
+    {
+        yield return new WaitForSeconds(m.attackDuration);
+        isAttacking = false;
+    }
+
+    #endregion
 }
 
 public enum CharacterState

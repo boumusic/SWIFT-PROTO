@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7fc0041c472b09c42abbf9790ff77b54, type: 3}
-  m_Name: Movement
+  m_Name: Character
   m_EditorClassIdentifier: 
-  runSpeed: 13
+  runSpeed: 10
   acceleration: 0.1
   jumpCount: 2
-  jumpStrength: 30
-  jumpProgressSpeed: 3.5
+  jumpStrength: 28
+  jumpProgressSpeed: 3.4
   jumpCurve:
     serializedVersion: 2
     m_Curve:
@@ -69,9 +69,8 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   resetVelocityOnJump: 1
-  airControl: 0.2
-  fallStrength: 60
-  fallProgressSpeed: 1.3
+  fallStrength: 35
+  fallProgressSpeed: 1.2
   fallCurve:
     serializedVersion: 2
     m_Curve:
@@ -104,7 +103,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 512
   slideAgainstWalls: 0
-  slideWallCastLength: 1
+  slideWallCastLength: 0.5
   curveWallSlide:
     serializedVersion: 2
     m_Curve:
@@ -149,3 +148,10 @@ MonoBehaviour:
     m_RotationOrder: 4
   minSlideWallSpeed: 0
   maxSlideWallSpeed: 80
+  wallClimbSpeed: 15
+  healthPoints: 1
+  damage: 1
+  attackWidth: 2
+  attackLength: 2
+  attackHeight: 2
+  attackDuration: 0.7

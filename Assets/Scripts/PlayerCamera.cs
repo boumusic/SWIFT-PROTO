@@ -66,6 +66,19 @@ public class PlayerCamera : MonoBehaviour
         animator.SetTrigger("Jump");
     }
 
+    public void WallClimb(bool climb)
+    {
+        animator.SetBool("isWallclimbing", climb);
+    }
+
+    public void Attack()
+    {
+        int attackIndex = Random.Range(0, 3);
+        Debug.Log(attackIndex);
+        animator.SetFloat("AttackIndex", attackIndex);
+        animator.SetTrigger("Attack");
+    }
+
     public void InputMouse(Vector2 mouse)
     {
         this.mouse = mouse;
