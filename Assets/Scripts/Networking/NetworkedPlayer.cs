@@ -10,11 +10,14 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
 {
     public Transform characterTransform;
 
+    [Header("To destroy if not owner")]
     public Player player;
     public Character playerCharacter;
-    public Rigidbody playerRb;
-
     public GameObject playerCamera;
+
+    [Header("References")]
+    public Rigidbody playerRb;
+    public Animator armsAnimator;
 
     protected override void NetworkStart()
     {
@@ -28,8 +31,21 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
             Destroy(playerCharacter.GetComponent<StateMachineRunner>());
             Destroy(playerCharacter);
             Destroy(playerCamera);
+            
+            networkObject.Networker.disconnected += x =>
+            {
+                Destroy(this.gameObject);
+            };
+        }
+        else
+        {
+            playerCharacter.OnAttack += () =>
+            {
+                networkObject.SendRpc(RPC_ATTACK, Receivers.All);
+            };
         }
     }
+
 
     private void Update()
     {
@@ -45,5 +61,14 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
         {
             networkObject.position = characterTransform.position;
         }
+    }
+
+    public override void Attack(RpcArgs args)
+    {
+        MainThreadManager.Run(() =>
+        {
+            GameObject testBall = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            testBall.transform.position = characterTransform.position;
+        });
     }
 }
