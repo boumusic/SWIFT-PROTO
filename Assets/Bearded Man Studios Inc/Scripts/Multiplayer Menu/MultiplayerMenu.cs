@@ -11,6 +11,7 @@ public class MultiplayerMenu : MonoBehaviour
 {
 	public InputField ipAddress = null;
 	public InputField portNumber = null;
+    public InputField playerName = null;
 	public bool DontChangeSceneOnConnect = false;
 	public string masterServerHost = string.Empty;
 	public ushort masterServerPort = 15940;
@@ -36,7 +37,7 @@ public class MultiplayerMenu : MonoBehaviour
 
 	private void Start()
 	{
-		ipAddress.text = "127.0.0.1";
+		ipAddress.text = "82.66.74.114";
 		portNumber.text = "15937";
 
 		for (int i = 0; i < ToggledButtons.Length; ++i)
@@ -235,6 +236,11 @@ public class MultiplayerMenu : MonoBehaviour
 		for (int i = 0; i < _uiButtons.Count; ++i)
 			_uiButtons[i].interactable = value;
 	}
+
+    public void ChangePlayerName()
+    {
+        PlayerInfoManager.Instance.ChangeName(playerName.text);
+    }
 
 	private void OnApplicationQuit()
 	{

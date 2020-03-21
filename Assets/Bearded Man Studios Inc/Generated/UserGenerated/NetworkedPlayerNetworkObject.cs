@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedInterpol("{\"inter\":[0,15]")]
+	[GeneratedInterpol("{\"inter\":[0,3]")]
 	public partial class NetworkedPlayerNetworkObject : NetworkObject
 	{
 		public const int IDENTITY = 5;
@@ -17,7 +17,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		#pragma warning restore 0067
 		private Vector3 _position;
 		public event FieldEvent<Vector3> positionChanged;
-		public InterpolateVector3 positionInterpolation = new InterpolateVector3() { LerpT = 0.15f, Enabled = true };
+		public InterpolateVector3 positionInterpolation = new InterpolateVector3() { LerpT = 0.3f, Enabled = true };
 		public Vector3 position
 		{
 			get { return _position; }
