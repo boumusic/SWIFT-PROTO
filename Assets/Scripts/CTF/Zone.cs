@@ -5,8 +5,12 @@ using UnityEngine;
 public class Zone : MonoBehaviour, ITeamAffilitation
 {
     public int teamIndex = 0;
+
+    [Header("Components")]
     public Flag flag;
     public Renderer rend;
+    public ParticleSystem capturedFx;
+    public ParticleSystem scoredFx;
 
     public bool IsCaptured => !flag.gameObject.activeInHierarchy;
 
@@ -33,12 +37,14 @@ public class Zone : MonoBehaviour, ITeamAffilitation
                 if(chara.TeamIndex != teamIndex)
                 {
                     chara.Capture(flag);
+                    capturedFx.Play();
                 }                
             }
 
             if(chara.HasFlag && chara.TeamIndex == teamIndex)
             {
                 chara.Score();
+                scoredFx.Play();
             }            
         }
     }

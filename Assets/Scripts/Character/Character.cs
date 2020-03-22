@@ -417,17 +417,19 @@ public class Character : MonoBehaviour
     public void Capture(Flag flag)
     {
         flag.gameObject.SetActive(false);
-        Debug.Log(PlayerName + " captured the flag!");
+        UIManager.Instance.LogMessage(PlayerName + " captured the Flag !");
         this.flag = flag;
     }
 
     public void Score()
     {
-        Debug.Log(PlayerName + " scored for team " + TeamIndex + "!");
+        string message = PlayerName + " scored for team " + TeamIndex + "!";
+        UIManager.Instance.LogMessage(message);
         flag.gameObject.SetActive(true);
         flag = null;
         TeamManager.Instance.Score(TeamIndex);
         CTFManager.Instance.OnTeamScored?.Invoke();
+        
     }
 
     #endregion

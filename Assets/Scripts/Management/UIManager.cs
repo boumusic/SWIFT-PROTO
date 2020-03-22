@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class UIManager : MonoBehaviour
 {
+    public bool debugLogMessages = false;
+    
+
     private static UIManager instance;
     public static UIManager Instance
     {
@@ -16,9 +19,17 @@ public class UIManager : MonoBehaviour
 
     [Header("Components")]
     public Animator hitMarker;
+    public UIGeneralMessage generalMessage;
 
     public void KillPerformed()
     {
         hitMarker.SetTrigger("In");
+    }
+
+    public void LogMessage(string message)
+    {
+        message = message.ToUpper();
+        if (debugLogMessages) Debug.Log(message);
+        generalMessage.Message(message);
     }
 }
