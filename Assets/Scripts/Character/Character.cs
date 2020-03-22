@@ -409,14 +409,25 @@ public class Character : MonoBehaviour
 
     #region CTF
 
-    private Flag possessedFlag = null;
-    public Flag Flag { get => possessedFlag; }
-
-    public bool HasFlag => possessedFlag != null;
+    private Flag flag = null;
+    public Flag Flag { get => flag; }
+    public int TeamIndex => player.TeamIndex;
+    public bool HasFlag => flag != null;
     
     public void Capture(Flag flag)
     {
-        this.possessedFlag = flag;
+        flag.gameObject.SetActive(false);
+        Debug.Log(PlayerName + " captured the flag!");
+        this.flag = flag;
+    }
+
+    public void Score()
+    {
+        Debug.Log(PlayerName + " scored for team " + TeamIndex + "!");
+        flag.gameObject.SetActive(true);
+        flag = null;
+        TeamManager.Instance.Score(TeamIndex);
+        CTFManager.Instance.OnTeamScored?.Invoke();
     }
 
     #endregion

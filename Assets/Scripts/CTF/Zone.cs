@@ -8,6 +8,8 @@ public class Zone : MonoBehaviour, ITeamAffilitation
     public Flag flag;
     public Renderer rend;
 
+    public bool IsCaptured => !flag.gameObject.activeInHierarchy;
+
     private void Start()
     {
         UpdateAffiliation();
@@ -21,25 +23,23 @@ public class Zone : MonoBehaviour, ITeamAffilitation
         flag.SetTeamIndex(teamIndex);
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerStay(Collider other)
     {
         Character chara;
         if(other.gameObject.TryGetComponent(out chara))
         {
-            if(flag != null)
+            if(!IsCaptured)
             {
-                Debug.Log(chara.PlayerName + " captured the flag!");
-                chara.Capture(flag);
-                flag = null;
+                if(chara.TeamIndex != teamIndex)
+                {
+                    chara.Capture(flag);
+                }                
             }
 
-            else if(chara.HasFlag)
+            if(chara.HasFlag && chara.TeamIndex == teamIndex)
             {
-                this.flag = chara.Flag;
-                //SCORE FLAG;
-                //Feedback etc...
-            }
-            
+                chara.Score();
+            }            
         }
     }
 }

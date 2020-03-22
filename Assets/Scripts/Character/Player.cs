@@ -24,13 +24,27 @@ public class Player : MonoBehaviour
     public KeyCode attack = KeyCode.Mouse0;
     public KeyCode toggleTps = KeyCode.H;
 
+
+    [Header("Team")]
+    public int debugTeamIndex = -1;
+    public int TeamIndex => TeamManager.Instance.GetIndex(this);
+
     private string playerName = "XxkillerxX";
 
     private void Start()
     {
         InitializeCharacter();
         SetPlayerName(playerName);
-        TeamManager.Instance.JoinSmallestTeam(this);
+
+        if (debugTeamIndex >= 0)
+        {
+            TeamManager.Instance.JoinTeam(debugTeamIndex, this);
+        }
+
+        else
+        {
+            TeamManager.Instance.JoinSmallestTeam(this);
+        }
     }
 
     private void InitializeCharacter()
@@ -43,17 +57,17 @@ public class Player : MonoBehaviour
         playerName = name;
         nameText.text = playerName;
     }
-    
+
     private void Update()
     {
         Cursor.visible = cursor;
-        Cursor.lockState =  cursor ? CursorLockMode.None : CursorLockMode.Locked;
+        Cursor.lockState = cursor ? CursorLockMode.None : CursorLockMode.Locked;
         UpdateAxis();
         UpdateMouse();
 
         character.InputSpacebar(Input.GetKey(jump));
 
-        if(Input.GetKeyDown(jump))
+        if (Input.GetKeyDown(jump))
         {
             character.Jump();
         }
