@@ -14,6 +14,8 @@ public class Player : MonoBehaviour
     public float attackSensitivity = 0.2f;
 
     public float CurrentSensitivity => character.IsAttacking ? attackSensitivity : sensitivity;
+    public string PlayerName { get => playerName; }
+
     public bool cursor = true;
     private Vector2 mouse;
 
@@ -26,7 +28,14 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
+        InitializeCharacter();
         SetPlayerName(playerName);
+        TeamManager.Instance.JoinSmallestTeam(this);
+    }
+
+    private void InitializeCharacter()
+    {
+        character.Initialize(this);
     }
 
     public void SetPlayerName(string name)

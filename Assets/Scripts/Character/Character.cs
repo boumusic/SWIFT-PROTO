@@ -16,6 +16,8 @@ public class Character : MonoBehaviour
     public GameObject tps;
     public GameObject fps;
     public bool startTps = false;
+    private Player player;
+    public string PlayerName => player.PlayerName;
 
     #region Movement
 
@@ -104,6 +106,11 @@ public class Character : MonoBehaviour
 
         CheckWallClimb();
         OrientModel();
+    }
+
+    public void Initialize(Player player)
+    {
+        this.player = player;
     }
 
     private void CalculateHorizontalVelocity()
@@ -396,6 +403,20 @@ public class Character : MonoBehaviour
     private void OrientModel()
     {
         tps.transform.forward = Forward;
+    }
+
+    #endregion
+
+    #region CTF
+
+    private Flag possessedFlag = null;
+    public Flag Flag { get => possessedFlag; }
+
+    public bool HasFlag => possessedFlag != null;
+    
+    public void Capture(Flag flag)
+    {
+        this.possessedFlag = flag;
     }
 
     #endregion
