@@ -860,7 +860,7 @@ MonoBehaviour:
   cam: {fileID: 7145732497399286383}
   roll: {fileID: 7145732497536486534}
   animator: {fileID: 7145732498213220677}
-  maxRoll: -3
+  maxRoll: -2
   rollCurve:
     serializedVersion: 2
     m_Curve:

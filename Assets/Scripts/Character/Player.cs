@@ -28,6 +28,7 @@ public class Player : MonoBehaviour
     [Header("Team")]
     public int debugTeamIndex = -1;
     public int TeamIndex => TeamManager.Instance.GetIndex(this);
+    public Color TeamColor => TeamManager.Instance.GetTeamColor(TeamIndex);
 
     public Character Character { get => character;}
 

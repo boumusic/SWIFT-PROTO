@@ -72,13 +72,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 705507993}
-  m_LocalRotation: {x: 0.4706193, y: 0.013494487, z: 0.5509729, w: 0.6890315}
+  m_LocalRotation: {x: 0.75514084, y: -0.4745089, z: 0.2754602, w: 0.35878307}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 2302956484880859535}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 39.322002, y: 43.980003, z: 93.714005}
+  m_LocalEulerAnglesHint: {x: 53.444004, y: 172.714, z: 240.617}
 --- !u!108 &705507994
 Light:
   m_ObjectHideFlags: 0
@@ -150,7 +150,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2302956484880859535}
   m_Layer: 0
-  m_Name: Lighting_Tour2
+  m_Name: LIGHTING_Tour2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
