@@ -17,11 +17,13 @@ public class Character : MonoBehaviour
     public GameObject fps;
     public bool startTps = false;
     private Player player;
-    public string PlayerName => player!= null ? player.PlayerName : "NPC";
+    public string PlayerName => player != null ? player.PlayerName : "NPC";
     public Color TeamColor => player != null ? player.TeamColor : Color.grey;
 
     #region Movement
 
+    private float currentAccel;
+    private float accelProgress;
     private Vector2 lastAxis;
     private Vector2 axis;
     private Vector3 DesiredVelocity => CamRotation * new Vector3(axis.x, 0, axis.y);
@@ -122,14 +124,34 @@ public class Character : MonoBehaviour
         this.player = player;
     }
 
+    private float CurrentDecelSpeed => CurrentState == CharacterState.Grounded ? m.decelerationSpeed : m.jumpDecelerationSpeed;
+
     private void CalculateHorizontalVelocity()
     {
-        Vector2 usedAxis = IsinAir ? lastAxis : axis;
-        float x = usedAxis.x;
-        float z = usedAxis.y;
-        Vector3 target = new Vector3(x, 0, z).normalized * m.runSpeed;
-        Vector3 horiz = Vector3.SmoothDamp(velocity, target, ref currentVel, m.acceleration);
-        velocity = new Vector3(horiz.x, velocity.y, horiz.z);
+        if (CurrentState != CharacterState.WallClimbing)
+        {
+            if (axis.magnitude != 0)
+            {
+                accelProgress += Time.deltaTime * m.accelerationSpeed;
+                currentAccel = m.accelerationCurve.Evaluate(accelProgress);
+                Vector2 usedAxis = IsinAir ? lastAxis : axis;
+                float x = usedAxis.x;
+                float z = usedAxis.y;
+                Vector3 target = new Vector3(x, 0, z).normalized * m.runSpeed;
+                //Vector3 horiz = Vector3.SmoothDamp(velocity, target, ref currentVel, m.acceleration);
+                Vector3 horiz = target * currentAccel;
+                velocity = new Vector3(horiz.x, velocity.y, horiz.z);
+            }
+
+            else
+            {
+                accelProgress -= Time.deltaTime * CurrentDecelSpeed;
+                currentAccel = m.decelerationCurve.Evaluate(accelProgress);
+                velocity = new Vector3(velocity.x / currentAccel, velocity.y, velocity.z / currentAccel);
+            }
+        }
+        accelProgress = Mathf.Clamp01(accelProgress);
+        Debug.Log(accelProgress);
     }
 
     private void ResetVelocity()
@@ -285,7 +307,7 @@ public class Character : MonoBehaviour
             if (CurrentState != CharacterState.WallClimbing && spacebar)
             {
                 stateMachine.ChangeState(CharacterState.WallClimbing);
-            }            
+            }
         }
     }
 
@@ -306,7 +328,7 @@ public class Character : MonoBehaviour
             jumpLeft++;
             Jump();
         }
-        
+
         yVelocity = m.wallClimbSpeed;
         velocity = Vector3.zero;
     }

@@ -9,7 +9,12 @@ public class CharacterSettings : ScriptableObject
 
     [Header("Run")]
     public float runSpeed = 5f;
-    public float acceleration = 0.5f;
+    public float accelerationSpeed = 1f;
+    public AnimationCurve accelerationCurve;
+    
+    public float decelerationSpeed = 1f;
+    public float jumpDecelerationSpeed = 1f;
+    public AnimationCurve decelerationCurve;
 
     [Header("Jump")]
     public int jumpCount = 2;
