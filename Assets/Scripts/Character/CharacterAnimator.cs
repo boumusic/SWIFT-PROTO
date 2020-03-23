@@ -9,6 +9,7 @@ public class CharacterAnimator : MonoBehaviour
         Bool("isRunning", value);
         for (int i = 0; i < animators.Length; i++)
         {
+            if (animators[i] == null) continue;
             animators[i].SetFloat("x", planarVelocity.x);
             animators[i].SetFloat("z", planarVelocity.z);
         }
@@ -48,6 +49,7 @@ public class CharacterAnimator : MonoBehaviour
     {
         for (int i = 0; i < animators.Length; i++)
         {
+            if (animators[i] == null) continue;
             animators[i].SetTrigger(name);
         }
     }
@@ -56,6 +58,7 @@ public class CharacterAnimator : MonoBehaviour
     {
         for (int i = 0; i < animators.Length; i++)
         {
+            if (animators[i] == null) continue;
             animators[i].SetBool(name, value);
         }
     }

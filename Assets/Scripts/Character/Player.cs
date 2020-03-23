@@ -29,6 +29,8 @@ public class Player : MonoBehaviour
     public int debugTeamIndex = -1;
     public int TeamIndex => TeamManager.Instance.GetIndex(this);
 
+    public Character Character { get => character;}
+
     private string playerName = "XxkillerxX";
 
     private void Start()

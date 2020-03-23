@@ -11,7 +11,7 @@ public class MultiplayerMenu : MonoBehaviour
 {
 	public InputField ipAddress = null;
 	public InputField portNumber = null;
-    public InputField playerName = null;
+    public InputField playerName;
 	public bool DontChangeSceneOnConnect = false;
 	public string masterServerHost = string.Empty;
 	public ushort masterServerPort = 15940;
@@ -25,6 +25,7 @@ public class MultiplayerMenu : MonoBehaviour
 	public GameObject networkManager = null;
 	public GameObject[] ToggledButtons;
 	private NetworkManager mgr = null;
+	private NetWorker server;
 
 	private List<Button> _uiButtons = new List<Button>();
 	private bool _matchmaking = false;
@@ -135,8 +136,6 @@ public class MultiplayerMenu : MonoBehaviour
 
 	public void Host()
 	{
-		NetWorker server;
-
 		if (useTCP)
 		{
 			server = new TCPServer(64);
@@ -149,7 +148,7 @@ public class MultiplayerMenu : MonoBehaviour
 			if (natServerHost.Trim().Length == 0)
 				((UDPServer)server).Connect(ipAddress.text, ushort.Parse(portNumber.text));
 			else
-				((UDPServer)server).Connect(natHost: natServerHost, natPort: natServerPort);
+				((UDPServer)server).Connect(port: ushort.Parse(portNumber.text), natHost: natServerHost, natPort: natServerPort);
 		}
 
 		server.playerTimeout += (player, sender) =>
@@ -163,6 +162,7 @@ public class MultiplayerMenu : MonoBehaviour
 
 	private void Update()
 	{
+        /*
 		if (Input.GetKeyDown(KeyCode.H))
 			Host();
 		else if (Input.GetKeyDown(KeyCode.C))
@@ -172,7 +172,7 @@ public class MultiplayerMenu : MonoBehaviour
 			NetWorker.localServerLocated -= TestLocalServerFind;
 			NetWorker.localServerLocated += TestLocalServerFind;
 			NetWorker.RefreshLocalUdpListings();
-		}
+		}*/
 	}
 
 	private void TestLocalServerFind(NetWorker.BroadcastEndpoints endpoint, NetWorker sender)
@@ -239,12 +239,14 @@ public class MultiplayerMenu : MonoBehaviour
 
     public void ChangePlayerName()
     {
-        PlayerInfoManager.Instance.ChangeName(playerName.text);
+        PlayerInfoManager.Instance.playerName = playerName.text;
     }
 
 	private void OnApplicationQuit()
 	{
 		if (getLocalNetworkConnections)
 			NetWorker.EndSession();
+
+		if (server != null) server.Disconnect(true);
 	}
 }
