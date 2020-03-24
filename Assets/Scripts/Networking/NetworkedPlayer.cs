@@ -40,23 +40,35 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
             nameText.GetComponentInParent<LookAtCamera>().cam = Camera.main.transform;
 
             tpsCharacter.SetActive(true);
+
+            networkObject.Networker.disconnected += x =>
+            {
+                networkObject.Destroy();
+            };
         }
         else
         {
-            Debug.Log(networkObject.UpdateInterval);
             networkObject.UpdateInterval = (ulong)16.6667f;
 
             SetName();
 
-            playerCharacter.OnAttack += () =>
+            characterAnimator.onLandAnim += () =>
             {
-                networkObject.SendRpc(RPC_ATTACK, Receivers.All);
+                networkObject.SendRpc(RPC_LAND, Receivers.Others);
+            };
+            characterAnimator.onJumpAnim += () =>
+            {
+                networkObject.SendRpc(RPC_JUMP, Receivers.Others);
+            };
+            characterAnimator.onAttackAnim += () =>
+            {
+                networkObject.SendRpc(RPC_ATTACK, Receivers.Others);
+            };
+            characterAnimator.onDeathAnim += () =>
+            {
+                networkObject.SendRpc(RPC_DIE, Receivers.Others);
             };
 
-            networkObject.Networker.disconnected += x =>
-            {
-                networkObject.SendRpc(RPC_DESTROY, Receivers.All);
-            };
         }
     }
 
@@ -71,12 +83,20 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
 
             // position
             characterTransform.position = networkObject.position;
+
             // run animation
-            Vector3 velocity = characterTransform.position - previousPosition;
-            bool isRunning = velocity.magnitude > .05f;
-            characterAnimator.Run(isRunning, tpsCharacter.transform.InverseTransformDirection(velocity.normalized));
+            Vector3 velocity = networkObject.localVelocity;
+
+            Vector3 runVelocity = velocity;
+            runVelocity.y = 0;
+            bool isRunning = runVelocity.magnitude > 0.005f;
+
+            characterAnimator.Run(isRunning, velocity);
+
             previousPosition = characterTransform.position;
 
+            // climb animation
+            characterAnimator.WallClimb(networkObject.climbing);
         }
         else
         {
@@ -85,7 +105,6 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
                 player.enabled = false;
-                player.Character.playerCamera.InputMouse(Vector2.zero);
             }
             if (Input.GetMouseButtonDown(0) &&
             Application.isFocused)
@@ -103,6 +122,8 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
         {
             networkObject.position = characterTransform.position;
             networkObject.rotation = tpsCharacter.transform.rotation;
+            networkObject.localVelocity = playerCharacter.Velocity;
+            networkObject.climbing = playerCharacter.CurrentState == CharacterState.WallClimbing;
         }
     }
 
@@ -118,16 +139,33 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
 
     public override void Attack(RpcArgs args)
     {
-    }
-
-    public override void Destroy(RpcArgs args)
-    {
-        Destroy(this.gameObject);
+        characterAnimator.Attack();
     }
 
     public override void ChangeName(RpcArgs args)
     {
         playerName = args.GetAt<string>(0);
         nameText.text = playerName;
+    }
+
+    public override void Jump(RpcArgs args)
+    {
+        Debug.Log(networkObject.IsOwner ? "owner " : "remote " + "is jumping");
+        characterAnimator.Jump();
+    }
+
+    public override void Land(RpcArgs args)
+    {
+        characterAnimator.Land();
+    }
+
+    public override void Die(RpcArgs args)
+    {
+        characterAnimator.Death();
+    }
+
+    public override void Destroy(RpcArgs args)
+    {
+        throw new System.NotImplementedException();
     }
 }

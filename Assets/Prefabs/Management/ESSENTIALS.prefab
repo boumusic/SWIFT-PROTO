@@ -270,6 +270,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Chat Maker
       objectReference: {fileID: 0}
+    - target: {fileID: 1000012382896100, guid: e77f53b2a5e4fbe46ae85581b9b0d11d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4000011697456928, guid: e77f53b2a5e4fbe46ae85581b9b0d11d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

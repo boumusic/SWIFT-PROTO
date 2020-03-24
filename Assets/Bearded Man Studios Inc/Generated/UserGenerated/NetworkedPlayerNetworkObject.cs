@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedInterpol("{\"inter\":[0.3,0.3]")]
+	[GeneratedInterpol("{\"inter\":[0.5,0.5,0,0]")]
 	public partial class NetworkedPlayerNetworkObject : NetworkObject
 	{
 		public const int IDENTITY = 7;
@@ -18,7 +18,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		[ForgeGeneratedField]
 		private Vector3 _position;
 		public event FieldEvent<Vector3> positionChanged;
-		public InterpolateVector3 positionInterpolation = new InterpolateVector3() { LerpT = 0.3f, Enabled = true };
+		public InterpolateVector3 positionInterpolation = new InterpolateVector3() { LerpT = 0.5f, Enabled = true };
 		public Vector3 position
 		{
 			get { return _position; }
@@ -49,7 +49,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		[ForgeGeneratedField]
 		private Quaternion _rotation;
 		public event FieldEvent<Quaternion> rotationChanged;
-		public InterpolateQuaternion rotationInterpolation = new InterpolateQuaternion() { LerpT = 0.3f, Enabled = true };
+		public InterpolateQuaternion rotationInterpolation = new InterpolateQuaternion() { LerpT = 0.5f, Enabled = true };
 		public Quaternion rotation
 		{
 			get { return _rotation; }
@@ -77,6 +77,68 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			if (rotationChanged != null) rotationChanged(_rotation, timestep);
 			if (fieldAltered != null) fieldAltered("rotation", _rotation, timestep);
 		}
+		[ForgeGeneratedField]
+		private Vector3 _localVelocity;
+		public event FieldEvent<Vector3> localVelocityChanged;
+		public InterpolateVector3 localVelocityInterpolation = new InterpolateVector3() { LerpT = 0f, Enabled = false };
+		public Vector3 localVelocity
+		{
+			get { return _localVelocity; }
+			set
+			{
+				// Don't do anything if the value is the same
+				if (_localVelocity == value)
+					return;
+
+				// Mark the field as dirty for the network to transmit
+				_dirtyFields[0] |= 0x4;
+				_localVelocity = value;
+				hasDirtyFields = true;
+			}
+		}
+
+		public void SetlocalVelocityDirty()
+		{
+			_dirtyFields[0] |= 0x4;
+			hasDirtyFields = true;
+		}
+
+		private void RunChange_localVelocity(ulong timestep)
+		{
+			if (localVelocityChanged != null) localVelocityChanged(_localVelocity, timestep);
+			if (fieldAltered != null) fieldAltered("localVelocity", _localVelocity, timestep);
+		}
+		[ForgeGeneratedField]
+		private bool _climbing;
+		public event FieldEvent<bool> climbingChanged;
+		public Interpolated<bool> climbingInterpolation = new Interpolated<bool>() { LerpT = 0f, Enabled = false };
+		public bool climbing
+		{
+			get { return _climbing; }
+			set
+			{
+				// Don't do anything if the value is the same
+				if (_climbing == value)
+					return;
+
+				// Mark the field as dirty for the network to transmit
+				_dirtyFields[0] |= 0x8;
+				_climbing = value;
+				hasDirtyFields = true;
+			}
+		}
+
+		public void SetclimbingDirty()
+		{
+			_dirtyFields[0] |= 0x8;
+			hasDirtyFields = true;
+		}
+
+		private void RunChange_climbing(ulong timestep)
+		{
+			if (climbingChanged != null) climbingChanged(_climbing, timestep);
+			if (fieldAltered != null) fieldAltered("climbing", _climbing, timestep);
+		}
 
 		protected override void OwnershipChanged()
 		{
@@ -88,6 +150,8 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		{
 			positionInterpolation.current = positionInterpolation.target;
 			rotationInterpolation.current = rotationInterpolation.target;
+			localVelocityInterpolation.current = localVelocityInterpolation.target;
+			climbingInterpolation.current = climbingInterpolation.target;
 		}
 
 		public override int UniqueIdentity { get { return IDENTITY; } }
@@ -96,6 +160,8 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		{
 			UnityObjectMapper.Instance.MapBytes(data, _position);
 			UnityObjectMapper.Instance.MapBytes(data, _rotation);
+			UnityObjectMapper.Instance.MapBytes(data, _localVelocity);
+			UnityObjectMapper.Instance.MapBytes(data, _climbing);
 
 			return data;
 		}
@@ -110,6 +176,14 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			rotationInterpolation.current = _rotation;
 			rotationInterpolation.target = _rotation;
 			RunChange_rotation(timestep);
+			_localVelocity = UnityObjectMapper.Instance.Map<Vector3>(payload);
+			localVelocityInterpolation.current = _localVelocity;
+			localVelocityInterpolation.target = _localVelocity;
+			RunChange_localVelocity(timestep);
+			_climbing = UnityObjectMapper.Instance.Map<bool>(payload);
+			climbingInterpolation.current = _climbing;
+			climbingInterpolation.target = _climbing;
+			RunChange_climbing(timestep);
 		}
 
 		protected override BMSByte SerializeDirtyFields()
@@ -121,6 +195,10 @@ namespace BeardedManStudios.Forge.Networking.Generated
 				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _position);
 			if ((0x2 & _dirtyFields[0]) != 0)
 				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _rotation);
+			if ((0x4 & _dirtyFields[0]) != 0)
+				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _localVelocity);
+			if ((0x8 & _dirtyFields[0]) != 0)
+				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _climbing);
 
 			// Reset all the dirty fields
 			for (int i = 0; i < _dirtyFields.Length; i++)
@@ -163,6 +241,32 @@ namespace BeardedManStudios.Forge.Networking.Generated
 					RunChange_rotation(timestep);
 				}
 			}
+			if ((0x4 & readDirtyFlags[0]) != 0)
+			{
+				if (localVelocityInterpolation.Enabled)
+				{
+					localVelocityInterpolation.target = UnityObjectMapper.Instance.Map<Vector3>(data);
+					localVelocityInterpolation.Timestep = timestep;
+				}
+				else
+				{
+					_localVelocity = UnityObjectMapper.Instance.Map<Vector3>(data);
+					RunChange_localVelocity(timestep);
+				}
+			}
+			if ((0x8 & readDirtyFlags[0]) != 0)
+			{
+				if (climbingInterpolation.Enabled)
+				{
+					climbingInterpolation.target = UnityObjectMapper.Instance.Map<bool>(data);
+					climbingInterpolation.Timestep = timestep;
+				}
+				else
+				{
+					_climbing = UnityObjectMapper.Instance.Map<bool>(data);
+					RunChange_climbing(timestep);
+				}
+			}
 		}
 
 		public override void InterpolateUpdate()
@@ -179,6 +283,16 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			{
 				_rotation = (Quaternion)rotationInterpolation.Interpolate();
 				//RunChange_rotation(rotationInterpolation.Timestep);
+			}
+			if (localVelocityInterpolation.Enabled && !localVelocityInterpolation.current.UnityNear(localVelocityInterpolation.target, 0.0015f))
+			{
+				_localVelocity = (Vector3)localVelocityInterpolation.Interpolate();
+				//RunChange_localVelocity(localVelocityInterpolation.Timestep);
+			}
+			if (climbingInterpolation.Enabled && !climbingInterpolation.current.UnityNear(climbingInterpolation.target, 0.0015f))
+			{
+				_climbing = (bool)climbingInterpolation.Interpolate();
+				//RunChange_climbing(climbingInterpolation.Timestep);
 			}
 		}
 

@@ -6,7 +6,7 @@ public class ChatMaker : MonoBehaviour
 {
 	private void Awake()
 	{
-		SceneManager.sceneLoaded += CreateInlineChat;
+		if (NetworkManager.Instance.IsServer) SceneManager.sceneLoaded += CreateInlineChat;
 	}
 
 	private void CreateInlineChat(Scene arg0, LoadSceneMode arg1)
