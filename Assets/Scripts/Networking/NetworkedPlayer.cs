@@ -22,7 +22,13 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
     public CharacterAnimator characterAnimator;
     public TextMeshPro nameText;
 
-    private string playerName = "DefaultName";
+    public string playerName = "DefaultName";
+
+    // variables
+
+    public int teamIndex;
+    public Flag flag;
+    public bool HasFlag => flag != null;
 
     protected override void NetworkStart()
     {
