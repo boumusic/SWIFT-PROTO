@@ -156,7 +156,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  dashStrength: 50
+  dashStrength: 30
   dashCurve:
     serializedVersion: 2
     m_Curve:
@@ -164,15 +164,15 @@ MonoBehaviour:
       time: 0.016544405
       value: 1
       inSlope: 0.012326627
-      outSlope: -0.1101991
+      outSlope: -0.2841106
       tangentMode: 65
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.5186554
-      value: 0.9446678
-      inSlope: -0.1101991
+      time: 0.36240542
+      value: 0.9017372
+      inSlope: -0.2841106
       outSlope: -2.2305377
       tangentMode: 5
       weightedMode: 0
@@ -200,8 +200,9 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   dashCooldown: 3
-  dashProgressSpeed: 5
+  dashProgressSpeed: 4
   resetDashOnLand: 1
+  resetDashOnWallclimb: 1
   groundRaycastDown: 0.36
   groundRaycastUp: 0.43
   groundCastRadius: 0.18

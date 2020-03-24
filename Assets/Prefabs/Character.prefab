@@ -550,15 +550,6 @@ MonoBehaviour:
         inWeight: 0
         outWeight: 0.2122653
       - serializedVersion: 3
-        time: 0.046073914
-        value: 1.4266129
-        inSlope: 2.8837445
-        outSlope: 2.8837445
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0.40770108
-      - serializedVersion: 3
         time: 0.10292643
         value: 0.9734821
         inSlope: -0.5226799
@@ -588,8 +579,8 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    duration: 0.8
-    multiplier: 0.9
+    duration: 1
+    multiplier: 1.1
   usePostProcess: 0
   postProcessFeedback:
     delay: 0
