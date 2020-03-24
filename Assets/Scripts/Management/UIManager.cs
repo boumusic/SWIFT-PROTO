@@ -16,6 +16,8 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    public Player owner;
+
     [Header("Components")]
     public Animator hitMarker;
     public UIGeneralMessage generalMessage;
@@ -25,6 +27,8 @@ public class UIManager : MonoBehaviour
     public Transform killFeedParent;
     public float killFeedSpacing = 100f;
     public float killFeedOffset = 50f;
+
+    [Header("Dash")]
 
     private List<UIKillFeed> killFeeds = new List<UIKillFeed>();
 

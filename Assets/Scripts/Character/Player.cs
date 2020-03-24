@@ -22,6 +22,7 @@ public class Player : MonoBehaviour
     [Header("Inputs")]
     public KeyCode jump = KeyCode.Space;
     public KeyCode attack = KeyCode.Mouse0;
+    public KeyCode dash = KeyCode.LeftShift;
     public KeyCode toggleTps = KeyCode.H;
 
 
@@ -78,6 +79,11 @@ public class Player : MonoBehaviour
         if (Input.GetKeyDown(attack))
         {
             character.TryAttack();
+        }
+
+        if (Input.GetKeyDown(dash))
+        {
+            character.StartDash();
         }
 
         if (Input.GetKeyDown(toggleTps))
