@@ -17,10 +17,13 @@ public class Character : MonoBehaviour
     public GameObject fps;
     public bool startTps = false;
     private Player player;
-    public string PlayerName => player.PlayerName;
+    public string PlayerName => player != null ? player.PlayerName : "NPC";
+    public Color TeamColor => player != null ? player.TeamColor : Color.grey;
 
     #region Movement
 
+    private float currentAccel;
+    private float accelProgress;
     private Vector2 lastAxis;
     private Vector2 axis;
     private Vector3 DesiredVelocity => CamRotation * new Vector3(axis.x, 0, axis.y);
@@ -66,21 +69,24 @@ public class Character : MonoBehaviour
     private int healthPointsLeft;
     public Action OnAttack;
     public Action OnKill;
+    public Action OnScore;
 
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
         Vector3 origin = FeetOrigin;
         //Gizmos.DrawWireCube(origin, CastBox * m.groundCastRadius * 2);
-        Gizmos.DrawLine(transform.position + Vector3.up, transform.position + Vector3.up + DesiredVelocity * m.slideWallCastLength);
+        //Gizmos.DrawLine(transform.position + Vector3.up, transform.position + Vector3.up + DesiredVelocity * m.slideWallCastLength);
 
         if (hits.Length > 0)
         {
-            Vector3 point = hits[0].point;
-            Gizmos.DrawLine(point, point + hits[0].normal * 10);
+            //Vector3 point = hits[0].point;
+            //Gizmos.DrawLine(point, point + hits[0].normal * 10);
 
-            Gizmos.color = Color.green;
-            Gizmos.DrawLine(point, point + wallSlideVector);
+            //Gizmos.color = Color.green;
+            //Gizmos.DrawLine(point, point + wallSlideVector);
+
+            Gizmos.DrawLine(transform.position, transform.position + WallUp * 10);
         }
     }
 
@@ -93,7 +99,7 @@ public class Character : MonoBehaviour
         stateMachine.ChangeState(CharacterState.Grounded);
 
         tps.SetActive(startTps);
-        OnKill += UIManager.Instance.KillPerformed;
+        OnKill += UIManager.Instance.HitMarker;
     }
 
     private void Update()
@@ -108,30 +114,58 @@ public class Character : MonoBehaviour
         OrientModel();
     }
 
+    private void FixedUpdate()
+    {
+        ApplyVelocity();
+    }
+
     public void Initialize(Player player)
     {
         this.player = player;
     }
 
+    private float CurrentDecelSpeed => CurrentState == CharacterState.Grounded ? m.decelerationSpeed : m.jumpDecelerationSpeed;
+
     private void CalculateHorizontalVelocity()
     {
-        Vector2 usedAxis = IsinAir ? lastAxis : axis;
-        float x = usedAxis.x;
-        float z = usedAxis.y;
-        Vector3 target = new Vector3(x, 0, z).normalized * m.runSpeed;
-        Vector3 horiz = Vector3.SmoothDamp(velocity, target, ref currentVel, m.acceleration);
-        velocity = new Vector3(horiz.x, velocity.y, horiz.z);
+        if (CurrentState != CharacterState.WallClimbing)
+        {
+            if (axis.magnitude != 0)
+            {
+                accelProgress += Time.deltaTime * m.accelerationSpeed;
+                currentAccel = m.accelerationCurve.Evaluate(accelProgress);
+                Vector2 usedAxis = IsinAir ? lastAxis : axis;
+                float x = usedAxis.x;
+                float z = usedAxis.y;
+                Vector3 target = new Vector3(x, 0, z).normalized * m.runSpeed;
+                //Vector3 horiz = Vector3.SmoothDamp(velocity, target, ref currentVel, m.acceleration);
+                Vector3 horiz = target * currentAccel;
+                velocity = new Vector3(horiz.x, velocity.y, horiz.z);
+            }
+
+            else
+            {
+                accelProgress -= Time.deltaTime * CurrentDecelSpeed;
+                currentAccel = m.decelerationCurve.Evaluate(accelProgress);
+                velocity = new Vector3(velocity.x / currentAccel, velocity.y, velocity.z / currentAccel);
+            }
+        }
+        accelProgress = Mathf.Clamp01(accelProgress);
+        Debug.Log(accelProgress);
     }
 
-    private void FixedUpdate()
+    private void ResetVelocity()
     {
-        ApplyVelocity();
+        velocity = Vector3.zero;
+        yVelocity = 0f;
     }
 
     private void ApplyVelocity()
     {
         body.velocity = FinalVelocity;
     }
+
+    #region Input
 
     public void InputAxis(Vector2 axis)
     {
@@ -146,6 +180,8 @@ public class Character : MonoBehaviour
     {
         spacebar = space;
     }
+
+    #endregion
 
     #region Ground
 
@@ -227,6 +263,8 @@ public class Character : MonoBehaviour
 
     #endregion
 
+    #region Falling
+
     private void Falling_Enter()
     {
         fallProgress = 0f;
@@ -242,6 +280,8 @@ public class Character : MonoBehaviour
         }
     }
 
+    #endregion
+
     public bool CastGround()
     {
         if (Physics.BoxCast(FeetOrigin, CastBox * m.groundCastRadius, -Vector3.up, out hit, Quaternion.identity, m.groundRaycastDown, m.groundMask))
@@ -256,12 +296,6 @@ public class Character : MonoBehaviour
     private void SnapToGround()
     {
         body.position = new Vector3(transform.position.x, hit.point.y, transform.position.z);
-    }
-
-    private void ResetVelocity()
-    {
-        velocity = Vector3.zero;
-        yVelocity = 0f;
     }
 
     #region Wall
@@ -283,11 +317,16 @@ public class Character : MonoBehaviour
         jumpLeft++;
     }
 
+    private Vector3 WallNormal => hits.Length > 0 ? hits[0].normal : Vector3.zero;
+    private Vector3 WallUp => Vector3.Cross(WallNormal, -Right);
+
     private void WallClimbing_Update()
     {
-        if (!spacebar)
+        if (!spacebar || !CastWall())
         {
-            stateMachine.ChangeState(CharacterState.Falling);
+            //stateMachine.ChangeState(CharacterState.Falling);
+            jumpLeft++;
+            Jump();
         }
 
         yVelocity = m.wallClimbSpeed;
@@ -299,13 +338,26 @@ public class Character : MonoBehaviour
         animator.WallClimb(false);
     }
 
-    #endregion
-
     public bool CastWall()
     {
-        hits = Physics.RaycastAll(transform.position + Vector3.up, Forward, m.slideWallCastLength);
+        RaycastHit[] down = Physics.RaycastAll(transform.position, Forward, m.slideWallCastLength);
+        RaycastHit[] up = Physics.RaycastAll(transform.position + Vector3.up * 2f, Forward, m.slideWallCastLength);
+        List<RaycastHit> final = new List<RaycastHit>();
+        for (int i = 0; i < down.Length; i++)
+        {
+            final.Add(down[i]);
+        }
+
+        for (int i = 0; i < up.Length; i++)
+        {
+            final.Add(up[i]);
+        }
+
+        hits = final.ToArray();
         return hits.Length > 0;
     }
+
+    #endregion
 
     #region Health
 
@@ -345,7 +397,7 @@ public class Character : MonoBehaviour
         if (CurrentState != CharacterState.WallClimbing && !isAttacking)
         {
             animator.Attack();
-            StartCoroutine(AttackDelay());           
+            StartCoroutine(AttackDelay());
         }
     }
 
@@ -372,6 +424,7 @@ public class Character : MonoBehaviour
                         {
                             chara.TakeDamage(m.damage);
                             OnKill?.Invoke();
+                            UIManager.Instance.DisplayKillFeed(this, chara);
                         }
                     }
                 }
@@ -413,7 +466,7 @@ public class Character : MonoBehaviour
     public Flag Flag { get => flag; }
     public int TeamIndex => player.TeamIndex;
     public bool HasFlag => flag != null;
-    
+
     public void Capture(Flag flag)
     {
         flag.gameObject.SetActive(false);
@@ -429,7 +482,7 @@ public class Character : MonoBehaviour
         flag = null;
         TeamManager.Instance.Score(TeamIndex);
         CTFManager.Instance.OnTeamScored?.Invoke();
-        
+        OnScore?.Invoke();
     }
 
     #endregion

@@ -1,8 +1,14 @@
 ﻿using UnityEngine;
+using System;
 
 public class CharacterAnimator : MonoBehaviour
 {
     public Animator[] animators;
+
+    public Action onLandAnim;
+    public Action onJumpAnim;
+    public Action onAttackAnim;
+    public Action onDeathAnim;
     
     public void Run(bool value, Vector3 planarVelocity)
     {
@@ -23,21 +29,25 @@ public class CharacterAnimator : MonoBehaviour
     public void Attack()
     {
         Trigger("Attack");
+        onAttackAnim?.Invoke();
     }
 
     public void Jump()
     {
         Trigger("Jump");
+        onJumpAnim?.Invoke();
     }
 
     public void Land()
     {
         Trigger("Land");
+        onLandAnim?.Invoke();
     }
 
     public void Death()
     {
         Trigger("Death");
+        onDeathAnim?.Invoke();
     }
 
     public void WallClimb(bool climb)

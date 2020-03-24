@@ -12,10 +12,69 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fc0041c472b09c42abbf9790ff77b54, type: 3}
   m_Name: Character
   m_EditorClassIdentifier: 
-  runSpeed: 13
-  acceleration: 0.1
+  runSpeed: 8.5
+  accelerationSpeed: 0.3
+  accelerationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.10502136
+      value: 0.64537245
+      inSlope: 1.3840828
+      outSlope: 1.3840828
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  decelerationSpeed: 0.5
+  jumpDecelerationSpeed: 0.1
+  decelerationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1.5
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: -0.96695507
+      outSlope: -0.96695507
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.105474055
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   jumpCount: 2
-  jumpStrength: 28
+  jumpStrength: 20
   jumpProgressSpeed: 3.4
   jumpCurve:
     serializedVersion: 2
@@ -69,7 +128,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   resetVelocityOnJump: 1
-  fallStrength: 35
+  fallStrength: 28
   fallProgressSpeed: 1.2
   fallCurve:
     serializedVersion: 2
@@ -148,11 +207,11 @@ MonoBehaviour:
     m_RotationOrder: 4
   minSlideWallSpeed: 0
   maxSlideWallSpeed: 80
-  wallClimbSpeed: 15
+  wallClimbSpeed: 12
   healthPoints: 1
   attackDelay: 0.03
   damage: 1
-  attackWidth: 2
+  attackWidth: 1.5
   attackLength: 2
   attackHeight: 2
   attackDuration: 0.7

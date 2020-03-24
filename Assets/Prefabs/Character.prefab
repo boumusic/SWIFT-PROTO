@@ -860,7 +860,7 @@ MonoBehaviour:
   cam: {fileID: 7145732497399286383}
   roll: {fileID: 7145732497536486534}
   animator: {fileID: 7145732498213220677}
-  maxRoll: -3
+  maxRoll: -2
   rollCurve:
     serializedVersion: 2
     m_Curve:
@@ -887,7 +887,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   smoothnessRoll: 0.3
   minFov: 80
-  maxFov: 95
+  maxFov: 110
   fovSmooth: 0.5
   tpsDistance: 2.5
   smoothnessCamZ: 0.2
