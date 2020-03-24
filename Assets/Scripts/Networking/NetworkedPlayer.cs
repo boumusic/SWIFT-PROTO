@@ -43,6 +43,9 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
         }
         else
         {
+            Debug.Log(networkObject.UpdateInterval);
+            networkObject.UpdateInterval = (ulong)16.6667f;
+
             SetName();
 
             playerCharacter.OnAttack += () =>
