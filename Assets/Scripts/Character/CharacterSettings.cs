@@ -22,8 +22,10 @@ public class CharacterSettings : ScriptableObject
     public float jumpProgressSpeed = 2f;
     public AnimationCurve jumpCurve = new AnimationCurve();
     public bool resetVelocityOnJump = false;
+    public float coyoteTime = 0.3f;
 
     [Header("Fall")]
+    public float airControl = 0.7f;
     public float fallStrength = 2f;
     public float fallProgressSpeed = 1f;
     public AnimationCurve fallCurve;
