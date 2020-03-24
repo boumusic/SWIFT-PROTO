@@ -125,6 +125,7 @@ public class Character : MonoBehaviour
     }
 
     private float CurrentDecelSpeed => CurrentState == CharacterState.Grounded ? m.decelerationSpeed : m.jumpDecelerationSpeed;
+    private float CurrentAccelSpeed => CurrentState == CharacterState.Grounded ? m.accelerationSpeed : m.accelerationSpeed * m.airControl;
 
     private void CalculateHorizontalVelocity()
     {
@@ -151,7 +152,6 @@ public class Character : MonoBehaviour
             }
         }
         accelProgress = Mathf.Clamp01(accelProgress);
-        Debug.Log(accelProgress);
     }
 
     private void ResetVelocity()
@@ -187,6 +187,7 @@ public class Character : MonoBehaviour
 
     private void Grounded_Enter()
     {
+        TryStopCoyote();
         yVelocity = 0f;
         ResetJumpCount();
         animator.Land();
@@ -195,11 +196,13 @@ public class Character : MonoBehaviour
 
     private Vector3 wallSlideVector;
 
+    private Coroutine coyote;
+
     private void Grounded_Update()
     {
         if (!CastGround())
         {
-            jumpLeft--;
+            if (coyote == null) coyote = StartCoroutine(CoyoteTime());
             stateMachine.ChangeState(CharacterState.Falling);
         }
 
@@ -221,6 +224,17 @@ public class Character : MonoBehaviour
 
         else
             WallSlideRotation = Quaternion.identity;
+    }
+
+    private void TryStopCoyote()
+    {
+        if (coyote != null) StopCoroutine(coyote);
+    }
+
+    private IEnumerator CoyoteTime()
+    {
+        yield return new WaitForSeconds(m.coyoteTime);
+        jumpLeft = 1;
     }
 
     #endregion
@@ -378,14 +392,39 @@ public class Character : MonoBehaviour
     }
 
     private bool isDead = false;
+
     private void Die()
     {
         if (!isDead)
         {
             isDead = true;
             animator.Death();
-            //gameObject.SetActive(false);
+            RespawnManager.Instance.Death(this);
+            StartCoroutine(DeathAnim());
         }
+    }
+
+    private IEnumerator DeathAnim()
+    {
+        yield return new WaitForSeconds(1.5f);
+        Disable();
+    }
+
+    private void Disable()
+    {
+        gameObject.SetActive(false);
+    }
+    
+    public void Respawn()
+    {
+        gameObject.SetActive(true);
+        isDead = false;
+    }
+
+    public void Respawn(Vector3 pos)
+    {
+        transform.position = pos;
+        Respawn();
     }
 
     #endregion
