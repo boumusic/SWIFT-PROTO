@@ -35,7 +35,7 @@ public class Player : MonoBehaviour
 
     private string playerName = "XxkillerxX";
 
-    private void Start()
+    private void Awake()
     {
         InitializeCharacter();
         SetPlayerName(playerName);

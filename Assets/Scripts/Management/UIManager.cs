@@ -1,11 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
     public bool debugLogMessages = false;
-    
+
     private static UIManager instance;
     public static UIManager Instance
     {
@@ -16,7 +17,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public Player owner;
+    public Player player;
 
     [Header("Components")]
     public Animator hitMarker;
@@ -29,12 +30,19 @@ public class UIManager : MonoBehaviour
     public float killFeedOffset = 50f;
 
     [Header("Dash")]
-
+    public Image dashCd;
+    public Image dashReset;
     private List<UIKillFeed> killFeeds = new List<UIKillFeed>();
+
+    public void FeedPlayer(Player p)
+    {
+        player = p;
+    }
 
     private void Update()
     {
         PositionKillFeeds();
+        UpdateDashCooldown();
     }
 
     public void HitMarker()
@@ -47,6 +55,20 @@ public class UIManager : MonoBehaviour
         message = message.ToUpper();
         if (debugLogMessages) Debug.Log(message);
         generalMessage.Message(message);
+    }
+
+    public void UpdateDashCooldown()
+    {
+        if (player)
+        {
+            dashCd.fillAmount = player.Character.DashCooldownProgress;
+            dashReset.gameObject.SetActive(player.Character.ResetDash);
+
+            float a = player.Character.CanDash ? 0.5f : 0.05f;
+            Color col = new Color(1, 1, 1, a);
+            dashReset.color = col;
+            dashCd.color = col;
+        }
     }
 
     #region KillFeed

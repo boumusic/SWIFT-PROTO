@@ -37,6 +37,7 @@ public class CharacterSettings : ScriptableObject
     public float dashCooldown = 3f;
     public float dashProgressSpeed = 2f;
     public bool resetDashOnLand = true;
+    public bool resetDashOnWallclimb = true;
 
     [Header("Grounded")]
     public float groundRaycastDown = 1f;

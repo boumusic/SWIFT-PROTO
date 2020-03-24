@@ -11,6 +11,7 @@ public class Character : MonoBehaviour
     public CharacterSettings m;
     public PlayerCamera playerCamera;
     public CharacterAnimator animator;
+    public CharacterFeedbacks feedbacks;
 
     [Header("Visuals")]
     public GameObject tps;
@@ -108,6 +109,8 @@ public class Character : MonoBehaviour
 
         tps.SetActive(startTps);
         OnKill += UIManager.Instance.HitMarker;
+
+        dashCooldownProgress = 1f;
     }
 
     private void Update()
@@ -120,6 +123,7 @@ public class Character : MonoBehaviour
 
         CheckWallClimb();
         OrientModel();
+        DashCooldown();
     }
 
     private void FixedUpdate()
@@ -325,7 +329,10 @@ public class Character : MonoBehaviour
     private Vector2 dashAxis;
     private bool resetDash = true;
     private bool cooldownDashDone = true;
-    private bool CanDash => resetDash && cooldownDashDone;
+    public bool CanDash => resetDash && cooldownDashDone;
+    private float dashCooldownProgress = 1f;
+    public float DashCooldownProgress => dashCooldownProgress;
+    public bool ResetDash => resetDash;
 
     public void StartDash()
     {
@@ -345,9 +352,10 @@ public class Character : MonoBehaviour
             dashAxis = new Vector2(transform.forward.x, transform.forward.z);
 
         dashProgress = 0f;
+        dashCooldownProgress = 0f;
         cooldownDashDone = false;
         resetDash = false;
-        StartCoroutine(DashCooldown());
+        feedbacks.Play("Dash");
     }
 
     private void Dashing_Update()
@@ -360,10 +368,20 @@ public class Character : MonoBehaviour
         }
     }
 
-    private IEnumerator DashCooldown()
+    private void DashCooldown()
     {
-        yield return new WaitForSeconds(m.dashCooldown);
-        cooldownDashDone = true;
+        if(!cooldownDashDone)
+        {
+            if(dashCooldownProgress < 1f)
+            {
+                dashCooldownProgress += Time.deltaTime / m.dashCooldown;
+            }
+
+            else
+            {
+                cooldownDashDone = true;
+            }
+        }
     }
 
     #endregion
@@ -383,6 +401,7 @@ public class Character : MonoBehaviour
 
     private void WallClimbing_Enter()
     {
+        if (m.resetDashOnWallclimb) resetDash = true;
         animator.WallClimb(true);
         jumpLeft++;
     }
@@ -410,8 +429,8 @@ public class Character : MonoBehaviour
 
     public bool CastWall()
     {
-        RaycastHit[] down = Physics.RaycastAll(transform.position, Forward, m.slideWallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
-        RaycastHit[] up = Physics.RaycastAll(transform.position + Vector3.up * 2f, Forward, m.slideWallCastLength ,m.groundMask, QueryTriggerInteraction.Ignore);
+        RaycastHit[] down = Physics.RaycastAll(transform.position, DesiredVelocity, m.slideWallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
+        RaycastHit[] up = Physics.RaycastAll(transform.position + Vector3.up * 2f, DesiredVelocity, m.slideWallCastLength ,m.groundMask, QueryTriggerInteraction.Ignore);
         List<RaycastHit> final = new List<RaycastHit>();
         for (int i = 0; i < down.Length; i++)
         {
