@@ -39,6 +39,10 @@ namespace BeardedManStudios.Forge.Networking.Generated
 						availableCallback = true;
 						obj = new NetworkCameraNetworkObject(networker, id, frame);
 						break;
+					case NetworkedFlagNetworkObject.IDENTITY:
+						availableCallback = true;
+						obj = new NetworkedFlagNetworkObject(networker, id, frame);
+						break;
 					case NetworkedPlayerNetworkObject.IDENTITY:
 						availableCallback = true;
 						obj = new NetworkedPlayerNetworkObject(networker, id, frame);
