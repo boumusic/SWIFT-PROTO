@@ -33,7 +33,7 @@ namespace Pataya.QuikFeedback
         public List<Bouncer> Bouncers { get => bouncers; set => bouncers = value; }
         public Zoomer Zoomer { get => zoomer; set => zoomer = value; }
 
-        public bool IsZooming => Zoomer.IsZooming;
+        public bool IsZooming => Zoomer != null ? Zoomer.IsZooming : false;
 
         private void Awake()
         {
