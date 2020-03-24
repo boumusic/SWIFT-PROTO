@@ -13,8 +13,9 @@ public class CharacterSettings : ScriptableObject
     public AnimationCurve accelerationCurve;
     
     public float decelerationSpeed = 1f;
-    public float jumpDecelerationSpeed = 1f;
     public AnimationCurve decelerationCurve;
+
+    public float dotSpeedMultiplier = 0.9f;
 
     [Header("Jump")]
     public int jumpCount = 2;
@@ -22,11 +23,21 @@ public class CharacterSettings : ScriptableObject
     public float jumpProgressSpeed = 2f;
     public AnimationCurve jumpCurve = new AnimationCurve();
     public bool resetVelocityOnJump = false;
+    public float coyoteTime = 0.3f;
 
     [Header("Fall")]
+    public float airControl = 0.7f;
     public float fallStrength = 2f;
     public float fallProgressSpeed = 1f;
     public AnimationCurve fallCurve;
+
+    [Header("Dash")]
+    public float dashStrength = 1f;
+    public AnimationCurve dashCurve;
+    public float dashCooldown = 3f;
+    public float dashProgressSpeed = 2f;
+    public bool resetDashOnLand = true;
+    public bool resetDashOnWallclimb = true;
 
     [Header("Grounded")]
     public float groundRaycastDown = 1f;

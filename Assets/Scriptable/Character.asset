@@ -13,22 +13,22 @@ MonoBehaviour:
   m_Name: Character
   m_EditorClassIdentifier: 
   runSpeed: 8.5
-  accelerationSpeed: 0.3
+  accelerationSpeed: 0.5
   accelerationCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 2
-      outSlope: 2
+      inSlope: 2.7458532
+      outSlope: 2.7458532
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.33333334
-      outWeight: 0.33333334
+      outWeight: 0.17376755
     - serializedVersion: 3
-      time: 0.10502136
-      value: 0.64537245
+      time: 0.2612332
+      value: 0.70768934
       inSlope: 1.3840828
       outSlope: 1.3840828
       tangentMode: 0
@@ -48,7 +48,6 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   decelerationSpeed: 0.5
-  jumpDecelerationSpeed: 0.1
   decelerationCurve:
     serializedVersion: 2
     m_Curve:
@@ -73,8 +72,9 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  dotSpeedMultiplier: 0.9
   jumpCount: 2
-  jumpStrength: 20
+  jumpStrength: 13
   jumpProgressSpeed: 3.4
   jumpCurve:
     serializedVersion: 2
@@ -128,6 +128,8 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   resetVelocityOnJump: 1
+  coyoteTime: 0.3
+  airControl: 0.7
   fallStrength: 28
   fallProgressSpeed: 1.2
   fallCurve:
@@ -154,6 +156,52 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  dashStrength: 50
+  dashCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0.016544405
+      value: 1
+      inSlope: 0.012326627
+      outSlope: -0.1101991
+      tangentMode: 65
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.5186554
+      value: 0.9446678
+      inSlope: -0.1101991
+      outSlope: -2.2305377
+      tangentMode: 5
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.23041463
+    - serializedVersion: 3
+      time: 0.54469603
+      value: 0.44957274
+      inSlope: -0.356382
+      outSlope: -0.8973822
+      tangentMode: 1
+      weightedMode: 0
+      inWeight: 0.5480973
+      outWeight: 0.15426092
+    - serializedVersion: 3
+      time: 1
+      value: 0.24014282
+      inSlope: -0.07682467
+      outSlope: -0.07682467
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  dashCooldown: 3
+  dashProgressSpeed: 5
+  resetDashOnLand: 1
   groundRaycastDown: 0.36
   groundRaycastUp: 0.43
   groundCastRadius: 0.18

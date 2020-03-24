@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Pataya.QuikFeedback;
 
 public class PlayerCamera : MonoBehaviour
 {
@@ -52,7 +53,9 @@ public class PlayerCamera : MonoBehaviour
     {
         float target = Utility.Interpolate(minFov, maxFov, 0f, character.m.runSpeed, character.Velocity.magnitude * character.FacingVelocity);
         float currentFov = Mathf.SmoothDamp(cam.fieldOfView, target, ref currentVelFov, fovSmooth);
-        cam.fieldOfView = currentFov;
+
+        if(!QuikFeedbackManager.instance.IsZooming)
+            cam.fieldOfView = currentFov;
     }
 
     private void UpdateRotation()

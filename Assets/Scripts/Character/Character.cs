@@ -11,6 +11,7 @@ public class Character : MonoBehaviour
     public CharacterSettings m;
     public PlayerCamera playerCamera;
     public CharacterAnimator animator;
+    public CharacterFeedbacks feedbacks;
 
     [Header("Visuals")]
     public GameObject tps;
@@ -18,13 +19,12 @@ public class Character : MonoBehaviour
     public bool startTps = false;
     private Player player;
     public string PlayerName => player != null ? player.PlayerName : "NPC";
-    public Color TeamColor => player != null ? player.TeamColor : Color.grey;
+    public Color TeamColor => player != null ? player.TeamColor : Color.white;
 
     #region Movement
 
     private float currentAccel;
     private float accelProgress;
-    private Vector2 lastAxis;
     private Vector2 axis;
     private Vector3 DesiredVelocity => CamRotation * new Vector3(axis.x, 0, axis.y);
     private Vector3 velocity;
@@ -58,9 +58,17 @@ public class Character : MonoBehaviour
     public Vector3 FeetOrigin => transform.position + Vector3.up * m.groundRaycastUp;
     public Vector3 FeetDestination => FeetOrigin - Vector3.up * m.groundRaycastDown;
     public Vector3 CastBox => new Vector3(m.castBoxWidth, 1f, m.castBoxWidth);
-
-
     private Quaternion WallSlideRotation = Quaternion.identity;
+
+    private bool grounded => CurrentState == CharacterState.Grounded;
+    private float CurrentDecelSpeed => grounded ? m.decelerationSpeed : 0;
+    private float CurrentAccelSpeed => grounded ? m.accelerationSpeed : m.accelerationSpeed * m.airControl;
+
+    #region Dash
+
+    private float dashProgress = 0f;
+
+    #endregion
 
     #endregion
 
@@ -70,6 +78,7 @@ public class Character : MonoBehaviour
     public Action OnAttack;
     public Action OnKill;
     public Action OnScore;
+    public Action OnDash;
 
     private void OnDrawGizmos()
     {
@@ -100,6 +109,8 @@ public class Character : MonoBehaviour
 
         tps.SetActive(startTps);
         OnKill += UIManager.Instance.HitMarker;
+
+        dashCooldownProgress = 1f;
     }
 
     private void Update()
@@ -112,6 +123,7 @@ public class Character : MonoBehaviour
 
         CheckWallClimb();
         OrientModel();
+        DashCooldown();
     }
 
     private void FixedUpdate()
@@ -119,12 +131,15 @@ public class Character : MonoBehaviour
         ApplyVelocity();
     }
 
+    private void Start()
+    {
+        UpdateColor();
+    }
+
     public void Initialize(Player player)
     {
         this.player = player;
     }
-
-    private float CurrentDecelSpeed => CurrentState == CharacterState.Grounded ? m.decelerationSpeed : m.jumpDecelerationSpeed;
 
     private void CalculateHorizontalVelocity()
     {
@@ -134,11 +149,10 @@ public class Character : MonoBehaviour
             {
                 accelProgress += Time.deltaTime * m.accelerationSpeed;
                 currentAccel = m.accelerationCurve.Evaluate(accelProgress);
-                Vector2 usedAxis = IsinAir ? lastAxis : axis;
+                Vector2 usedAxis = axis;
                 float x = usedAxis.x;
                 float z = usedAxis.y;
                 Vector3 target = new Vector3(x, 0, z).normalized * m.runSpeed;
-                //Vector3 horiz = Vector3.SmoothDamp(velocity, target, ref currentVel, m.acceleration);
                 Vector3 horiz = target * currentAccel;
                 velocity = new Vector3(horiz.x, velocity.y, horiz.z);
             }
@@ -149,9 +163,10 @@ public class Character : MonoBehaviour
                 currentAccel = m.decelerationCurve.Evaluate(accelProgress);
                 velocity = new Vector3(velocity.x / currentAccel, velocity.y, velocity.z / currentAccel);
             }
+            
+            if (CurrentState == CharacterState.Dashing) velocity = new Vector3(dashVelocity.x, 0f, dashVelocity.z);
         }
         accelProgress = Mathf.Clamp01(accelProgress);
-        Debug.Log(accelProgress);
     }
 
     private void ResetVelocity()
@@ -170,10 +185,6 @@ public class Character : MonoBehaviour
     public void InputAxis(Vector2 axis)
     {
         this.axis = axis;
-        if (axis.magnitude != 0)
-        {
-            lastAxis = axis;
-        }
     }
 
     public void InputSpacebar(bool space)
@@ -187,19 +198,23 @@ public class Character : MonoBehaviour
 
     private void Grounded_Enter()
     {
+        TryStopCoyote();
         yVelocity = 0f;
         ResetJumpCount();
         animator.Land();
         animator.Grounded(true);
+        if (m.resetDashOnLand) resetDash = true;
     }
 
     private Vector3 wallSlideVector;
+
+    private Coroutine coyote;
 
     private void Grounded_Update()
     {
         if (!CastGround())
         {
-            jumpLeft--;
+            if (coyote == null) coyote = StartCoroutine(CoyoteTime());
             stateMachine.ChangeState(CharacterState.Falling);
         }
 
@@ -223,18 +238,44 @@ public class Character : MonoBehaviour
             WallSlideRotation = Quaternion.identity;
     }
 
+    private void TryStopCoyote()
+    {
+        if (coyote != null) StopCoroutine(coyote);
+    }
+
+    private IEnumerator CoyoteTime()
+    {
+        yield return new WaitForSeconds(m.coyoteTime);
+        jumpLeft = 1;
+    }
+    
+    public bool CastGround()
+    {
+        if (Physics.BoxCast(FeetOrigin, CastBox * m.groundCastRadius, -Vector3.up, out hit, Quaternion.identity, m.groundRaycastDown, m.groundMask))
+        {
+            //Debug.Log("Hit " + hit.collider.gameObject.name);
+            SnapToGround();
+            return true;
+        }
+        return false;
+    }
+
+    private void SnapToGround()
+    {
+        body.position = new Vector3(transform.position.x, hit.point.y, transform.position.z);
+    }
+
     #endregion
 
     #region Jump
 
     public void Jump()
     {
-        if (jumpLeft > 0)
+        if (jumpLeft > 0 && CurrentState != CharacterState.Dashing)
         {
             jumpLeft--;
             stateMachine.ChangeState(CharacterState.Jumping);
-
-            lastAxis = axis;
+            
             if (m.resetVelocityOnJump) ResetVelocity();
         }
     }
@@ -282,21 +323,68 @@ public class Character : MonoBehaviour
 
     #endregion
 
-    public bool CastGround()
+    #region Dash
+
+    private Vector3 dashVelocity;
+    private Vector2 dashAxis;
+    private bool resetDash = true;
+    private bool cooldownDashDone = true;
+    public bool CanDash => resetDash && cooldownDashDone;
+    private float dashCooldownProgress = 1f;
+    public float DashCooldownProgress => dashCooldownProgress;
+    public bool ResetDash => resetDash;
+
+    public void StartDash()
     {
-        if (Physics.BoxCast(FeetOrigin, CastBox * m.groundCastRadius, -Vector3.up, out hit, Quaternion.identity, m.groundRaycastDown, m.groundMask))
+        if(CanDash)
         {
-            //Debug.Log("Hit " + hit.collider.gameObject.name);
-            SnapToGround();
-            return true;
-        }
-        return false;
+            OnDash?.Invoke();
+            stateMachine.ChangeState(CharacterState.Dashing);            
+        }       
+    }    
+
+    private void Dashing_Enter()
+    {
+        yVelocity = 0f;
+        if (axis.magnitude != 0)
+            dashAxis = axis;
+        else
+            dashAxis = new Vector2(transform.forward.x, transform.forward.z);
+
+        dashProgress = 0f;
+        dashCooldownProgress = 0f;
+        cooldownDashDone = false;
+        resetDash = false;
+        feedbacks.Play("Dash");
     }
 
-    private void SnapToGround()
+    private void Dashing_Update()
     {
-        body.position = new Vector3(transform.position.x, hit.point.y, transform.position.z);
+        dashProgress += Time.deltaTime * m.dashProgressSpeed;
+        dashVelocity = new Vector3(dashAxis.x, 0f, dashAxis.y).normalized * m.dashCurve.Evaluate(dashProgress) * m.dashStrength;
+        if(dashProgress >= 1f)
+        {
+            stateMachine.ChangeState(CharacterState.Falling);
+        }
     }
+
+    private void DashCooldown()
+    {
+        if(!cooldownDashDone)
+        {
+            if(dashCooldownProgress < 1f)
+            {
+                dashCooldownProgress += Time.deltaTime / m.dashCooldown;
+            }
+
+            else
+            {
+                cooldownDashDone = true;
+            }
+        }
+    }
+
+    #endregion
 
     #region Wall
 
@@ -313,6 +401,7 @@ public class Character : MonoBehaviour
 
     private void WallClimbing_Enter()
     {
+        if (m.resetDashOnWallclimb) resetDash = true;
         animator.WallClimb(true);
         jumpLeft++;
     }
@@ -340,8 +429,8 @@ public class Character : MonoBehaviour
 
     public bool CastWall()
     {
-        RaycastHit[] down = Physics.RaycastAll(transform.position, Forward, m.slideWallCastLength);
-        RaycastHit[] up = Physics.RaycastAll(transform.position + Vector3.up * 2f, Forward, m.slideWallCastLength);
+        RaycastHit[] down = Physics.RaycastAll(transform.position, DesiredVelocity, m.slideWallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
+        RaycastHit[] up = Physics.RaycastAll(transform.position + Vector3.up * 2f, DesiredVelocity, m.slideWallCastLength ,m.groundMask, QueryTriggerInteraction.Ignore);
         List<RaycastHit> final = new List<RaycastHit>();
         for (int i = 0; i < down.Length; i++)
         {
@@ -378,14 +467,39 @@ public class Character : MonoBehaviour
     }
 
     private bool isDead = false;
+
     private void Die()
     {
         if (!isDead)
         {
             isDead = true;
             animator.Death();
-            //gameObject.SetActive(false);
+            RespawnManager.Instance.Death(this);
+            StartCoroutine(DeathAnim());
         }
+    }
+
+    private IEnumerator DeathAnim()
+    {
+        yield return new WaitForSeconds(1.5f);
+        Disable();
+    }
+
+    private void Disable()
+    {
+        gameObject.SetActive(false);
+    }
+    
+    public void Respawn()
+    {
+        gameObject.SetActive(true);
+        isDead = false;
+    }
+
+    public void Respawn(Vector3 pos)
+    {
+        transform.position = pos;
+        Respawn();
     }
 
     #endregion
@@ -486,6 +600,15 @@ public class Character : MonoBehaviour
     }
 
     #endregion
+
+    #region Visuals
+
+    public void UpdateColor()
+    {
+        GetComponentInChildren<SkinnedMeshRenderer>(true).material.SetColor("_Color", TeamColor);
+    }
+
+    #endregion
 }
 
 public enum CharacterState
@@ -493,5 +616,6 @@ public enum CharacterState
     Grounded,
     Jumping,
     Falling,
-    WallClimbing
+    WallClimbing,
+    Dashing
 }
