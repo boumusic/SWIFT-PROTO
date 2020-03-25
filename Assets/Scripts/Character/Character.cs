@@ -496,10 +496,11 @@ public class Character : MonoBehaviour
 
     private bool isDead = false;
 
-    private void Die()
+    public void Die()
     {
         if (!isDead)
         {
+            healthPointsLeft = 0;
             isDead = true;
             animator.Death();
             RespawnManager.Instance.Death(this);
