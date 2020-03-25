@@ -99,7 +99,7 @@ public class MultiplayerMenu : MonoBehaviour
 				((UDPClient)client).Connect(ipAddress.text, (ushort)port, natServerHost, natServerPort);
 		}
 
-		Connected(client);
+        Connected(client);
 	}
 
 	public void ConnectToMatchmaking()
@@ -218,9 +218,13 @@ public class MultiplayerMenu : MonoBehaviour
 		if (networker is IServer)
 		{
 			if (!DontChangeSceneOnConnect)
-				SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+            {
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+            }
 			else
-				NetworkObject.Flush(networker); //Called because we are already in the correct scene!
+            {
+                NetworkObject.Flush(networker); //Called because we are already in the correct scene!
+            }
 		}
 	}
 

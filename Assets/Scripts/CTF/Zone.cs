@@ -28,6 +28,8 @@ public class Zone : NetworkedFlagBehavior, ITeamAffilitation
 
     protected override void NetworkStart()
     {
+        base.NetworkStart();
+
         teamIndex = networkObject.teamIndex;
 
         UpdateAffiliation();
@@ -49,15 +51,15 @@ public class Zone : NetworkedFlagBehavior, ITeamAffilitation
         {
             if (!NetworkManager.Instance.IsServer) return;
 
-            NetworkedPlayer player = other.gameObject.GetComponentInParent<NetworkedPlayer>();
+            NetworkedPlayer player = other.transform.root.GetComponent<NetworkedPlayer>();
             if (player != null)
             {
                 if (!IsCaptured)
                 {
-                    if (player.teamIndex != teamIndex)
+                    if (player.teamIndex != networkObject.teamIndex)
                     {
                         player.flag = flag;
-                        networkObject.SendRpc(RPC_STOLEN, Receivers.All, player.playerName);
+                        networkObject.SendRpc(RPC_CAPTURED, Receivers.All, player.playerName);
                         networkObject.isFlagThere = false;
                     }
                 }
@@ -104,13 +106,16 @@ public class Zone : NetworkedFlagBehavior, ITeamAffilitation
     {
         string message = args.GetAt<string>(0) + " scored for team " + args.GetAt<int>(1) + "!";
         UIManager.Instance.LogMessage(message);
+
+        //activate the player's flag
         flag.gameObject.SetActive(true);
+
         TeamManager.Instance.Score(args.GetAt<int>(1));
 
         scoredFx.Play();
     }
 
-    public override void Stolen(RpcArgs args)
+    public override void Captured(RpcArgs args)
     {
         UIManager.Instance.LogMessage(args.GetAt<string>(0) + " captured the Flag !");
         flag.gameObject.SetActive(false);

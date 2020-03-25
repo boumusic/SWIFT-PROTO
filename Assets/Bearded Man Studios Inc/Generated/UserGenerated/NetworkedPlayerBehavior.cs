@@ -4,16 +4,15 @@ using UnityEngine;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedRPC("{\"types\":[[][][\"string\"][][][]]")]
-	[GeneratedRPCVariableNames("{\"types\":[[][][\"\"][][][]]")]
+	[GeneratedRPC("{\"types\":[[][\"string\"][][][]]")]
+	[GeneratedRPCVariableNames("{\"types\":[[][\"\"][][][]]")]
 	public abstract partial class NetworkedPlayerBehavior : NetworkBehavior
 	{
 		public const byte RPC_ATTACK = 0 + 5;
-		public const byte RPC_DESTROY = 1 + 5;
-		public const byte RPC_CHANGE_NAME = 2 + 5;
-		public const byte RPC_JUMP = 3 + 5;
-		public const byte RPC_LAND = 4 + 5;
-		public const byte RPC_DIE = 5 + 5;
+		public const byte RPC_CHANGE_NAME = 1 + 5;
+		public const byte RPC_JUMP = 2 + 5;
+		public const byte RPC_LAND = 3 + 5;
+		public const byte RPC_DIE = 4 + 5;
 		
 		public NetworkedPlayerNetworkObject networkObject = null;
 
@@ -28,7 +27,6 @@ namespace BeardedManStudios.Forge.Networking.Generated
 
 			base.SetupHelperRpcs(networkObject);
 			networkObject.RegisterRpc("Attack", Attack);
-			networkObject.RegisterRpc("Destroy", Destroy);
 			networkObject.RegisterRpc("ChangeName", ChangeName, typeof(string));
 			networkObject.RegisterRpc("Jump", Jump);
 			networkObject.RegisterRpc("Land", Land);
@@ -113,10 +111,6 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		/// Arguments:
 		/// </summary>
 		public abstract void Attack(RpcArgs args);
-		/// <summary>
-		/// Arguments:
-		/// </summary>
-		public abstract void Destroy(RpcArgs args);
 		/// <summary>
 		/// Arguments:
 		/// </summary>

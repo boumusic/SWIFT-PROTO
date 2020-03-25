@@ -95,7 +95,7 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
 
             Vector3 runVelocity = velocity;
             runVelocity.y = 0;
-            bool isRunning = runVelocity.magnitude > 0.005f;
+            bool isRunning = runVelocity.magnitude != 0f;
 
             characterAnimator.Run(isRunning, velocity);
 
@@ -106,6 +106,13 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
         }
         else
         {
+            networkObject.position = characterTransform.position;
+            networkObject.rotation = tpsCharacter.transform.rotation;
+            networkObject.localVelocity = playerCharacter.Velocity;
+            networkObject.climbing = playerCharacter.CurrentState == CharacterState.WallClimbing;
+
+            /// debug
+
             if (Input.GetKeyDown(KeyCode.Escape))
             {
                 Cursor.lockState = CursorLockMode.None;
@@ -119,17 +126,6 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
                 Cursor.visible = false;
                 player.enabled = true;
             }
-        }
-    }
-
-    private void FixedUpdate()
-    {
-        if (networkObject.IsOwner)
-        {
-            networkObject.position = characterTransform.position;
-            networkObject.rotation = tpsCharacter.transform.rotation;
-            networkObject.localVelocity = playerCharacter.Velocity;
-            networkObject.climbing = playerCharacter.CurrentState == CharacterState.WallClimbing;
         }
     }
 
@@ -168,10 +164,5 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
     public override void Die(RpcArgs args)
     {
         characterAnimator.Death();
-    }
-
-    public override void Destroy(RpcArgs args)
-    {
-        throw new System.NotImplementedException();
     }
 }

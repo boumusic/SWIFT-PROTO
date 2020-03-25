@@ -16,15 +16,14 @@ public class NetworkedGameManager : MonoBehaviour
 
     void ReplaceFlags()
     {
-        Zone[] allFlagZones = FindObjectsOfType<Zone>();
+        if (!NetworkManager.Instance.IsServer) return;
 
-        for (int i = 0; i < allFlagZones.Length; i++)
+        FlagZoneSpawn[] allFlagZoneSpawns = FindObjectsOfType<FlagZoneSpawn>();
+
+        for (int i = 0; i < allFlagZoneSpawns.Length; i++)
         {
-            if (NetworkManager.Instance.IsServer)
-            {
-                NetworkedFlagBehavior flag = NetworkManager.Instance.InstantiateNetworkedFlag(position: allFlagZones[i].transform.position, rotation: allFlagZones[i].transform.rotation);
-                flag.networkObject.teamIndex = allFlagZones[i].teamIndex;
-            }
+            NetworkedFlagBehavior flag =  NetworkManager.Instance.InstantiateNetworkedFlag(position: allFlagZoneSpawns[i].transform.position, rotation: allFlagZoneSpawns[i].transform.rotation);
+            flag.networkObject.teamIndex = allFlagZoneSpawns[i].teamIndex;
         }
     }
 }

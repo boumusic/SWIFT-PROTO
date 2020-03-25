@@ -52,6 +52,9 @@ MonoBehaviour:
   tpsCharacter: {fileID: 5956535184425941361}
   characterAnimator: {fileID: 7603398387840196994}
   nameText: {fileID: 3482324083475654934}
+  playerName: DefaultName
+  teamIndex: 0
+  flag: {fileID: 0}
 --- !u!1001 &7210525686735752730
 PrefabInstance:
   m_ObjectHideFlags: 0
