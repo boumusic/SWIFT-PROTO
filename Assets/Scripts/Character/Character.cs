@@ -23,8 +23,7 @@ public class Character : MonoBehaviour
 
     #region Movement
 
-    private float currentAccel;
-    private float accelProgress;
+    private Vector2 accelProgress;
     private Vector2 axis;
     private Vector3 DesiredVelocity => CamRotation * new Vector3(axis.x, 0, axis.y);
     private Vector3 velocity;
@@ -46,10 +45,19 @@ public class Character : MonoBehaviour
     public Vector3 Forward => new Vector3(playerCamera.transform.forward.x, 0, playerCamera.transform.forward.z);
     public Vector3 Right => new Vector3(playerCamera.transform.right.x, 0, playerCamera.transform.right.z);
 
-    public Vector3 FinalVelocity => CamRotation * WallSlideRotation * Velocity;
+    public Vector3 FinalVelocity
+    {
+        get
+        {
+            if (grounded) return CamRotation * Velocity;
+            else return LastCamRotation * Velocity;
+
+        }
+    }
     public float FacingVelocity => Mathf.Clamp01(Vector3.Dot(Forward, FinalVelocity));
     public float CameraRoll => Vector3.Dot(Right, FinalVelocity.normalized) * (CurrentState == CharacterState.Jumping ? 3.5f : 1f);
 
+    private Quaternion LastCamRotation;
     public Quaternion CamRotation => playerCamera.Forward;
 
     public bool IsRunning { get => isRunning; }
@@ -58,11 +66,10 @@ public class Character : MonoBehaviour
     public Vector3 FeetOrigin => transform.position + Vector3.up * m.groundRaycastUp;
     public Vector3 FeetDestination => FeetOrigin - Vector3.up * m.groundRaycastDown;
     public Vector3 CastBox => new Vector3(m.castBoxWidth, 1f, m.castBoxWidth);
-    private Quaternion WallSlideRotation = Quaternion.identity;
 
     private bool grounded => CurrentState == CharacterState.Grounded;
-    private float CurrentDecelSpeed => grounded ? m.decelerationSpeed : 0;
-    private float CurrentAccelSpeed => grounded ? m.accelerationSpeed : m.accelerationSpeed * m.airControl;
+    private float CurrentDecelSpeed => grounded ? m.decelerationSpeed : m.jumpDecelerationSpeed;
+    private float CurrentAccelSpeed => grounded ? m.accelerationSpeed : m.jumpAccelerationSpeed;
 
     #region Dash
 
@@ -141,32 +148,47 @@ public class Character : MonoBehaviour
         this.player = player;
     }
 
+    private float xAccel = 0f;
+    private float zAccel = 0f;
+
     private void CalculateHorizontalVelocity()
     {
+        if (axis.magnitude != 0) LastCamRotation = CamRotation;
         if (CurrentState != CharacterState.WallClimbing)
         {
-            if (axis.magnitude != 0)
-            {
-                accelProgress += Time.deltaTime * m.accelerationSpeed;
-                currentAccel = m.accelerationCurve.Evaluate(accelProgress);
-                Vector2 usedAxis = axis;
-                float x = usedAxis.x;
-                float z = usedAxis.y;
-                Vector3 target = new Vector3(x, 0, z).normalized * m.runSpeed;
-                Vector3 horiz = target * currentAccel;
-                velocity = new Vector3(horiz.x, velocity.y, horiz.z);
-            }
+            Vector2 usedAxis = CurrentState == CharacterState.Grounded ? axis : axis;
+            Accel(ref xAccel, usedAxis.x);
+            Accel(ref zAccel, usedAxis.y);
+            Vector3 target = new Vector3(xAccel, 0, zAccel) * m.runSpeed;
 
-            else
-            {
-                accelProgress -= Time.deltaTime * CurrentDecelSpeed;
-                currentAccel = m.decelerationCurve.Evaluate(accelProgress);
-                velocity = new Vector3(velocity.x / currentAccel, velocity.y, velocity.z / currentAccel);
-            }
-            
+            velocity = target;
             if (CurrentState == CharacterState.Dashing) velocity = new Vector3(dashVelocity.x, 0f, dashVelocity.z);
         }
-        accelProgress = Mathf.Clamp01(accelProgress);
+    }
+
+    private void Accel(ref float accel, float axis)
+    {
+        if (axis != 0)
+        {
+            accel += axis * Time.deltaTime * CurrentAccelSpeed;
+        }
+
+        else
+        {
+            accel /= CurrentDecelSpeed;
+        }
+        accel = Mathf.Clamp(accel, -1f, 1f);
+
+        if (Mathf.Abs(accel) < 0.001f) accel = 0f;
+    }
+
+    private void SnapAccelToAxis()
+    {
+        if(axis.magnitude != 0)
+        {
+            xAccel = axis.x;
+            zAccel = axis.y;
+        }        
     }
 
     private void ResetVelocity()
@@ -219,6 +241,8 @@ public class Character : MonoBehaviour
         }
 
         CastWall();
+
+        /*
         if (hits.Length > 0 && m.slideAgainstWalls)
         {
             Vector3 wallNormal = hits[0].normal;
@@ -236,6 +260,7 @@ public class Character : MonoBehaviour
 
         else
             WallSlideRotation = Quaternion.identity;
+        */
     }
 
     private void TryStopCoyote()
@@ -248,7 +273,7 @@ public class Character : MonoBehaviour
         yield return new WaitForSeconds(m.coyoteTime);
         jumpLeft = 1;
     }
-    
+
     public bool CastGround()
     {
         if (Physics.BoxCast(FeetOrigin, CastBox * m.groundCastRadius, -Vector3.up, out hit, Quaternion.identity, m.groundRaycastDown, m.groundMask))
@@ -273,15 +298,18 @@ public class Character : MonoBehaviour
     {
         if (jumpLeft > 0 && CurrentState != CharacterState.Dashing)
         {
-            jumpLeft--;
             stateMachine.ChangeState(CharacterState.Jumping);
-            
-            if (m.resetVelocityOnJump) ResetVelocity();
         }
     }
 
     private void Jumping_Enter()
     {
+        if(axis.magnitude != 0)
+            LastCamRotation = CamRotation;
+
+        jumpLeft--;
+        SnapAccelToAxis();
+        if (m.resetVelocityOnJump) ResetVelocity();
         jumpProgress = 0f;
         animator.Jump();
         animator.Grounded(false);
@@ -336,12 +364,12 @@ public class Character : MonoBehaviour
 
     public void StartDash()
     {
-        if(CanDash)
+        if (CanDash)
         {
             OnDash?.Invoke();
-            stateMachine.ChangeState(CharacterState.Dashing);            
-        }       
-    }    
+            stateMachine.ChangeState(CharacterState.Dashing);
+        }
+    }
 
     private void Dashing_Enter()
     {
@@ -362,7 +390,7 @@ public class Character : MonoBehaviour
     {
         dashProgress += Time.deltaTime * m.dashProgressSpeed;
         dashVelocity = new Vector3(dashAxis.x, 0f, dashAxis.y).normalized * m.dashCurve.Evaluate(dashProgress) * m.dashStrength;
-        if(dashProgress >= 1f)
+        if (dashProgress >= 1f)
         {
             stateMachine.ChangeState(CharacterState.Falling);
         }
@@ -370,9 +398,9 @@ public class Character : MonoBehaviour
 
     private void DashCooldown()
     {
-        if(!cooldownDashDone)
+        if (!cooldownDashDone)
         {
-            if(dashCooldownProgress < 1f)
+            if (dashCooldownProgress < 1f)
             {
                 dashCooldownProgress += Time.deltaTime / m.dashCooldown;
             }
@@ -430,7 +458,7 @@ public class Character : MonoBehaviour
     public bool CastWall()
     {
         RaycastHit[] down = Physics.RaycastAll(transform.position, DesiredVelocity, m.slideWallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
-        RaycastHit[] up = Physics.RaycastAll(transform.position + Vector3.up * 2f, DesiredVelocity, m.slideWallCastLength ,m.groundMask, QueryTriggerInteraction.Ignore);
+        RaycastHit[] up = Physics.RaycastAll(transform.position + Vector3.up * 2f, DesiredVelocity, m.slideWallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
         List<RaycastHit> final = new List<RaycastHit>();
         for (int i = 0; i < down.Length; i++)
         {
@@ -489,7 +517,7 @@ public class Character : MonoBehaviour
     {
         gameObject.SetActive(false);
     }
-    
+
     public void Respawn()
     {
         gameObject.SetActive(true);

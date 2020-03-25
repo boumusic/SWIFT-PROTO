@@ -25,8 +25,7 @@ public class Player : MonoBehaviour
     public KeyCode dash = KeyCode.LeftShift;
     public KeyCode toggleTps = KeyCode.H;
     public KeyCode pause = KeyCode.Escape;
-
-
+    
     [Header("Team")]
     public int debugTeamIndex = -1;
     public int TeamIndex => TeamManager.Instance.GetIndex(this);
