@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Character
   m_EditorClassIdentifier: 
   runSpeed: 8.5
-  accelerationSpeed: 0.5
+  accelerationSpeed: 10
   accelerationCurve:
     serializedVersion: 2
     m_Curve:
@@ -47,7 +47,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  decelerationSpeed: 0.5
+  decelerationSpeed: 1.12
   decelerationCurve:
     serializedVersion: 2
     m_Curve:
@@ -129,7 +129,8 @@ MonoBehaviour:
     m_RotationOrder: 4
   resetVelocityOnJump: 1
   coyoteTime: 0.3
-  airControl: 0.7
+  jumpDecelerationSpeed: 1.01
+  jumpAccelerationSpeed: 7
   fallStrength: 28
   fallProgressSpeed: 1.2
   fallCurve:
