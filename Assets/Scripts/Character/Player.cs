@@ -37,6 +37,9 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
+        Cursor.visible = cursor;
+        Cursor.lockState = cursor ? CursorLockMode.None : CursorLockMode.Locked;
+
         InitializeCharacter();
         SetPlayerName(playerName);
 
@@ -64,8 +67,6 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        Cursor.visible = cursor;
-        Cursor.lockState = cursor ? CursorLockMode.None : CursorLockMode.Locked;
 
         if(!UIManager.Instance.IsPaused)
         {

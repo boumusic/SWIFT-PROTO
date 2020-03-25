@@ -70,7 +70,7 @@ MonoBehaviour:
     value: 360
   sampleCount:
     overrideState: 1
-    value: 30
+    value: 14
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0

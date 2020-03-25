@@ -39,6 +39,9 @@ public class UIManager : MonoBehaviour
     private bool isPaused = false;
     public bool IsPaused => isPaused;
 
+    [Header("Flag Status")]
+    public GameObject flagStatus;
+
     public void FeedPlayer(Player p)
     {
         player = p;
@@ -47,6 +50,7 @@ public class UIManager : MonoBehaviour
     private void Update()
     {
         PositionKillFeeds();
+        UpdateFlagStatus();
         UpdateDashCooldown();
     }
 
@@ -73,7 +77,6 @@ public class UIManager : MonoBehaviour
             Color col = new Color(1, 1, 1, a);
             dashReset.color = col;
             dashCd.color = col;
-
         }
     }
 
@@ -83,6 +86,14 @@ public class UIManager : MonoBehaviour
         pause.SetActive(isPaused);
         Cursor.visible = isPaused;
         Cursor.lockState = isPaused ? CursorLockMode.Locked : CursorLockMode.None;
+    }
+
+    private void UpdateFlagStatus()
+    {
+        if(player)
+        {
+            flagStatus.SetActive(player.Character.HasFlag);
+        }
     }
 
     #region KillFeed
