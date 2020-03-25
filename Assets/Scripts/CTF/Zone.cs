@@ -69,6 +69,13 @@ public class Zone : NetworkedFlagBehavior, ITeamAffilitation
                     player.flag = null;
 
                     networkObject.SendRpc(RPC_SCORED, Receivers.All, player.playerName, player.teamIndex);
+
+                    for (int i = 0; i < NetworkedGameManager.Instance.flagZones.Count; i++)
+                    {
+                        if (NetworkedGameManager.Instance.flagZones[i] == this) continue;
+
+                        NetworkedGameManager.Instance.flagZones[i].networkObject.SendRpc(RPC_RESPAWN_FLAG, Receivers.All);
+                    }
                 }
             }
 
@@ -107,9 +114,6 @@ public class Zone : NetworkedFlagBehavior, ITeamAffilitation
         string message = args.GetAt<string>(0) + " scored for team " + args.GetAt<int>(1) + "!";
         UIManager.Instance.LogMessage(message);
 
-        //activate the player's flag
-        flag.gameObject.SetActive(true);
-
         TeamManager.Instance.Score(args.GetAt<int>(1));
 
         scoredFx.Play();
@@ -120,5 +124,10 @@ public class Zone : NetworkedFlagBehavior, ITeamAffilitation
         UIManager.Instance.LogMessage(args.GetAt<string>(0) + " captured the Flag !");
         flag.gameObject.SetActive(false);
         capturedFx.Play();
+    }
+
+    public override void RespawnFlag(RpcArgs args)
+    {
+        flag.gameObject.SetActive(true);
     }
 }

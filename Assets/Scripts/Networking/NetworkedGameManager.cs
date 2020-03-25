@@ -7,6 +7,15 @@ using BeardedManStudios.Forge.Networking.Generated;
 
 public class NetworkedGameManager : MonoBehaviour
 {
+    public static NetworkedGameManager Instance;
+
+    public List<Zone> flagZones = new List<Zone>();
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
     private void Start()
     {
         ReplaceFlags();
@@ -24,6 +33,8 @@ public class NetworkedGameManager : MonoBehaviour
         {
             NetworkedFlagBehavior flag =  NetworkManager.Instance.InstantiateNetworkedFlag(position: allFlagZoneSpawns[i].transform.position, rotation: allFlagZoneSpawns[i].transform.rotation);
             flag.networkObject.teamIndex = allFlagZoneSpawns[i].teamIndex;
+
+            flagZones.Add(flag.GetComponent<Zone>());
         }
     }
 }

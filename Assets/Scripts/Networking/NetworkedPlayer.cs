@@ -152,7 +152,6 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
 
     public override void Jump(RpcArgs args)
     {
-        Debug.Log(networkObject.IsOwner ? "owner " : "remote " + "is jumping");
         characterAnimator.Jump();
     }
 
