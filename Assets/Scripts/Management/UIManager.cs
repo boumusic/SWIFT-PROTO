@@ -34,6 +34,11 @@ public class UIManager : MonoBehaviour
     public Image dashReset;
     private List<UIKillFeed> killFeeds = new List<UIKillFeed>();
 
+    [Header("Pause")]
+    public GameObject pause;
+    private bool isPaused = false;
+    public bool IsPaused => isPaused;
+
     public void FeedPlayer(Player p)
     {
         player = p;
@@ -68,7 +73,16 @@ public class UIManager : MonoBehaviour
             Color col = new Color(1, 1, 1, a);
             dashReset.color = col;
             dashCd.color = col;
+
         }
+    }
+
+    public void TogglePause()
+    {
+        isPaused = !isPaused;
+        pause.SetActive(isPaused);
+        Cursor.visible = isPaused;
+        Cursor.lockState = isPaused ? CursorLockMode.Locked : CursorLockMode.None;
     }
 
     #region KillFeed
