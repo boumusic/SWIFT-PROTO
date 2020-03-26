@@ -33,6 +33,15 @@ public class UIKillFeed : MonoBehaviour
         textKilled.color = killed.TeamColor;        
     }
 
+    public void Init(string killerName, int killerTeam, string killedName, int killedTeam)
+    {
+        textKiller.text = killerName;
+        textKiller.color = TeamManager.Instance.GetTeamColor(killerTeam);
+
+        textKilled.text = killedName;
+        textKilled.color = TeamManager.Instance.GetTeamColor(killedTeam);
+    }
+
     public void UpdatePosition(Vector3 pos)
     {
         targetPos = new Vector3(transform.localPosition.x, pos.y, 0);

@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using MonsterLove.StateMachine;
 using System;
+using BeardedManStudios.Forge.Networking;
+using BeardedManStudios.Forge.Networking.Unity;
+using BeardedManStudios.Forge.Networking.Generated;
+using MonsterLove.StateMachine;
 
 public class Character : MonoBehaviour
 {
@@ -568,6 +572,28 @@ public class Character : MonoBehaviour
 
         if (hits.Length > 0)
         {
+            if (NetworkManager.Instance != null)
+            {
+                for (int i = 0; i < hits.Length; i++)
+                {
+                    NetworkedPlayer player;
+                    if (hits[i].collider.transform.root.TryGetComponent(out player))
+                    {
+                        if (player.player == null)
+                        {
+                            NetworkedPlayer myNetworkerPlayer = transform.root.GetComponent<NetworkedPlayer>();
+                            player.networkObject.SendRpc(NetworkedPlayerBehavior.RPC_TRY_HIT, Receivers.Server, 
+                                myNetworkerPlayer.playerName, myNetworkerPlayer.teamIndex);
+
+                            UIManager.Instance.HitMarker();
+                        }
+                    }
+                }
+
+                // don't do the "normal" hit dectection
+                yield return null;
+            }
+
             for (int i = 0; i < hits.Length; i++)
             {
                 Character chara;
@@ -578,7 +604,6 @@ public class Character : MonoBehaviour
                         if (!chara.isDead)
                         {
                             chara.TakeDamage(m.damage);
-                            OnKill?.Invoke();
                             UIManager.Instance.DisplayKillFeed(this, chara);
                         }
                     }
