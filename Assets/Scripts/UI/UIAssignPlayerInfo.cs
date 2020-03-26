@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using BeardedManStudios.Forge.Networking;
+using BeardedManStudios.Forge.Networking.Unity;
+using BeardedManStudios.Forge.Networking.Generated;
 
 public enum PlayerInfo
 {
@@ -30,7 +33,7 @@ public class UIAssignPlayerInfo : MonoBehaviour
         switch (toAssign)
         {
             case PlayerInfo.Name:
-                text.text = UIManager.Instance.Player.PlayerName;
+                text.text = NetworkManager.Instance == null ? UIManager.Instance.Player.PlayerName : PlayerInfoManager.Instance.playerName;
                 break;
         }
     }

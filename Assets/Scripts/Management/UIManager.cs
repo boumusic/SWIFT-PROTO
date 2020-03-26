@@ -109,6 +109,17 @@ public class UIManager : MonoBehaviour
         killFeeds.Add(kf);
     }
 
+    public void DisplayKillFeed(string killerName, int killerTeam, string killedName, int killedTeam)
+    {
+        GameObject newKillFeed = Instantiate(prefabKillFeed, killFeedParent);
+        newKillFeed.transform.parent = killFeedParent;
+        newKillFeed.transform.localPosition = new Vector3(newKillFeed.transform.localPosition.x, -800f, 0f);
+        newKillFeed.gameObject.SetActive(true);
+        UIKillFeed kf = newKillFeed.GetComponent<UIKillFeed>();
+        kf.Init(killerName, killerTeam, killedName, killedTeam);
+        killFeeds.Add(kf);
+    }
+
     private void PositionKillFeeds()
     {
         for (int i = 0; i < killFeeds.Count; i++)

@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedInterpol("{\"inter\":[0.5,0.5,0,0,0]")]
+	[GeneratedInterpol("{\"inter\":[0.5,0.5,0,0,0,0]")]
 	public partial class NetworkedPlayerNetworkObject : NetworkObject
 	{
 		public const int IDENTITY = 9;
@@ -170,6 +170,37 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			if (runningChanged != null) runningChanged(_running, timestep);
 			if (fieldAltered != null) fieldAltered("running", _running, timestep);
 		}
+		[ForgeGeneratedField]
+		private bool _alive;
+		public event FieldEvent<bool> aliveChanged;
+		public Interpolated<bool> aliveInterpolation = new Interpolated<bool>() { LerpT = 0f, Enabled = false };
+		public bool alive
+		{
+			get { return _alive; }
+			set
+			{
+				// Don't do anything if the value is the same
+				if (_alive == value)
+					return;
+
+				// Mark the field as dirty for the network to transmit
+				_dirtyFields[0] |= 0x20;
+				_alive = value;
+				hasDirtyFields = true;
+			}
+		}
+
+		public void SetaliveDirty()
+		{
+			_dirtyFields[0] |= 0x20;
+			hasDirtyFields = true;
+		}
+
+		private void RunChange_alive(ulong timestep)
+		{
+			if (aliveChanged != null) aliveChanged(_alive, timestep);
+			if (fieldAltered != null) fieldAltered("alive", _alive, timestep);
+		}
 
 		protected override void OwnershipChanged()
 		{
@@ -184,6 +215,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			localVelocityInterpolation.current = localVelocityInterpolation.target;
 			climbingInterpolation.current = climbingInterpolation.target;
 			runningInterpolation.current = runningInterpolation.target;
+			aliveInterpolation.current = aliveInterpolation.target;
 		}
 
 		public override int UniqueIdentity { get { return IDENTITY; } }
@@ -195,6 +227,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			UnityObjectMapper.Instance.MapBytes(data, _localVelocity);
 			UnityObjectMapper.Instance.MapBytes(data, _climbing);
 			UnityObjectMapper.Instance.MapBytes(data, _running);
+			UnityObjectMapper.Instance.MapBytes(data, _alive);
 
 			return data;
 		}
@@ -221,6 +254,10 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			runningInterpolation.current = _running;
 			runningInterpolation.target = _running;
 			RunChange_running(timestep);
+			_alive = UnityObjectMapper.Instance.Map<bool>(payload);
+			aliveInterpolation.current = _alive;
+			aliveInterpolation.target = _alive;
+			RunChange_alive(timestep);
 		}
 
 		protected override BMSByte SerializeDirtyFields()
@@ -238,6 +275,8 @@ namespace BeardedManStudios.Forge.Networking.Generated
 				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _climbing);
 			if ((0x10 & _dirtyFields[0]) != 0)
 				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _running);
+			if ((0x20 & _dirtyFields[0]) != 0)
+				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _alive);
 
 			// Reset all the dirty fields
 			for (int i = 0; i < _dirtyFields.Length; i++)
@@ -319,6 +358,19 @@ namespace BeardedManStudios.Forge.Networking.Generated
 					RunChange_running(timestep);
 				}
 			}
+			if ((0x20 & readDirtyFlags[0]) != 0)
+			{
+				if (aliveInterpolation.Enabled)
+				{
+					aliveInterpolation.target = UnityObjectMapper.Instance.Map<bool>(data);
+					aliveInterpolation.Timestep = timestep;
+				}
+				else
+				{
+					_alive = UnityObjectMapper.Instance.Map<bool>(data);
+					RunChange_alive(timestep);
+				}
+			}
 		}
 
 		public override void InterpolateUpdate()
@@ -350,6 +402,11 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			{
 				_running = (bool)runningInterpolation.Interpolate();
 				//RunChange_running(runningInterpolation.Timestep);
+			}
+			if (aliveInterpolation.Enabled && !aliveInterpolation.current.UnityNear(aliveInterpolation.target, 0.0015f))
+			{
+				_alive = (bool)aliveInterpolation.Interpolate();
+				//RunChange_alive(aliveInterpolation.Timestep);
 			}
 		}
 
