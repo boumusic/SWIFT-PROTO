@@ -132,6 +132,7 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
 
             playerCharacter.enabled = true;
             player.enabled = true;
+            playerRb.useGravity = false;
             characterTransform.position = Vector3.zero;
         }
         else
@@ -178,6 +179,7 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
             if (!playerCharacter.tps.activeInHierarchy) playerCharacter.ToggleTPS();
             playerCharacter.enabled = false;
             player.enabled = false;
+            playerRb.useGravity = true;
         }
         else
         {
