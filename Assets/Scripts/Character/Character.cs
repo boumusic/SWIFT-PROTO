@@ -506,6 +506,8 @@ public class Character : MonoBehaviour
     {
         if (!isDead)
         {
+            DropFlag();
+            ResetVelocity();
             flagVisuals.SetActive(false);
             coll.enabled = false;
             healthPointsLeft = 0;
@@ -633,12 +635,24 @@ public class Character : MonoBehaviour
     {
         string message = PlayerName + " scored for team " + TeamIndex + "!";
         UIManager.Instance.LogMessage(message);
-        flag.gameObject.SetActive(true);
-        flagVisuals.SetActive(false);
-        flag = null;
+        ResetFlag();
         TeamManager.Instance.Score(TeamIndex);
         CTFManager.Instance.OnTeamScored?.Invoke();
         OnScore?.Invoke();
+    }
+
+    private void DropFlag()
+    {
+        string message = "The flag has been retreived!";
+        UIManager.Instance.LogMessage(message);
+        ResetFlag();
+    }
+
+    private void ResetFlag()
+    {
+        flag.gameObject.SetActive(true);
+        flagVisuals.SetActive(false);
+        flag = null;
     }
 
     #endregion
