@@ -829,6 +829,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   debugLogMessages: 0
+  canvas: {fileID: 4010347745234475815}
   hitMarker: {fileID: 4010347744573204429}
   generalMessage: {fileID: 3047378960923715256}
   prefabKillFeed: {fileID: 5480004415945069041, guid: 6b1869efb6eda5746883e08bbe4a9004,
@@ -2913,6 +2914,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 7709313961988094264}
     m_Modifications:
+    - target: {fileID: 115064270149681730, guid: ffe456feac044364ca8cd44ac66acf96,
+        type: 3}
+      propertyPath: canvas
+      value: 
+      objectReference: {fileID: 4010347745234475815}
     - target: {fileID: 7969278892242438025, guid: ffe456feac044364ca8cd44ac66acf96,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -3026,7 +3032,7 @@ PrefabInstance:
     - target: {fileID: 8664592799690796207, guid: ffe456feac044364ca8cd44ac66acf96,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ffe456feac044364ca8cd44ac66acf96, type: 3}

@@ -21,6 +21,7 @@ public class UIManager : MonoBehaviour
     public Player Player { get { if (!player) player = FindObjectOfType<Player>(); return player; } }
 
     [Header("Components")]
+    public Canvas canvas;
     public Animator hitMarker;
     public UIGeneralMessage generalMessage;
 

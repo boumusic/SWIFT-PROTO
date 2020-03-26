@@ -165,7 +165,7 @@ public class Character : MonoBehaviour
             Vector2 usedAxis = CurrentState == CharacterState.Grounded ? axis : axis;
             Accel(ref xAccel, usedAxis.x);
             Accel(ref zAccel, usedAxis.y);
-            Vector3 target = new Vector3(xAccel, 0, zAccel) * m.runSpeed;
+            Vector3 target = new Vector3(xAccel, 0, zAccel) * m.runSpeed * (HasFlag? m.flagMultiplier : 1);
 
             velocity = target;
             if (CurrentState == CharacterState.Dashing) velocity = new Vector3(dashVelocity.x, 0f, dashVelocity.z);
