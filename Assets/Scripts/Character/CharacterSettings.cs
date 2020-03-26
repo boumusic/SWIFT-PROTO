@@ -16,6 +16,7 @@ public class CharacterSettings : ScriptableObject
     public AnimationCurve decelerationCurve;
 
     public float dotSpeedMultiplier = 0.9f;
+    public float flagMultiplier = 0.9f;
 
     [Header("Jump")]
     public int jumpCount = 2;
