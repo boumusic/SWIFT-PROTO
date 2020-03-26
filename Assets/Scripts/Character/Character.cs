@@ -560,7 +560,7 @@ public class Character : MonoBehaviour
         OnAttack?.Invoke();
         isAttacking = true;
         StartCoroutine(AttackDuration());
-        Vector3 center = transform.position + Vector3.up * 1.8f + Forward * m.attackLength / 2f;
+        Vector3 center = transform.position + Vector3.up * 1.8f + playerCamera.transform.forward * m.attackLength / 2f;
         Vector3 halfExtents = new Vector3(m.attackWidth, m.attackHeight, m.attackLength) / 2f;
         RaycastHit[] hits = Physics.BoxCastAll(center, halfExtents, Vector3.forward, Quaternion.identity, m.attackLength);
 
