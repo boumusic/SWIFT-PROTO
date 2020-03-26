@@ -25,6 +25,8 @@ public class Character : MonoBehaviour
 
     private Vector2 accelProgress;
     private Vector2 axis;
+    public Vector2 Axis { get => axis;}
+
     private Vector3 DesiredVelocity => CamRotation * new Vector3(axis.x, 0, axis.y);
     private Vector3 velocity;
     private Vector3 currentVel;

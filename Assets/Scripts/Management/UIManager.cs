@@ -85,7 +85,7 @@ public class UIManager : MonoBehaviour
         isPaused = !isPaused;
         pause.SetActive(isPaused);
         Cursor.visible = isPaused;
-        Cursor.lockState = isPaused ? CursorLockMode.Locked : CursorLockMode.None;
+        Cursor.lockState = isPaused ? CursorLockMode.None : CursorLockMode.Locked;
     }
 
     private void UpdateFlagStatus()

@@ -47,10 +47,6 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
 
             tpsCharacter.SetActive(true);
 
-            networkObject.Networker.disconnected += x =>
-            {
-                networkObject.Destroy();
-            };
         }
         else
         {
@@ -79,7 +75,6 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
     }
 
 
-    private Vector3 previousPosition;
     private void Update()
     {
         if (!networkObject.IsOwner)
@@ -91,15 +86,7 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
             characterTransform.position = networkObject.position;
 
             // run animation
-            Vector3 velocity = networkObject.localVelocity;
-
-            Vector3 runVelocity = velocity;
-            runVelocity.y = 0;
-            bool isRunning = runVelocity.magnitude != 0f;
-
-            characterAnimator.Run(isRunning, velocity);
-
-            previousPosition = characterTransform.position;
+            characterAnimator.Run(networkObject.running, networkObject.localVelocity);
 
             // climb animation
             characterAnimator.WallClimb(networkObject.climbing);
@@ -110,22 +97,8 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
             networkObject.rotation = tpsCharacter.transform.rotation;
             networkObject.localVelocity = playerCharacter.Velocity;
             networkObject.climbing = playerCharacter.CurrentState == CharacterState.WallClimbing;
+            networkObject.running = playerCharacter.Axis.magnitude != 0;
 
-            /// debug
-
-            if (Input.GetKeyDown(KeyCode.Escape))
-            {
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
-                player.enabled = false;
-            }
-            if (Input.GetMouseButtonDown(0) &&
-            Application.isFocused)
-            {
-                Cursor.lockState = CursorLockMode.Confined;
-                Cursor.visible = false;
-                player.enabled = true;
-            }
         }
     }
 
