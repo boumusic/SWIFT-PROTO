@@ -17,7 +17,8 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public Player player;
+    private Player player;
+    public Player Player { get { if (!player) player = FindObjectOfType<Player>(); return player; } }
 
     [Header("Components")]
     public Animator hitMarker;
@@ -41,8 +42,8 @@ public class UIManager : MonoBehaviour
 
     [Header("Flag Status")]
     public GameObject flagStatus;
-
-    public void FeedPlayer(Player p)
+    
+    public void AssignPlayer(Player p)
     {
         player = p;
     }
@@ -73,10 +74,9 @@ public class UIManager : MonoBehaviour
             dashCd.fillAmount = player.Character.DashCooldownProgress;
             dashReset.gameObject.SetActive(player.Character.ResetDash);
 
-            float a = player.Character.CanDash ? 0.5f : 0.05f;
-            Color col = new Color(1, 1, 1, a);
-            dashReset.color = col;
-            dashCd.color = col;
+            float a = player.Character.CanDash ? 0.7f : 0.2f;
+            dashReset.color = new Color(dashReset.color.r, dashReset.color.g, dashReset.color.b, a) ;
+            dashCd.color = new Color(dashCd.color.r, dashCd.color.g, dashCd.color.b, a);
         }
     }
 

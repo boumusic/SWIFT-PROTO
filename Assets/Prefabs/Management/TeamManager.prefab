@@ -45,5 +45,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   teams: []
   colors:
-  - {r: 1, g: 0.16509432, b: 0.2546644, a: 1}
+  - {r: 1, g: 0.23137257, b: 0.37647063, a: 1}
   - {r: 0.1462264, g: 0.6554504, b: 1, a: 1}

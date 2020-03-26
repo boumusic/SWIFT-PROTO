@@ -50,6 +50,8 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
         }
         else
         {
+            UIManager.Instance.AssignPlayer(this.player);
+
             networkObject.UpdateInterval = (ulong)16.6667f;
 
             SetName();

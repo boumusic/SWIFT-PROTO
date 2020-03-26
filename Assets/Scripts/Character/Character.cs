@@ -8,13 +8,17 @@ public class Character : MonoBehaviour
 {
     [Header("Components")]
     public Rigidbody body;
+    public Collider coll;
     public CharacterSettings m;
     public PlayerCamera playerCamera;
     public CharacterAnimator animator;
     public CharacterFeedbacks feedbacks;
 
+
     [Header("Visuals")]
     public GameObject tps;
+    public GameObject flagVisuals;
+    public Renderer flagVisualsRend;
     public GameObject fps;
     public bool startTps = false;
     private Player player;
@@ -46,12 +50,12 @@ public class Character : MonoBehaviour
 
     public Vector3 Forward => new Vector3(playerCamera.transform.forward.x, 0, playerCamera.transform.forward.z);
     public Vector3 Right => new Vector3(playerCamera.transform.right.x, 0, playerCamera.transform.right.z);
-
+    public bool Dashing => CurrentState == CharacterState.Dashing;
     public Vector3 FinalVelocity
     {
         get
         {
-            if (grounded) return CamRotation * Velocity;
+            if (grounded || Dashing) return CamRotation * Velocity;
             else return LastCamRotation * Velocity;
 
         }
@@ -379,7 +383,7 @@ public class Character : MonoBehaviour
         if (axis.magnitude != 0)
             dashAxis = axis;
         else
-            dashAxis = new Vector2(transform.forward.x, transform.forward.z);
+            dashAxis = new Vector2(0, 1);
 
         dashProgress = 0f;
         dashCooldownProgress = 0f;
@@ -502,6 +506,8 @@ public class Character : MonoBehaviour
     {
         if (!isDead)
         {
+            flagVisuals.SetActive(false);
+            coll.enabled = false;
             healthPointsLeft = 0;
             isDead = true;
             animator.Death();
@@ -513,6 +519,7 @@ public class Character : MonoBehaviour
     private IEnumerator DeathAnim()
     {
         yield return new WaitForSeconds(1.5f);
+        coll.enabled = true;
         Disable();
     }
 
@@ -537,9 +544,10 @@ public class Character : MonoBehaviour
 
     #region Attack
 
+    public bool CanAttack => CurrentState != CharacterState.WallClimbing && !isAttacking && !HasFlag;
     public void TryAttack()
     {
-        if (CurrentState != CharacterState.WallClimbing && !isAttacking)
+        if (CanAttack)
         {
             animator.Attack();
             StartCoroutine(AttackDelay());
@@ -600,6 +608,7 @@ public class Character : MonoBehaviour
 
     private void OrientModel()
     {
+        if (Forward != Vector3.zero)
         tps.transform.forward = Forward;
     }
 
@@ -615,6 +624,7 @@ public class Character : MonoBehaviour
     public void Capture(Flag flag)
     {
         flag.gameObject.SetActive(false);
+        flagVisuals.SetActive(true);
         UIManager.Instance.LogMessage(PlayerName + " captured the Flag !");
         this.flag = flag;
     }
@@ -624,6 +634,7 @@ public class Character : MonoBehaviour
         string message = PlayerName + " scored for team " + TeamIndex + "!";
         UIManager.Instance.LogMessage(message);
         flag.gameObject.SetActive(true);
+        flagVisuals.SetActive(false);
         flag = null;
         TeamManager.Instance.Score(TeamIndex);
         CTFManager.Instance.OnTeamScored?.Invoke();
@@ -637,6 +648,8 @@ public class Character : MonoBehaviour
     public void UpdateColor()
     {
         GetComponentInChildren<SkinnedMeshRenderer>(true).material.SetColor("_Color", TeamColor);
+        if(player)
+            flagVisualsRend.material.SetColor("_Color", TeamManager.Instance.GetOppositeTeamColor(player.TeamIndex));
     }
 
     #endregion

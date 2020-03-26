@@ -122,6 +122,18 @@ public class TeamManager : MonoBehaviour
         return Color.white;
     }
 
+    public Color GetOppositeTeamColor(int i)
+    {
+        for (int t = 0; t < teams.Count; t++)
+        {
+            if(t != i)
+            {
+                return teams[t].Color;
+            }
+        }
+        return Color.white;
+    }
+
     private Team SmallestTeam()
     {
         Team smallest = null;

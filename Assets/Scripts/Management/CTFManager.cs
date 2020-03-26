@@ -26,7 +26,9 @@ public class CTFManager : MonoBehaviour
 
     [Header("Settings")]
     public int flagGoal = 3;
-    public int minutes = 10;
+    public Timer timer;
+
+    private List<Flag> flags = new List<Flag>();
 
     private void Start()
     {
@@ -40,6 +42,13 @@ public class CTFManager : MonoBehaviour
                 zone.teamIndex = allFlagZoneSpawns[i].teamIndex;
             }
         }
+
+        timer.Start();
+    }
+
+    private void Update()
+    {
+        timer.Update();
     }
 
     public void TeamWins(Team team)
@@ -47,4 +56,8 @@ public class CTFManager : MonoBehaviour
         Debug.Log("Team " + team.index + " wins!");
     }
 
+    public void RegisterFlag(Flag flag)
+    {
+        flags.Add(flag);
+    }
 }

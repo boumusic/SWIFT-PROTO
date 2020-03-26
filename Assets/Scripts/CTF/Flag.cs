@@ -9,6 +9,11 @@ public class Flag : MonoBehaviour
     public Renderer[] rends;
     private int teamIndex = 0;
 
+    private void Start()
+    {
+        CTFManager.Instance.RegisterFlag(this);
+    }
+
     public void SetTeamIndex(int index)
     {
         this.teamIndex = index;

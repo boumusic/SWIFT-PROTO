@@ -33,7 +33,7 @@ public class Player : MonoBehaviour
 
     public Character Character { get => character; }
 
-    private string playerName = "XxkillerxX";
+    private string playerName = "KRUSHER99";
 
     private void Awake()
     {
@@ -67,7 +67,6 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-
         if(!UIManager.Instance.IsPaused)
         {
             UpdateAxis();

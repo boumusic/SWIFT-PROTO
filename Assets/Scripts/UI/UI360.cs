@@ -19,14 +19,14 @@ public class UI360 : MonoBehaviour
 
     private void Start()
     {
-        player = UIManager.Instance.player;
+        player = UIManager.Instance.Player;
     }
 
     private void Update()
     {
         angle = Angle.ToString("F2");
 
-        float dot = Vector3.Dot(Chara.Forward, (rend.transform.position - Cam.transform.position).normalized);
+        float dot = rend != null ? Vector3.Dot(Chara.Forward, (rend.transform.position - Cam.transform.position).normalized) : 0;
 
         if (dot > dotThreshold)
         {
@@ -42,7 +42,7 @@ public class UI360 : MonoBehaviour
         }
     }
 
-    private float Angle => Vector3.SignedAngle(Chara.Forward, (rend.transform.position - Cam.transform.position).normalized, Vector3.up);
+    private float Angle => rend != null ? Vector3.SignedAngle(Chara.Forward, (rend.transform.position - Cam.transform.position).normalized, Vector3.up) : 0;
 
     private bool Side => Mathf.Abs(Angle) < 90f;
 }

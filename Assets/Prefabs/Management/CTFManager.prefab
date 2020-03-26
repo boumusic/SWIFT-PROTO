@@ -46,4 +46,6 @@ MonoBehaviour:
   flagZonePrefab: {fileID: 7219515360390634516, guid: 1a02270a956db3247bb82921322627e0,
     type: 3}
   flagGoal: 3
-  minutes: 10
+  timer:
+    minutes: 10
+    seconds: 5
