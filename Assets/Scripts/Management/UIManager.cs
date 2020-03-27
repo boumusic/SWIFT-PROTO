@@ -43,6 +43,10 @@ public class UIManager : MonoBehaviour
 
     [Header("Flag Status")]
     public GameObject flagStatus;
+
+    [Header("UI FlagZone")]
+    public GameObject uiFlagZonePrefab;
+    private List<Zone> flagZones = new List<Zone>();
     
     public void AssignPlayer(Player p)
     {
@@ -79,6 +83,12 @@ public class UIManager : MonoBehaviour
             dashReset.color = new Color(dashReset.color.r, dashReset.color.g, dashReset.color.b, a) ;
             dashCd.color = new Color(dashCd.color.r, dashCd.color.g, dashCd.color.b, a);
         }
+    }
+
+    public void RegisterFlagZones(List<Zone> zones)
+    {
+        flagZones = zones;
+
     }
 
     public void TogglePause()

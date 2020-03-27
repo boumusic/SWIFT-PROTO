@@ -35,6 +35,7 @@ public class CTFManager : MonoBehaviour
         if (NetworkManager.Instance == null)
         {
             FlagZoneSpawn[] allFlagZoneSpawns = FindObjectsOfType<FlagZoneSpawn>();
+            List<Zone> zones = new List<Zone>();
 
             for (int i = 0; i < allFlagZoneSpawns.Length; i++)
             {
@@ -42,7 +43,10 @@ public class CTFManager : MonoBehaviour
                 zone.teamIndex = allFlagZoneSpawns[i].teamIndex;
                 zone.type = allFlagZoneSpawns[i].type;
                 zone.radius = allFlagZoneSpawns[i].radius;
+                zones.Add(zone);
             }
+
+            UIManager.Instance.RegisterFlagZones(zones);
         }
 
         timer.Start();
