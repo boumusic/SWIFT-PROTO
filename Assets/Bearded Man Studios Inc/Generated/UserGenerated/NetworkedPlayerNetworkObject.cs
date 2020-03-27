@@ -5,10 +5,10 @@ using UnityEngine;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedInterpol("{\"inter\":[0.5,0.5,0,0,0,0]")]
+	[GeneratedInterpol("{\"inter\":[0.5,0.5,0,0,0,0,0]")]
 	public partial class NetworkedPlayerNetworkObject : NetworkObject
 	{
-		public const int IDENTITY = 7;
+		public const int IDENTITY = 9;
 
 		private byte[] _dirtyFields = new byte[1];
 
@@ -201,6 +201,37 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			if (aliveChanged != null) aliveChanged(_alive, timestep);
 			if (fieldAltered != null) fieldAltered("alive", _alive, timestep);
 		}
+		[ForgeGeneratedField]
+		private int _teamIndex;
+		public event FieldEvent<int> teamIndexChanged;
+		public Interpolated<int> teamIndexInterpolation = new Interpolated<int>() { LerpT = 0f, Enabled = false };
+		public int teamIndex
+		{
+			get { return _teamIndex; }
+			set
+			{
+				// Don't do anything if the value is the same
+				if (_teamIndex == value)
+					return;
+
+				// Mark the field as dirty for the network to transmit
+				_dirtyFields[0] |= 0x40;
+				_teamIndex = value;
+				hasDirtyFields = true;
+			}
+		}
+
+		public void SetteamIndexDirty()
+		{
+			_dirtyFields[0] |= 0x40;
+			hasDirtyFields = true;
+		}
+
+		private void RunChange_teamIndex(ulong timestep)
+		{
+			if (teamIndexChanged != null) teamIndexChanged(_teamIndex, timestep);
+			if (fieldAltered != null) fieldAltered("teamIndex", _teamIndex, timestep);
+		}
 
 		protected override void OwnershipChanged()
 		{
@@ -216,6 +247,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			climbingInterpolation.current = climbingInterpolation.target;
 			runningInterpolation.current = runningInterpolation.target;
 			aliveInterpolation.current = aliveInterpolation.target;
+			teamIndexInterpolation.current = teamIndexInterpolation.target;
 		}
 
 		public override int UniqueIdentity { get { return IDENTITY; } }
@@ -228,6 +260,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			UnityObjectMapper.Instance.MapBytes(data, _climbing);
 			UnityObjectMapper.Instance.MapBytes(data, _running);
 			UnityObjectMapper.Instance.MapBytes(data, _alive);
+			UnityObjectMapper.Instance.MapBytes(data, _teamIndex);
 
 			return data;
 		}
@@ -258,6 +291,10 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			aliveInterpolation.current = _alive;
 			aliveInterpolation.target = _alive;
 			RunChange_alive(timestep);
+			_teamIndex = UnityObjectMapper.Instance.Map<int>(payload);
+			teamIndexInterpolation.current = _teamIndex;
+			teamIndexInterpolation.target = _teamIndex;
+			RunChange_teamIndex(timestep);
 		}
 
 		protected override BMSByte SerializeDirtyFields()
@@ -277,6 +314,8 @@ namespace BeardedManStudios.Forge.Networking.Generated
 				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _running);
 			if ((0x20 & _dirtyFields[0]) != 0)
 				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _alive);
+			if ((0x40 & _dirtyFields[0]) != 0)
+				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _teamIndex);
 
 			// Reset all the dirty fields
 			for (int i = 0; i < _dirtyFields.Length; i++)
@@ -371,6 +410,19 @@ namespace BeardedManStudios.Forge.Networking.Generated
 					RunChange_alive(timestep);
 				}
 			}
+			if ((0x40 & readDirtyFlags[0]) != 0)
+			{
+				if (teamIndexInterpolation.Enabled)
+				{
+					teamIndexInterpolation.target = UnityObjectMapper.Instance.Map<int>(data);
+					teamIndexInterpolation.Timestep = timestep;
+				}
+				else
+				{
+					_teamIndex = UnityObjectMapper.Instance.Map<int>(data);
+					RunChange_teamIndex(timestep);
+				}
+			}
 		}
 
 		public override void InterpolateUpdate()
@@ -407,6 +459,11 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			{
 				_alive = (bool)aliveInterpolation.Interpolate();
 				//RunChange_alive(aliveInterpolation.Timestep);
+			}
+			if (teamIndexInterpolation.Enabled && !teamIndexInterpolation.current.UnityNear(teamIndexInterpolation.target, 0.0015f))
+			{
+				_teamIndex = (int)teamIndexInterpolation.Interpolate();
+				//RunChange_teamIndex(teamIndexInterpolation.Timestep);
 			}
 		}
 

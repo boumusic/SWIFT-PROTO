@@ -37,6 +37,9 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
     {
         base.NetworkStart();
 
+        teamIndex = networkObject.teamIndex;
+        UpdateTeamColor();
+
         if (!networkObject.IsOwner)
         {
             playerRb.isKinematic = true;
@@ -80,11 +83,6 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
         }
     }
 
-    private void OnApplicationQuit()
-    {
-        networkObject.Destroy();
-    }
-
     private void Update()
     {
         if (!networkObject.IsOwner)
@@ -110,6 +108,11 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
             networkObject.running = playerCharacter.Axis.magnitude != 0;
 
         }
+    }
+
+    void UpdateTeamColor()
+    {
+        GetComponentInChildren<SkinnedMeshRenderer>(true).material.SetColor("_Color", TeamManager.Instance.GetTeamColor(teamIndex));
     }
 
     void SetName()
