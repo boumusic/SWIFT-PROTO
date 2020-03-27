@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fc0041c472b09c42abbf9790ff77b54, type: 3}
   m_Name: Character
   m_EditorClassIdentifier: 
-  runSpeed: 8.5
-  accelerationSpeed: 12
+  runSpeed: 7.5
+  accelerationSpeed: 19
   accelerationCurve:
     serializedVersion: 2
     m_Curve:
@@ -47,7 +47,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  decelerationSpeed: 1.12
+  decelerationSpeed: 1.45
   decelerationCurve:
     serializedVersion: 2
     m_Curve:
@@ -73,6 +73,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   dotSpeedMultiplier: 0.9
+  flagMultiplier: 0.9
   jumpCount: 2
   jumpStrength: 13
   jumpProgressSpeed: 3.4
@@ -165,23 +166,23 @@ MonoBehaviour:
       time: 0.016544405
       value: 1
       inSlope: 0.012326627
-      outSlope: -0.2841106
+      outSlope: -0.16966571
       tangentMode: 65
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.36240542
+      time: 0.59569967
       value: 0.9017372
-      inSlope: -0.2841106
+      inSlope: -0.16966571
       outSlope: -2.2305377
       tangentMode: 5
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.23041463
     - serializedVersion: 3
-      time: 0.54469603
-      value: 0.44957274
+      time: 0.7779903
+      value: 0.34907836
       inSlope: -0.356382
       outSlope: -0.8973822
       tangentMode: 1

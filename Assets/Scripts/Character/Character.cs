@@ -80,12 +80,9 @@ public class Character : MonoBehaviour
     private bool grounded => CurrentState == CharacterState.Grounded;
     private float CurrentDecelSpeed => grounded ? m.decelerationSpeed : m.jumpDecelerationSpeed;
     private float CurrentAccelSpeed => grounded ? m.accelerationSpeed : m.jumpAccelerationSpeed;
-
-    #region Dash
-
+    
     private float dashProgress = 0f;
-
-    #endregion
+    
 
     #endregion
 
@@ -550,7 +547,7 @@ public class Character : MonoBehaviour
 
     #region Attack
 
-    public bool CanAttack => CurrentState != CharacterState.WallClimbing && !isAttacking && !HasFlag;
+    public bool CanAttack => CurrentState != CharacterState.WallClimbing && !isAttacking && !HasFlag && !Dashing;
     public void TryAttack()
     {
         if (CanAttack)
@@ -605,6 +602,7 @@ public class Character : MonoBehaviour
                         {
                             chara.TakeDamage(m.damage);
                             UIManager.Instance.DisplayKillFeed(this, chara);
+                            UIManager.Instance.HitMarker();
                         }
                     }
                 }
@@ -668,9 +666,12 @@ public class Character : MonoBehaviour
 
     private void DropFlag()
     {
-        string message = "The flag has been retreived!";
-        UIManager.Instance.LogMessage(message);
-        ResetFlag();
+        if(HasFlag)
+        {
+            string message = "The flag has been retreived!";
+            UIManager.Instance.LogMessage(message);
+            ResetFlag();
+        }
     }
 
     private void ResetFlag()
