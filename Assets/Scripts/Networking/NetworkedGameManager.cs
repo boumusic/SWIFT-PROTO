@@ -33,6 +33,8 @@ public class NetworkedGameManager : MonoBehaviour
         {
             NetworkedFlagBehavior flag =  NetworkManager.Instance.InstantiateNetworkedFlag(position: allFlagZoneSpawns[i].transform.position, rotation: allFlagZoneSpawns[i].transform.rotation);
             flag.networkObject.teamIndex = allFlagZoneSpawns[i].teamIndex;
+            flag.networkObject.type = (int)allFlagZoneSpawns[i].type;
+            flag.networkObject.radius = allFlagZoneSpawns[i].radius;
 
             flagZones.Add(flag.GetComponent<Zone>());
         }

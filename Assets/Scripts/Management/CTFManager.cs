@@ -40,6 +40,8 @@ public class CTFManager : MonoBehaviour
             {
                 Zone zone = Instantiate(flagZonePrefab, allFlagZoneSpawns[i].transform.position, allFlagZoneSpawns[i].transform.rotation, allFlagZoneSpawns[i].transform.parent).GetComponent<Zone>();
                 zone.teamIndex = allFlagZoneSpawns[i].teamIndex;
+                zone.type = allFlagZoneSpawns[i].type;
+                zone.radius = allFlagZoneSpawns[i].radius;
             }
         }
 

@@ -4866,7 +4866,7 @@ Transform:
   m_GameObject: {fileID: 5384813808114216426}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 16, y: 16, z: 16}
+  m_LocalScale: {x: 20, y: 20, z: 20}
   m_Children: []
   m_Father: {fileID: 7219515360390634517}
   m_RootOrder: 0
@@ -9789,6 +9789,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   teamIndex: 0
+  type: 0
+  radius: 10
+  coll: {fileID: 7219515360390634515}
   flag: {fileID: 1558816660293797455}
   rend: {fileID: 5265622670588829208}
   capturedFx: {fileID: 3683991418732004892}
@@ -9804,7 +9807,7 @@ SphereCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 8
+  m_Radius: 10
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &7219515360390634512
 Rigidbody:
