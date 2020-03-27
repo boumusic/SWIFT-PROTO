@@ -16,6 +16,8 @@ public class Zone : NetworkedFlagBehavior, ITeamAffilitation
     public int teamIndex = 0;
     public FlagZoneType type;
 
+    private bool isAltar => type == FlagZoneType.Altar;
+
     [Header("Components")]
     public Flag flag;
     public Renderer rend;
@@ -62,7 +64,7 @@ public class Zone : NetworkedFlagBehavior, ITeamAffilitation
             {
                 if (!IsCaptured)
                 {
-                    if (player.teamIndex != networkObject.teamIndex)
+                    if (player.teamIndex != networkObject.teamIndex && isAltar)
                     {
                         player.flag = flag;
                         networkObject.SendRpc(RPC_CAPTURED, Receivers.All, player.playerName);
@@ -70,7 +72,7 @@ public class Zone : NetworkedFlagBehavior, ITeamAffilitation
                     }
                 }
 
-                if (player.HasFlag && player.teamIndex == teamIndex)
+                if (player.HasFlag && player.teamIndex == teamIndex && !isAltar)
                 {
                     player.flag = null;
 
@@ -94,22 +96,21 @@ public class Zone : NetworkedFlagBehavior, ITeamAffilitation
         {
             if(!IsCaptured)
             {
-                if(chara.TeamIndex != teamIndex)
+                if(chara.TeamIndex != teamIndex && isAltar)
                 {
                     chara.Capture(flag);
                     capturedFx.Play();
                 }                
             }
 
-            if(chara.HasFlag && chara.TeamIndex == teamIndex)
+            if(chara.HasFlag && chara.TeamIndex == teamIndex && !isAltar)
             {
                 chara.Score();
                 scoredFx.Play();
             }            
         }
     }
-
-
+    
     public override void Retrieved(RpcArgs args)
     {
         throw new System.NotImplementedException();

@@ -5,4 +5,5 @@ using UnityEngine;
 public class FlagZoneSpawn : MonoBehaviour
 {
     public int teamIndex;
+    public FlagZoneType type;
 }
