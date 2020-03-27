@@ -5,6 +5,7 @@ using UnityEngine;
 public class FlagZoneSpawn : MonoBehaviour
 {
     public int teamIndex;
+    public float radius = 10f;
     public FlagZoneType type;
 
     private void OnDrawGizmos()
@@ -20,6 +21,6 @@ public class FlagZoneSpawn : MonoBehaviour
             Gizmos.color = new Color(0.14f, 0.65f, 1f, 1f);
         }
 
-        Gizmos.DrawWireSphere(transform.position, 8f);
+        Gizmos.DrawWireSphere(transform.position, radius);
     }
 }
