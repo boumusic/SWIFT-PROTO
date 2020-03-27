@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedInterpol("{\"inter\":[0,0,0]")]
+	[GeneratedInterpol("{\"inter\":[0,0,0,0]")]
 	public partial class NetworkedFlagNetworkObject : NetworkObject
 	{
 		public const int IDENTITY = 6;
@@ -108,6 +108,37 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			if (typeChanged != null) typeChanged(_type, timestep);
 			if (fieldAltered != null) fieldAltered("type", _type, timestep);
 		}
+		[ForgeGeneratedField]
+		private float _radius;
+		public event FieldEvent<float> radiusChanged;
+		public InterpolateFloat radiusInterpolation = new InterpolateFloat() { LerpT = 0f, Enabled = false };
+		public float radius
+		{
+			get { return _radius; }
+			set
+			{
+				// Don't do anything if the value is the same
+				if (_radius == value)
+					return;
+
+				// Mark the field as dirty for the network to transmit
+				_dirtyFields[0] |= 0x8;
+				_radius = value;
+				hasDirtyFields = true;
+			}
+		}
+
+		public void SetradiusDirty()
+		{
+			_dirtyFields[0] |= 0x8;
+			hasDirtyFields = true;
+		}
+
+		private void RunChange_radius(ulong timestep)
+		{
+			if (radiusChanged != null) radiusChanged(_radius, timestep);
+			if (fieldAltered != null) fieldAltered("radius", _radius, timestep);
+		}
 
 		protected override void OwnershipChanged()
 		{
@@ -120,6 +151,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			isFlagThereInterpolation.current = isFlagThereInterpolation.target;
 			teamIndexInterpolation.current = teamIndexInterpolation.target;
 			typeInterpolation.current = typeInterpolation.target;
+			radiusInterpolation.current = radiusInterpolation.target;
 		}
 
 		public override int UniqueIdentity { get { return IDENTITY; } }
@@ -129,6 +161,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			UnityObjectMapper.Instance.MapBytes(data, _isFlagThere);
 			UnityObjectMapper.Instance.MapBytes(data, _teamIndex);
 			UnityObjectMapper.Instance.MapBytes(data, _type);
+			UnityObjectMapper.Instance.MapBytes(data, _radius);
 
 			return data;
 		}
@@ -147,6 +180,10 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			typeInterpolation.current = _type;
 			typeInterpolation.target = _type;
 			RunChange_type(timestep);
+			_radius = UnityObjectMapper.Instance.Map<float>(payload);
+			radiusInterpolation.current = _radius;
+			radiusInterpolation.target = _radius;
+			RunChange_radius(timestep);
 		}
 
 		protected override BMSByte SerializeDirtyFields()
@@ -160,6 +197,8 @@ namespace BeardedManStudios.Forge.Networking.Generated
 				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _teamIndex);
 			if ((0x4 & _dirtyFields[0]) != 0)
 				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _type);
+			if ((0x8 & _dirtyFields[0]) != 0)
+				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _radius);
 
 			// Reset all the dirty fields
 			for (int i = 0; i < _dirtyFields.Length; i++)
@@ -215,6 +254,19 @@ namespace BeardedManStudios.Forge.Networking.Generated
 					RunChange_type(timestep);
 				}
 			}
+			if ((0x8 & readDirtyFlags[0]) != 0)
+			{
+				if (radiusInterpolation.Enabled)
+				{
+					radiusInterpolation.target = UnityObjectMapper.Instance.Map<float>(data);
+					radiusInterpolation.Timestep = timestep;
+				}
+				else
+				{
+					_radius = UnityObjectMapper.Instance.Map<float>(data);
+					RunChange_radius(timestep);
+				}
+			}
 		}
 
 		public override void InterpolateUpdate()
@@ -236,6 +288,11 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			{
 				_type = (int)typeInterpolation.Interpolate();
 				//RunChange_type(typeInterpolation.Timestep);
+			}
+			if (radiusInterpolation.Enabled && !radiusInterpolation.current.UnityNear(radiusInterpolation.target, 0.0015f))
+			{
+				_radius = (float)radiusInterpolation.Interpolate();
+				//RunChange_radius(radiusInterpolation.Timestep);
 			}
 		}
 
