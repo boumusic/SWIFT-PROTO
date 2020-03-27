@@ -4,16 +4,16 @@ using UnityEngine;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedRPC("{\"types\":[[][][\"string\"][][][]]")]
-	[GeneratedRPCVariableNames("{\"types\":[[][][\"\"][][][]]")]
+	[GeneratedRPC("{\"types\":[[][\"string\"][][][\"string\", \"int\"][\"string\", \"int\"]]")]
+	[GeneratedRPCVariableNames("{\"types\":[[][\"\"][][][\"killerName\", \"killerTeam\"][\"killerName\", \"killerTeam\"]]")]
 	public abstract partial class NetworkedPlayerBehavior : NetworkBehavior
 	{
 		public const byte RPC_ATTACK = 0 + 5;
-		public const byte RPC_DESTROY = 1 + 5;
-		public const byte RPC_CHANGE_NAME = 2 + 5;
-		public const byte RPC_JUMP = 3 + 5;
-		public const byte RPC_LAND = 4 + 5;
-		public const byte RPC_DIE = 5 + 5;
+		public const byte RPC_CHANGE_NAME = 1 + 5;
+		public const byte RPC_JUMP = 2 + 5;
+		public const byte RPC_LAND = 3 + 5;
+		public const byte RPC_DIE = 4 + 5;
+		public const byte RPC_TRY_HIT = 5 + 5;
 		
 		public NetworkedPlayerNetworkObject networkObject = null;
 
@@ -28,11 +28,11 @@ namespace BeardedManStudios.Forge.Networking.Generated
 
 			base.SetupHelperRpcs(networkObject);
 			networkObject.RegisterRpc("Attack", Attack);
-			networkObject.RegisterRpc("Destroy", Destroy);
 			networkObject.RegisterRpc("ChangeName", ChangeName, typeof(string));
 			networkObject.RegisterRpc("Jump", Jump);
 			networkObject.RegisterRpc("Land", Land);
-			networkObject.RegisterRpc("Die", Die);
+			networkObject.RegisterRpc("Die", Die, typeof(string), typeof(int));
+			networkObject.RegisterRpc("TryHit", TryHit, typeof(string), typeof(int));
 
 			networkObject.onDestroy += DestroyGameObject;
 
@@ -116,10 +116,6 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		/// <summary>
 		/// Arguments:
 		/// </summary>
-		public abstract void Destroy(RpcArgs args);
-		/// <summary>
-		/// Arguments:
-		/// </summary>
 		public abstract void ChangeName(RpcArgs args);
 		/// <summary>
 		/// Arguments:
@@ -133,6 +129,10 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		/// Arguments:
 		/// </summary>
 		public abstract void Die(RpcArgs args);
+		/// <summary>
+		/// Arguments:
+		/// </summary>
+		public abstract void TryHit(RpcArgs args);
 
 		// DO NOT TOUCH, THIS GETS GENERATED PLEASE EXTEND THIS CLASS IF YOU WISH TO HAVE CUSTOM CODE ADDITIONS
 	}

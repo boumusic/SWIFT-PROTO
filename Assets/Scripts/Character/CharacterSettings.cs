@@ -9,13 +9,14 @@ public class CharacterSettings : ScriptableObject
 
     [Header("Run")]
     public float runSpeed = 5f;
-    public float accelerationSpeed = 1f;
+    [Range(0.01f, 20)] public float accelerationSpeed = 1f;
     public AnimationCurve accelerationCurve;
-    
-    public float decelerationSpeed = 1f;
+
+    [Range(1, 20)] public float decelerationSpeed = 1f;
     public AnimationCurve decelerationCurve;
 
     public float dotSpeedMultiplier = 0.9f;
+    public float flagMultiplier = 0.9f;
 
     [Header("Jump")]
     public int jumpCount = 2;
@@ -25,8 +26,10 @@ public class CharacterSettings : ScriptableObject
     public bool resetVelocityOnJump = false;
     public float coyoteTime = 0.3f;
 
+    [Range(1, 20)] public float jumpDecelerationSpeed = 1f;
+    [Range(0.01f, 20)] public float jumpAccelerationSpeed = 1f;
+
     [Header("Fall")]
-    public float airControl = 0.7f;
     public float fallStrength = 2f;
     public float fallProgressSpeed = 1f;
     public AnimationCurve fallCurve;

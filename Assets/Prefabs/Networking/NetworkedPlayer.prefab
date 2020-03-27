@@ -49,9 +49,14 @@ MonoBehaviour:
   playerCharacter: {fileID: 5956535182550062000}
   playerCamera: {fileID: 5956535183448673370}
   playerRb: {fileID: 5956535182550062003}
+  coll: {fileID: 5956535182550062002}
   tpsCharacter: {fileID: 5956535184425941361}
   characterAnimator: {fileID: 7603398387840196994}
   nameText: {fileID: 3482324083475654934}
+  playerName: DefaultName
+  teamIndex: 0
+  flag: {fileID: 0}
+  isAlive: 0
 --- !u!1001 &7210525686735752730
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -59,6 +64,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 8203772615182936409}
     m_Modifications:
+    - target: {fileID: 1077172128972357243, guid: cd71e6b2ab118ad49beea1339ceaf6be,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3943239951627418632, guid: cd71e6b2ab118ad49beea1339ceaf6be,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -119,6 +129,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 3943239952994940779, guid: cd71e6b2ab118ad49beea1339ceaf6be,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5077145631773406175, guid: cd71e6b2ab118ad49beea1339ceaf6be,
         type: 3}
       propertyPath: m_Mesh
@@ -165,6 +180,12 @@ MonoBehaviour:
 --- !u!54 &5956535182550062003 stripped
 Rigidbody:
   m_CorrespondingSourceObject: {fileID: 3943239952513736105, guid: cd71e6b2ab118ad49beea1339ceaf6be,
+    type: 3}
+  m_PrefabInstance: {fileID: 7210525686735752730}
+  m_PrefabAsset: {fileID: 0}
+--- !u!136 &5956535182550062002 stripped
+CapsuleCollider:
+  m_CorrespondingSourceObject: {fileID: 3943239952513736104, guid: cd71e6b2ab118ad49beea1339ceaf6be,
     type: 3}
   m_PrefabInstance: {fileID: 7210525686735752730}
   m_PrefabAsset: {fileID: 0}

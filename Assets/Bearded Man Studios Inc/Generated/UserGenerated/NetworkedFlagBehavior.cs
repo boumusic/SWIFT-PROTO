@@ -4,13 +4,14 @@ using UnityEngine;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedRPC("{\"types\":[[\"string\"][\"string\", \"int\"][]]")]
-	[GeneratedRPCVariableNames("{\"types\":[[\"\"][\"\", \"\"][]]")]
+	[GeneratedRPC("{\"types\":[[\"string\"][][\"string\", \"int\"][]]")]
+	[GeneratedRPCVariableNames("{\"types\":[[\"\"][][\"\", \"\"][]]")]
 	public abstract partial class NetworkedFlagBehavior : NetworkBehavior
 	{
-		public const byte RPC_STOLEN = 0 + 5;
-		public const byte RPC_SCORED = 1 + 5;
-		public const byte RPC_RETRIEVED = 2 + 5;
+		public const byte RPC_CAPTURED = 0 + 5;
+		public const byte RPC_RETRIEVED = 1 + 5;
+		public const byte RPC_SCORED = 2 + 5;
+		public const byte RPC_RESPAWN_FLAG = 3 + 5;
 		
 		public NetworkedFlagNetworkObject networkObject = null;
 
@@ -24,9 +25,10 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			networkObject.AttachedBehavior = this;
 
 			base.SetupHelperRpcs(networkObject);
-			networkObject.RegisterRpc("Stolen", Stolen, typeof(string));
-			networkObject.RegisterRpc("Scored", Scored, typeof(string), typeof(int));
+			networkObject.RegisterRpc("Captured", Captured, typeof(string));
 			networkObject.RegisterRpc("Retrieved", Retrieved);
+			networkObject.RegisterRpc("Scored", Scored, typeof(string), typeof(int));
+			networkObject.RegisterRpc("RespawnFlag", RespawnFlag);
 
 			networkObject.onDestroy += DestroyGameObject;
 
@@ -107,17 +109,19 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		/// Arguments:
 		/// string
 		/// </summary>
-		public abstract void Stolen(RpcArgs args);
+		public abstract void Captured(RpcArgs args);
 		/// <summary>
 		/// Arguments:
-		/// string 
-		/// int
+		/// </summary>
+		public abstract void Retrieved(RpcArgs args);
+		/// <summary>
+		/// Arguments:
 		/// </summary>
 		public abstract void Scored(RpcArgs args);
 		/// <summary>
 		/// Arguments:
 		/// </summary>
-		public abstract void Retrieved(RpcArgs args);
+		public abstract void RespawnFlag(RpcArgs args);
 
 		// DO NOT TOUCH, THIS GETS GENERATED PLEASE EXTEND THIS CLASS IF YOU WISH TO HAVE CUSTOM CODE ADDITIONS
 	}

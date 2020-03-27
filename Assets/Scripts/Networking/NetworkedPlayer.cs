@@ -18,6 +18,7 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
 
     [Header("References")]
     public Rigidbody playerRb;
+    public Collider coll;
     public GameObject tpsCharacter;
     public CharacterAnimator characterAnimator;
     public TextMeshPro nameText;
@@ -29,6 +30,8 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
     public int teamIndex;
     public Flag flag;
     public bool HasFlag => flag != null;
+
+    public bool isAlive;
 
     protected override void NetworkStart()
     {
@@ -46,14 +49,11 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
             nameText.GetComponentInParent<LookAtCamera>().cam = Camera.main.transform;
 
             tpsCharacter.SetActive(true);
-
-            networkObject.Networker.disconnected += x =>
-            {
-                networkObject.Destroy();
-            };
         }
         else
         {
+            UIManager.Instance.AssignPlayer(this.player);
+
             networkObject.UpdateInterval = (ulong)16.6667f;
 
             SetName();
@@ -70,16 +70,21 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
             {
                 networkObject.SendRpc(RPC_ATTACK, Receivers.Others);
             };
-            characterAnimator.onDeathAnim += () =>
-            {
-                networkObject.SendRpc(RPC_DIE, Receivers.Others);
-            };
 
+        }
+        
+        if (networkObject.IsServer)
+        {
+            isAlive = true;
+            networkObject.alive = isAlive;
         }
     }
 
+    private void OnApplicationQuit()
+    {
+        networkObject.Destroy();
+    }
 
-    private Vector3 previousPosition;
     private void Update()
     {
         if (!networkObject.IsOwner)
@@ -91,45 +96,19 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
             characterTransform.position = networkObject.position;
 
             // run animation
-            Vector3 velocity = networkObject.localVelocity;
-
-            Vector3 runVelocity = velocity;
-            runVelocity.y = 0;
-            bool isRunning = runVelocity.magnitude > 0.005f;
-
-            characterAnimator.Run(isRunning, velocity);
-
-            previousPosition = characterTransform.position;
+            characterAnimator.Run(networkObject.running, networkObject.localVelocity);
 
             // climb animation
             characterAnimator.WallClimb(networkObject.climbing);
         }
         else
         {
-            if (Input.GetKeyDown(KeyCode.Escape))
-            {
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
-                player.enabled = false;
-            }
-            if (Input.GetMouseButtonDown(0) &&
-            Application.isFocused)
-            {
-                Cursor.lockState = CursorLockMode.Confined;
-                Cursor.visible = false;
-                player.enabled = true;
-            }
-        }
-    }
-
-    private void FixedUpdate()
-    {
-        if (networkObject.IsOwner)
-        {
             networkObject.position = characterTransform.position;
             networkObject.rotation = tpsCharacter.transform.rotation;
             networkObject.localVelocity = playerCharacter.Velocity;
             networkObject.climbing = playerCharacter.CurrentState == CharacterState.WallClimbing;
+            networkObject.running = playerCharacter.Axis.magnitude != 0;
+
         }
     }
 
@@ -141,6 +120,35 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
         nameText.enabled = false;
 
         networkObject.SendRpc(RPC_CHANGE_NAME, Receivers.AllBuffered, PlayerInfoManager.Instance.playerName);
+    }
+
+    private IEnumerator Respawn()
+    {
+        yield return new WaitForSeconds(3);
+
+        if (networkObject.IsOwner)
+        {
+            if (playerCharacter.tps.activeInHierarchy) playerCharacter.ToggleTPS();
+
+            playerCharacter.enabled = true;
+            player.enabled = true;
+            playerRb.useGravity = false;
+            characterTransform.position = Vector3.zero;
+        }
+        else
+        {
+            coll.enabled = true;
+
+            //todo
+        }
+
+        if (NetworkManager.Instance.IsServer)
+        {
+            isAlive = true;
+            networkObject.alive = isAlive;
+        }
+
+        characterAnimator.Land();
     }
 
     public override void Attack(RpcArgs args)
@@ -156,7 +164,6 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
 
     public override void Jump(RpcArgs args)
     {
-        Debug.Log(networkObject.IsOwner ? "owner " : "remote " + "is jumping");
         characterAnimator.Jump();
     }
 
@@ -167,11 +174,33 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
 
     public override void Die(RpcArgs args)
     {
+        if (networkObject.IsOwner)
+        {
+            if (!playerCharacter.tps.activeInHierarchy) playerCharacter.ToggleTPS();
+            playerCharacter.enabled = false;
+            player.enabled = false;
+            playerRb.useGravity = true;
+        }
+        else
+        {
+            coll.enabled = false;
+
+            //todo : flag
+        }
+
         characterAnimator.Death();
+
+        UIManager.Instance.DisplayKillFeed(args.GetNext<string>(), args.GetNext<int>(), playerName, teamIndex);
+
+        StartCoroutine(Respawn());
     }
 
-    public override void Destroy(RpcArgs args)
+    public override void TryHit(RpcArgs args)
     {
-        throw new System.NotImplementedException();
+        if (!isAlive) return;
+
+        isAlive = false;
+
+        networkObject.SendRpc(RPC_DIE, Receivers.All, args.GetNext<string>(), args.GetNext<int>());
     }
 }

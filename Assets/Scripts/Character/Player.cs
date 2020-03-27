@@ -24,19 +24,22 @@ public class Player : MonoBehaviour
     public KeyCode attack = KeyCode.Mouse0;
     public KeyCode dash = KeyCode.LeftShift;
     public KeyCode toggleTps = KeyCode.H;
-
-
+    public KeyCode pause = KeyCode.Escape;
+    
     [Header("Team")]
     public int debugTeamIndex = -1;
     public int TeamIndex => TeamManager.Instance.GetIndex(this);
     public Color TeamColor => TeamManager.Instance.GetTeamColor(TeamIndex);
 
-    public Character Character { get => character;}
+    public Character Character { get => character; }
 
-    private string playerName = "XxkillerxX";
+    private string playerName = "KRUSHER99";
 
     private void Awake()
     {
+        Cursor.visible = cursor;
+        Cursor.lockState = cursor ? CursorLockMode.None : CursorLockMode.Locked;
+
         InitializeCharacter();
         SetPlayerName(playerName);
 
@@ -64,31 +67,37 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        Cursor.visible = cursor;
-        Cursor.lockState = cursor ? CursorLockMode.None : CursorLockMode.Locked;
-        UpdateAxis();
-        UpdateMouse();
-
-        character.InputSpacebar(Input.GetKey(jump));
-
-        if (Input.GetKeyDown(jump))
+        if(!UIManager.Instance.IsPaused)
         {
-            character.Jump();
+            UpdateAxis();
+            UpdateMouse();
+
+            character.InputSpacebar(Input.GetKey(jump));
+            if (Input.GetKeyDown(jump))
+            {
+                character.Jump();
+            }
+
+            if (Input.GetKeyDown(attack))
+            {
+                character.TryAttack();
+            }
+
+            if (Input.GetKeyDown(dash))
+            {
+                character.StartDash();
+            }
+
+            if (Input.GetKeyDown(toggleTps))
+            {
+                character.ToggleTPS();
+            }
         }
 
-        if (Input.GetKeyDown(attack))
+        if (Input.GetKeyDown(pause) || Input.GetKeyDown(KeyCode.P))
         {
-            character.TryAttack();
-        }
-
-        if (Input.GetKeyDown(dash))
-        {
-            character.StartDash();
-        }
-
-        if (Input.GetKeyDown(toggleTps))
-        {
-            character.ToggleTPS();
+            character.InputAxis(Vector2.zero);
+            UIManager.Instance.TogglePause();
         }
     }
 

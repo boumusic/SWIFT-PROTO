@@ -3,18 +3,26 @@ using System.Collections.Generic;
 using UnityEngine;
 using MonsterLove.StateMachine;
 using System;
+using BeardedManStudios.Forge.Networking;
+using BeardedManStudios.Forge.Networking.Unity;
+using BeardedManStudios.Forge.Networking.Generated;
+using MonsterLove.StateMachine;
 
 public class Character : MonoBehaviour
 {
     [Header("Components")]
     public Rigidbody body;
+    public Collider coll;
     public CharacterSettings m;
     public PlayerCamera playerCamera;
     public CharacterAnimator animator;
     public CharacterFeedbacks feedbacks;
 
+
     [Header("Visuals")]
     public GameObject tps;
+    public GameObject flagVisuals;
+    public Renderer flagVisualsRend;
     public GameObject fps;
     public bool startTps = false;
     private Player player;
@@ -23,9 +31,10 @@ public class Character : MonoBehaviour
 
     #region Movement
 
-    private float currentAccel;
-    private float accelProgress;
+    private Vector2 accelProgress;
     private Vector2 axis;
+    public Vector2 Axis { get => axis;}
+
     private Vector3 DesiredVelocity => CamRotation * new Vector3(axis.x, 0, axis.y);
     private Vector3 velocity;
     private Vector3 currentVel;
@@ -45,11 +54,20 @@ public class Character : MonoBehaviour
 
     public Vector3 Forward => new Vector3(playerCamera.transform.forward.x, 0, playerCamera.transform.forward.z);
     public Vector3 Right => new Vector3(playerCamera.transform.right.x, 0, playerCamera.transform.right.z);
+    public bool Dashing => CurrentState == CharacterState.Dashing;
+    public Vector3 FinalVelocity
+    {
+        get
+        {
+            if (grounded || Dashing) return CamRotation * Velocity;
+            else return LastCamRotation * Velocity;
 
-    public Vector3 FinalVelocity => CamRotation * WallSlideRotation * Velocity;
+        }
+    }
     public float FacingVelocity => Mathf.Clamp01(Vector3.Dot(Forward, FinalVelocity));
     public float CameraRoll => Vector3.Dot(Right, FinalVelocity.normalized) * (CurrentState == CharacterState.Jumping ? 3.5f : 1f);
 
+    private Quaternion LastCamRotation;
     public Quaternion CamRotation => playerCamera.Forward;
 
     public bool IsRunning { get => isRunning; }
@@ -58,11 +76,10 @@ public class Character : MonoBehaviour
     public Vector3 FeetOrigin => transform.position + Vector3.up * m.groundRaycastUp;
     public Vector3 FeetDestination => FeetOrigin - Vector3.up * m.groundRaycastDown;
     public Vector3 CastBox => new Vector3(m.castBoxWidth, 1f, m.castBoxWidth);
-    private Quaternion WallSlideRotation = Quaternion.identity;
 
     private bool grounded => CurrentState == CharacterState.Grounded;
-    private float CurrentDecelSpeed => grounded ? m.decelerationSpeed : 0;
-    private float CurrentAccelSpeed => grounded ? m.accelerationSpeed : m.accelerationSpeed * m.airControl;
+    private float CurrentDecelSpeed => grounded ? m.decelerationSpeed : m.jumpDecelerationSpeed;
+    private float CurrentAccelSpeed => grounded ? m.accelerationSpeed : m.jumpAccelerationSpeed;
 
     #region Dash
 
@@ -141,32 +158,47 @@ public class Character : MonoBehaviour
         this.player = player;
     }
 
+    private float xAccel = 0f;
+    private float zAccel = 0f;
+
     private void CalculateHorizontalVelocity()
     {
+        if (axis.magnitude != 0) LastCamRotation = CamRotation;
         if (CurrentState != CharacterState.WallClimbing)
         {
-            if (axis.magnitude != 0)
-            {
-                accelProgress += Time.deltaTime * m.accelerationSpeed;
-                currentAccel = m.accelerationCurve.Evaluate(accelProgress);
-                Vector2 usedAxis = axis;
-                float x = usedAxis.x;
-                float z = usedAxis.y;
-                Vector3 target = new Vector3(x, 0, z).normalized * m.runSpeed;
-                Vector3 horiz = target * currentAccel;
-                velocity = new Vector3(horiz.x, velocity.y, horiz.z);
-            }
+            Vector2 usedAxis = CurrentState == CharacterState.Grounded ? axis : axis;
+            Accel(ref xAccel, usedAxis.x);
+            Accel(ref zAccel, usedAxis.y);
+            Vector3 target = new Vector3(xAccel, 0, zAccel) * m.runSpeed * (HasFlag? m.flagMultiplier : 1);
 
-            else
-            {
-                accelProgress -= Time.deltaTime * CurrentDecelSpeed;
-                currentAccel = m.decelerationCurve.Evaluate(accelProgress);
-                velocity = new Vector3(velocity.x / currentAccel, velocity.y, velocity.z / currentAccel);
-            }
-            
+            velocity = target;
             if (CurrentState == CharacterState.Dashing) velocity = new Vector3(dashVelocity.x, 0f, dashVelocity.z);
         }
-        accelProgress = Mathf.Clamp01(accelProgress);
+    }
+
+    private void Accel(ref float accel, float axis)
+    {
+        if (axis != 0)
+        {
+            accel += axis * Time.deltaTime * CurrentAccelSpeed;
+        }
+
+        else
+        {
+            accel /= CurrentDecelSpeed;
+        }
+        accel = Mathf.Clamp(accel, -1f, 1f);
+
+        if (Mathf.Abs(accel) < 0.001f) accel = 0f;
+    }
+
+    private void SnapAccelToAxis()
+    {
+        if(axis.magnitude != 0)
+        {
+            xAccel = axis.x;
+            zAccel = axis.y;
+        }        
     }
 
     private void ResetVelocity()
@@ -219,6 +251,8 @@ public class Character : MonoBehaviour
         }
 
         CastWall();
+
+        /*
         if (hits.Length > 0 && m.slideAgainstWalls)
         {
             Vector3 wallNormal = hits[0].normal;
@@ -236,6 +270,7 @@ public class Character : MonoBehaviour
 
         else
             WallSlideRotation = Quaternion.identity;
+        */
     }
 
     private void TryStopCoyote()
@@ -248,7 +283,7 @@ public class Character : MonoBehaviour
         yield return new WaitForSeconds(m.coyoteTime);
         jumpLeft = 1;
     }
-    
+
     public bool CastGround()
     {
         if (Physics.BoxCast(FeetOrigin, CastBox * m.groundCastRadius, -Vector3.up, out hit, Quaternion.identity, m.groundRaycastDown, m.groundMask))
@@ -273,15 +308,18 @@ public class Character : MonoBehaviour
     {
         if (jumpLeft > 0 && CurrentState != CharacterState.Dashing)
         {
-            jumpLeft--;
             stateMachine.ChangeState(CharacterState.Jumping);
-            
-            if (m.resetVelocityOnJump) ResetVelocity();
         }
     }
 
     private void Jumping_Enter()
     {
+        if(axis.magnitude != 0)
+            LastCamRotation = CamRotation;
+
+        jumpLeft--;
+        SnapAccelToAxis();
+        if (m.resetVelocityOnJump) ResetVelocity();
         jumpProgress = 0f;
         animator.Jump();
         animator.Grounded(false);
@@ -336,12 +374,12 @@ public class Character : MonoBehaviour
 
     public void StartDash()
     {
-        if(CanDash)
+        if (CanDash)
         {
             OnDash?.Invoke();
-            stateMachine.ChangeState(CharacterState.Dashing);            
-        }       
-    }    
+            stateMachine.ChangeState(CharacterState.Dashing);
+        }
+    }
 
     private void Dashing_Enter()
     {
@@ -349,7 +387,7 @@ public class Character : MonoBehaviour
         if (axis.magnitude != 0)
             dashAxis = axis;
         else
-            dashAxis = new Vector2(transform.forward.x, transform.forward.z);
+            dashAxis = new Vector2(0, 1);
 
         dashProgress = 0f;
         dashCooldownProgress = 0f;
@@ -362,7 +400,7 @@ public class Character : MonoBehaviour
     {
         dashProgress += Time.deltaTime * m.dashProgressSpeed;
         dashVelocity = new Vector3(dashAxis.x, 0f, dashAxis.y).normalized * m.dashCurve.Evaluate(dashProgress) * m.dashStrength;
-        if(dashProgress >= 1f)
+        if (dashProgress >= 1f)
         {
             stateMachine.ChangeState(CharacterState.Falling);
         }
@@ -370,9 +408,9 @@ public class Character : MonoBehaviour
 
     private void DashCooldown()
     {
-        if(!cooldownDashDone)
+        if (!cooldownDashDone)
         {
-            if(dashCooldownProgress < 1f)
+            if (dashCooldownProgress < 1f)
             {
                 dashCooldownProgress += Time.deltaTime / m.dashCooldown;
             }
@@ -430,7 +468,7 @@ public class Character : MonoBehaviour
     public bool CastWall()
     {
         RaycastHit[] down = Physics.RaycastAll(transform.position, DesiredVelocity, m.slideWallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
-        RaycastHit[] up = Physics.RaycastAll(transform.position + Vector3.up * 2f, DesiredVelocity, m.slideWallCastLength ,m.groundMask, QueryTriggerInteraction.Ignore);
+        RaycastHit[] up = Physics.RaycastAll(transform.position + Vector3.up * 2f, DesiredVelocity, m.slideWallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
         List<RaycastHit> final = new List<RaycastHit>();
         for (int i = 0; i < down.Length; i++)
         {
@@ -468,10 +506,15 @@ public class Character : MonoBehaviour
 
     private bool isDead = false;
 
-    private void Die()
+    public void Die()
     {
         if (!isDead)
         {
+            DropFlag();
+            ResetVelocity();
+            flagVisuals.SetActive(false);
+            coll.enabled = false;
+            healthPointsLeft = 0;
             isDead = true;
             animator.Death();
             RespawnManager.Instance.Death(this);
@@ -482,6 +525,7 @@ public class Character : MonoBehaviour
     private IEnumerator DeathAnim()
     {
         yield return new WaitForSeconds(1.5f);
+        coll.enabled = true;
         Disable();
     }
 
@@ -489,7 +533,7 @@ public class Character : MonoBehaviour
     {
         gameObject.SetActive(false);
     }
-    
+
     public void Respawn()
     {
         gameObject.SetActive(true);
@@ -506,9 +550,10 @@ public class Character : MonoBehaviour
 
     #region Attack
 
+    public bool CanAttack => CurrentState != CharacterState.WallClimbing && !isAttacking && !HasFlag;
     public void TryAttack()
     {
-        if (CurrentState != CharacterState.WallClimbing && !isAttacking)
+        if (CanAttack)
         {
             animator.Attack();
             StartCoroutine(AttackDelay());
@@ -521,12 +566,34 @@ public class Character : MonoBehaviour
         OnAttack?.Invoke();
         isAttacking = true;
         StartCoroutine(AttackDuration());
-        Vector3 center = transform.position + Vector3.up * 1.8f + Forward * m.attackLength / 2f;
+        Vector3 center = transform.position + Vector3.up * 1.8f + playerCamera.transform.forward * m.attackLength / 2f;
         Vector3 halfExtents = new Vector3(m.attackWidth, m.attackHeight, m.attackLength) / 2f;
         RaycastHit[] hits = Physics.BoxCastAll(center, halfExtents, Vector3.forward, Quaternion.identity, m.attackLength);
 
         if (hits.Length > 0)
         {
+            if (NetworkManager.Instance != null)
+            {
+                for (int i = 0; i < hits.Length; i++)
+                {
+                    NetworkedPlayer player;
+                    if (hits[i].collider.transform.root.TryGetComponent(out player))
+                    {
+                        if (player.player == null)
+                        {
+                            NetworkedPlayer myNetworkerPlayer = transform.root.GetComponent<NetworkedPlayer>();
+                            player.networkObject.SendRpc(NetworkedPlayerBehavior.RPC_TRY_HIT, Receivers.Server, 
+                                myNetworkerPlayer.playerName, myNetworkerPlayer.teamIndex);
+
+                            UIManager.Instance.HitMarker();
+                        }
+                    }
+                }
+
+                // don't do the "normal" hit dectection
+                yield return null;
+            }
+
             for (int i = 0; i < hits.Length; i++)
             {
                 Character chara;
@@ -537,7 +604,6 @@ public class Character : MonoBehaviour
                         if (!chara.isDead)
                         {
                             chara.TakeDamage(m.damage);
-                            OnKill?.Invoke();
                             UIManager.Instance.DisplayKillFeed(this, chara);
                         }
                     }
@@ -569,6 +635,7 @@ public class Character : MonoBehaviour
 
     private void OrientModel()
     {
+        if (Forward != Vector3.zero)
         tps.transform.forward = Forward;
     }
 
@@ -584,6 +651,7 @@ public class Character : MonoBehaviour
     public void Capture(Flag flag)
     {
         flag.gameObject.SetActive(false);
+        flagVisuals.SetActive(true);
         UIManager.Instance.LogMessage(PlayerName + " captured the Flag !");
         this.flag = flag;
     }
@@ -592,11 +660,24 @@ public class Character : MonoBehaviour
     {
         string message = PlayerName + " scored for team " + TeamIndex + "!";
         UIManager.Instance.LogMessage(message);
-        flag.gameObject.SetActive(true);
-        flag = null;
+        ResetFlag();
         TeamManager.Instance.Score(TeamIndex);
         CTFManager.Instance.OnTeamScored?.Invoke();
         OnScore?.Invoke();
+    }
+
+    private void DropFlag()
+    {
+        string message = "The flag has been retreived!";
+        UIManager.Instance.LogMessage(message);
+        ResetFlag();
+    }
+
+    private void ResetFlag()
+    {
+        flag.gameObject.SetActive(true);
+        flagVisuals.SetActive(false);
+        flag = null;
     }
 
     #endregion
@@ -606,6 +687,8 @@ public class Character : MonoBehaviour
     public void UpdateColor()
     {
         GetComponentInChildren<SkinnedMeshRenderer>(true).material.SetColor("_Color", TeamColor);
+        if(player)
+            flagVisualsRend.material.SetColor("_Color", TeamManager.Instance.GetOppositeTeamColor(player.TeamIndex));
     }
 
     #endregion

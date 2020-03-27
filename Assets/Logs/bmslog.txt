@@ -1,0 +1,322 @@
+[25/03/2020 01:47:11 - INFO] ========= START RUN =========
+[25/03/2020 02:08:22 - INFO] ========= START RUN =========
+[25/03/2020 02:08:34 - EXCEPTION] Message: Une seule utilisation de chaque adresse de socket (protocole/adresse réseau/port) est habituellement autorisée.
+
+  at System.Net.Sockets.Socket.Bind (System.Net.EndPoint localEP) [0x00043] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at BeardedManStudios.Forge.Networking.CachedUdpClient.InitSocket (System.Net.EndPoint localEP) [0x0003f] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\CachedUdpClient.cs:141 
+  at BeardedManStudios.Forge.Networking.CachedUdpClient..ctor (System.Int32 port) [0x0006b] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\CachedUdpClient.cs:78 
+  at BeardedManStudios.Forge.Networking.UDPServer.Connect (System.String host, System.UInt16 port, System.String natHost, System.UInt16 natPort) [0x0001d] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\UDPServer.cs:170 
+  at System.Environment.get_StackTrace () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at BMSLogger.PutLogInFile (BeardedManStudios.Forge.Logging.BMSLog+Logtype type, System.String log) [0x00089] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Logging\BMSLogger.cs:200 
+  at BMSLogger.LogException (System.String log) [0x00014] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Logging\BMSLogger.cs:129 
+  at BeardedManStudios.Forge.Logging.BMSLog.InternalLog (BeardedManStudios.Forge.Logging.BMSLog+Logtype type, System.String text, System.Object[] args) [0x000a9] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Logging\BMSLog.cs:107 
+  at BeardedManStudios.Forge.Logging.BMSLog.LogException (System.Exception ex) [0x00001] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Logging\BMSLog.cs:54 
+  at BeardedManStudios.Forge.Networking.UDPServer.Connect (System.String host, System.UInt16 port, System.String natHost, System.UInt16 natPort) [0x00134] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\UDPServer.cs:208 
+  at MultiplayerMenu.Host () [0x0005f] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Multiplayer Menu\MultiplayerMenu.cs:149 
+  at UnityEngine.Events.InvokableCall.Invoke () [0x00000] in <94c5f4c38cdc42d2b006f8badef04394>:0 
+  at UnityEngine.Events.UnityEvent.Invoke () [0x00000] in <94c5f4c38cdc42d2b006f8badef04394>:0 
+  at UnityEngine.UI.Button.Press () [0x00027] in C:\Program Files\Unity\Hub\Editor\2019.3.3f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.ugui\Runtime\UI\Core\Button.cs:68 
+  at UnityEngine.UI.Button.OnPointerClick (UnityEngine.EventSystems.PointerEventData eventData) [0x00010] in C:\Program Files\Unity\Hub\Editor\2019.3.3f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.ugui\Runtime\UI\Core\Button.cs:110 
+  at UnityEngine.EventSystems.ExecuteEvents.Execute (UnityEngine.EventSystems.IPointerClickHandler handler, UnityEngine.EventSystems.BaseEventData eventData) [0x00001] in C:\Program Files\Unity\Hub\Editor\2019.3.3f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.ugui\Runtime\EventSystem\ExecuteEvents.cs:50 
+  at UnityEngine.EventSystems.ExecuteEvents.Execute[T] (UnityEngine.GameObject target, UnityEngine.EventSystems.BaseEventData eventData, UnityEngine.EventSystems.ExecuteEvents+EventFunction`1[T1] functor) [0x0006c] in C:\Program Files\Unity\Hub\Editor\2019.3.3f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.ugui\Runtime\EventSystem\ExecuteEvents.cs:261 
+  at UnityEngine.EventSystems.StandaloneInputModule.ReleaseMouse (UnityEngine.EventSystems.PointerEventData pointerEvent, UnityEngine.GameObject currentOverGo) [0x00036] in C:\Program Files\Unity\Hub\Editor\2019.3.3f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.ugui\Runtime\EventSystem\InputModules\StandaloneInputModule.cs:195 
+  at UnityEngine.EventSystems.StandaloneInputModule.ProcessMousePress (UnityEngine.EventSystems.PointerInputModule+MouseButtonEventData data) [0x00158] in C:\Program Files\Unity\Hub\Editor\2019.3.3f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.ugui\Runtime\EventSystem\InputModules\StandaloneInputModule.cs:644 
+  at UnityEngine.EventSystems.StandaloneInputModule.ProcessMouseEvent (System.Int32 id) [0x0002f] in C:\Program Files\Unity\Hub\Editor\2019.3.3f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.ugui\Runtime\EventSystem\InputModules\StandaloneInputModule.cs:552 
+  at UnityEngine.EventSystems.StandaloneInputModule.ProcessMouseEvent () [0x00001] in C:\Program Files\Unity\Hub\Editor\2019.3.3f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.ugui\Runtime\EventSystem\InputModules\StandaloneInputModule.cs:532 
+  at UnityEngine.EventSystems.StandaloneInputModule.Process () [0x0003e] in C:\Program Files\Unity\Hub\Editor\2019.3.3f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.ugui\Runtime\EventSystem\InputModules\StandaloneInputModule.cs:289 
+  at UnityEngine.EventSystems.EventSystem.Update () [0x000f9] in C:\Program Files\Unity\Hub\Editor\2019.3.3f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.ugui\Runtime\EventSystem\EventSystem.cs:377 
+[25/03/2020 02:12:09 - INFO] ========= START RUN =========
+[25/03/2020 02:17:41 - INFO] ========= START RUN =========
+[25/03/2020 02:20:19 - INFO] ========= START RUN =========
+[25/03/2020 02:38:05 - INFO] ========= START RUN =========
+[25/03/2020 02:39:26 - INFO] ========= START RUN =========
+[25/03/2020 02:48:06 - INFO] ========= START RUN =========
+[25/03/2020 02:48:53 - EXCEPTION] Message: 
+  at (wrapper managed-to-native) System.Net.Sockets.Socket.ReceiveFrom_internal(intptr,byte*,int,System.Net.Sockets.SocketFlags,System.Net.SocketAddress&,int&,bool)
+  at System.Net.Sockets.Socket.ReceiveFrom_internal (System.Net.Sockets.SafeSocketHandle safeHandle, System.Byte* buffer, System.Int32 count, System.Net.Sockets.SocketFlags flags, System.Net.SocketAddress& sockaddr, System.Int32& error, System.Boolean blocking) [0x0000c] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Int32 offset, System.Int32 size, System.Net.Sockets.SocketFlags socketFlags, System.Net.EndPoint& remoteEP, System.Net.Sockets.SocketError& errorCode) [0x00024] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Int32 offset, System.Int32 size, System.Net.Sockets.SocketFlags socketFlags, System.Net.EndPoint& remoteEP) [0x00026] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Net.EndPoint& remoteEP) [0x00000] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at BeardedManStudios.Forge.Networking.CachedUdpClient.Receive (System.Net.IPEndPoint& remoteEP, System.String& endpoint) [0x00033] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\CachedUdpClient.cs:340 
+  at BeardedManStudios.Forge.Networking.UDPClient.ReadNetwork () [0x0002d] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\UDPClient.cs:252 
+  at System.Environment.get_StackTrace () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at BMSLogger.PutLogInFile (BeardedManStudios.Forge.Logging.BMSLog+Logtype type, System.String log) [0x00089] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Logging\BMSLogger.cs:200 
+  at BMSLogger.LogException (System.String log) [0x00014] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Logging\BMSLogger.cs:129 
+  at BeardedManStudios.Forge.Logging.BMSLog.InternalLog (BeardedManStudios.Forge.Logging.BMSLog+Logtype type, System.String text, System.Object[] args) [0x000a9] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Logging\BMSLog.cs:107 
+  at BeardedManStudios.Forge.Logging.BMSLog.LogException (System.Exception ex) [0x00001] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Logging\BMSLog.cs:54 
+  at BeardedManStudios.Forge.Networking.UDPClient.ReadNetwork () [0x00355] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\UDPClient.cs:376 
+  at BeardedManStudios.Threading.Task+<>c__DisplayClass1_0.<Queue>b__0 (System.Object state) [0x0001a] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Threading\Task.cs:72 
+  at System.Threading.QueueUserWorkItemCallback.WaitCallback_Context (System.Object state) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ExecutionContext.RunInternal (System.Threading.ExecutionContext executionContext, System.Threading.ContextCallback callback, System.Object state, System.Boolean preserveSyncCtx) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ExecutionContext.Run (System.Threading.ExecutionContext executionContext, System.Threading.ContextCallback callback, System.Object state, System.Boolean preserveSyncCtx) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.QueueUserWorkItemCallback.System.Threading.IThreadPoolWorkItem.ExecuteWorkItem () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ThreadPoolWorkQueue.Dispatch () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading._ThreadPoolWaitCallback.PerformWaitCallback () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+[25/03/2020 02:48:53 - EXCEPTION] Message: 
+  at (wrapper managed-to-native) System.Net.Sockets.Socket.ReceiveFrom_internal(intptr,byte*,int,System.Net.Sockets.SocketFlags,System.Net.SocketAddress&,int&,bool)
+  at System.Net.Sockets.Socket.ReceiveFrom_internal (System.Net.Sockets.SafeSocketHandle safeHandle, System.Byte* buffer, System.Int32 count, System.Net.Sockets.SocketFlags flags, System.Net.SocketAddress& sockaddr, System.Int32& error, System.Boolean blocking) [0x0000c] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Int32 offset, System.Int32 size, System.Net.Sockets.SocketFlags socketFlags, System.Net.EndPoint& remoteEP, System.Net.Sockets.SocketError& errorCode) [0x00024] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Int32 offset, System.Int32 size, System.Net.Sockets.SocketFlags socketFlags, System.Net.EndPoint& remoteEP) [0x00026] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Net.EndPoint& remoteEP) [0x00000] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at BeardedManStudios.Forge.Networking.CachedUdpClient.Receive (System.Net.IPEndPoint& remoteEP, System.String& endpoint) [0x00033] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\CachedUdpClient.cs:340 
+  at BeardedManStudios.Forge.Networking.UDPClient.ReadNetwork () [0x0002d] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\UDPClient.cs:252 
+  at System.Environment.get_StackTrace () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at BMSLogger.PutLogInFile (BeardedManStudios.Forge.Logging.BMSLog+Logtype type, System.String log) [0x00089] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Logging\BMSLogger.cs:200 
+  at BMSLogger.LogException (System.String log) [0x00014] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Logging\BMSLogger.cs:129 
+  at BeardedManStudios.Forge.Logging.BMSLog.InternalLog (BeardedManStudios.Forge.Logging.BMSLog+Logtype type, System.String text, System.Object[] args) [0x000a9] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Logging\BMSLog.cs:107 
+  at BeardedManStudios.Forge.Logging.BMSLog.LogException (System.Exception ex) [0x00001] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Logging\BMSLog.cs:54 
+  at BeardedManStudios.Forge.Networking.UDPClient.ReadNetwork () [0x00355] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\UDPClient.cs:376 
+  at BeardedManStudios.Threading.Task+<>c__DisplayClass1_0.<Queue>b__0 (System.Object state) [0x0001a] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Threading\Task.cs:72 
+  at System.Threading.QueueUserWorkItemCallback.WaitCallback_Context (System.Object state) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ExecutionContext.RunInternal (System.Threading.ExecutionContext executionContext, System.Threading.ContextCallback callback, System.Object state, System.Boolean preserveSyncCtx) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ExecutionContext.Run (System.Threading.ExecutionContext executionContext, System.Threading.ContextCallback callback, System.Object state, System.Boolean preserveSyncCtx) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.QueueUserWorkItemCallback.System.Threading.IThreadPoolWorkItem.ExecuteWorkItem () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ThreadPoolWorkQueue.Dispatch () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading._ThreadPoolWaitCallback.PerformWaitCallback () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+[25/03/2020 02:48:53 - EXCEPTION] Message: 
+  at (wrapper managed-to-native) System.Net.Sockets.Socket.ReceiveFrom_internal(intptr,byte*,int,System.Net.Sockets.SocketFlags,System.Net.SocketAddress&,int&,bool)
+  at System.Net.Sockets.Socket.ReceiveFrom_internal (System.Net.Sockets.SafeSocketHandle safeHandle, System.Byte* buffer, System.Int32 count, System.Net.Sockets.SocketFlags flags, System.Net.SocketAddress& sockaddr, System.Int32& error, System.Boolean blocking) [0x0000c] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Int32 offset, System.Int32 size, System.Net.Sockets.SocketFlags socketFlags, System.Net.EndPoint& remoteEP, System.Net.Sockets.SocketError& errorCode) [0x00024] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Int32 offset, System.Int32 size, System.Net.Sockets.SocketFlags socketFlags, System.Net.EndPoint& remoteEP) [0x00026] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Net.EndPoint& remoteEP) [0x00000] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at BeardedManStudios.Forge.Networking.CachedUdpClient.Receive (System.Net.IPEndPoint& remoteEP, System.String& endpoint) [0x00033] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\CachedUdpClient.cs:340 
+  at BeardedManStudios.Forge.Networking.UDPClient.ReadNetwork () [0x0002d] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\UDPClient.cs:252 
+  at System.Environment.get_StackTrace () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at BMSLogger.PutLogInFile (BeardedManStudios.Forge.Logging.BMSLog+Logtype type, System.String log) [0x00089] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Logging\BMSLogger.cs:200 
+  at BMSLogger.LogException (System.String log) [0x00014] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Logging\BMSLogger.cs:129 
+  at BeardedManStudios.Forge.Logging.BMSLog.InternalLog (BeardedManStudios.Forge.Logging.BMSLog+Logtype type, System.String text, System.Object[] args) [0x000a9] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Logging\BMSLog.cs:107 
+  at BeardedManStudios.Forge.Logging.BMSLog.LogException (System.Exception ex) [0x00001] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Logging\BMSLog.cs:54 
+  at BeardedManStudios.Forge.Networking.UDPClient.ReadNetwork () [0x00355] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\UDPClient.cs:376 
+  at BeardedManStudios.Threading.Task+<>c__DisplayClass1_0.<Queue>b__0 (System.Object state) [0x0001a] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Threading\Task.cs:72 
+  at System.Threading.QueueUserWorkItemCallback.WaitCallback_Context (System.Object state) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ExecutionContext.RunInternal (System.Threading.ExecutionContext executionContext, System.Threading.ContextCallback callback, System.Object state, System.Boolean preserveSyncCtx) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ExecutionContext.Run (System.Threading.ExecutionContext executionContext, System.Threading.ContextCallback callback, System.Object state, System.Boolean preserveSyncCtx) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.QueueUserWorkItemCallback.System.Threading.IThreadPoolWorkItem.ExecuteWorkItem () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ThreadPoolWorkQueue.Dispatch () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading._ThreadPoolWaitCallback.PerformWaitCallback () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+[25/03/2020 02:48:53 - EXCEPTION] Message: 
+  at (wrapper managed-to-native) System.Net.Sockets.Socket.ReceiveFrom_internal(intptr,byte*,int,System.Net.Sockets.SocketFlags,System.Net.SocketAddress&,int&,bool)
+  at System.Net.Sockets.Socket.ReceiveFrom_internal (System.Net.Sockets.SafeSocketHandle safeHandle, System.Byte* buffer, System.Int32 count, System.Net.Sockets.SocketFlags flags, System.Net.SocketAddress& sockaddr, System.Int32& error, System.Boolean blocking) [0x0000c] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Int32 offset, System.Int32 size, System.Net.Sockets.SocketFlags socketFlags, System.Net.EndPoint& remoteEP, System.Net.Sockets.SocketError& errorCode) [0x00024] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Int32 offset, System.Int32 size, System.Net.Sockets.SocketFlags socketFlags, System.Net.EndPoint& remoteEP) [0x00026] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Net.EndPoint& remoteEP) [0x00000] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at BeardedManStudios.Forge.Networking.CachedUdpClient.Receive (System.Net.IPEndPoint& remoteEP, System.String& endpoint) [0x00033] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\CachedUdpClient.cs:340 
+  at BeardedManStudios.Forge.Networking.UDPClient.ReadNetwork () [0x0002d] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\UDPClient.cs:252 
+  at System.Environment.get_StackTrace () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at BMSLogger.PutLogInFile (BeardedManStudios.Forge.Logging.BMSLog+Logtype type, System.String log) [0x00089] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Logging\BMSLogger.cs:200 
+  at BMSLogger.LogException (System.String log) [0x00014] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Logging\BMSLogger.cs:129 
+  at BeardedManStudios.Forge.Logging.BMSLog.InternalLog (BeardedManStudios.Forge.Logging.BMSLog+Logtype type, System.String text, System.Object[] args) [0x000a9] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Logging\BMSLog.cs:107 
+  at BeardedManStudios.Forge.Logging.BMSLog.LogException (System.Exception ex) [0x00001] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Logging\BMSLog.cs:54 
+  at BeardedManStudios.Forge.Networking.UDPClient.ReadNetwork () [0x00355] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\UDPClient.cs:376 
+  at BeardedManStudios.Threading.Task+<>c__DisplayClass1_0.<Queue>b__0 (System.Object state) [0x0001a] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Threading\Task.cs:72 
+  at System.Threading.QueueUserWorkItemCallback.WaitCallback_Context (System.Object state) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ExecutionContext.RunInternal (System.Threading.ExecutionContext executionContext, System.Threading.ContextCallback callback, System.Object state, System.Boolean preserveSyncCtx) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ExecutionContext.Run (System.Threading.ExecutionContext executionContext, System.Threading.ContextCallback callback, System.Object state, System.Boolean preserveSyncCtx) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.QueueUserWorkItemCallback.System.Threading.IThreadPoolWorkItem.ExecuteWorkItem () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ThreadPoolWorkQueue.Dispatch () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading._ThreadPoolWaitCallback.PerformWaitCallback () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+[25/03/2020 02:48:53 - EXCEPTION] Message: 
+  at (wrapper managed-to-native) System.Net.Sockets.Socket.ReceiveFrom_internal(intptr,byte*,int,System.Net.Sockets.SocketFlags,System.Net.SocketAddress&,int&,bool)
+  at System.Net.Sockets.Socket.ReceiveFrom_internal (System.Net.Sockets.SafeSocketHandle safeHandle, System.Byte* buffer, System.Int32 count, System.Net.Sockets.SocketFlags flags, System.Net.SocketAddress& sockaddr, System.Int32& error, System.Boolean blocking) [0x0000c] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Int32 offset, System.Int32 size, System.Net.Sockets.SocketFlags socketFlags, System.Net.EndPoint& remoteEP, System.Net.Sockets.SocketError& errorCode) [0x00024] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Int32 offset, System.Int32 size, System.Net.Sockets.SocketFlags socketFlags, System.Net.EndPoint& remoteEP) [0x00026] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Net.EndPoint& remoteEP) [0x00000] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at BeardedManStudios.Forge.Networking.CachedUdpClient.Receive (System.Net.IPEndPoint& remoteEP, System.String& endpoint) [0x00033] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\CachedUdpClient.cs:340 
+  at BeardedManStudios.Forge.Networking.UDPClient.ReadNetwork () [0x0002d] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\UDPClient.cs:252 
+  at System.Environment.get_StackTrace () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at BMSLogger.PutLogInFile (BeardedManStudios.Forge.Logging.BMSLog+Logtype type, System.String log) [0x00089] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Logging\BMSLogger.cs:200 
+  at BMSLogger.LogException (System.String log) [0x00014] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Logging\BMSLogger.cs:129 
+  at BeardedManStudios.Forge.Logging.BMSLog.InternalLog (BeardedManStudios.Forge.Logging.BMSLog+Logtype type, System.String text, System.Object[] args) [0x000a9] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Logging\BMSLog.cs:107 
+  at BeardedManStudios.Forge.Logging.BMSLog.LogException (System.Exception ex) [0x00001] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Logging\BMSLog.cs:54 
+  at BeardedManStudios.Forge.Networking.UDPClient.ReadNetwork () [0x00355] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\UDPClient.cs:376 
+  at BeardedManStudios.Threading.Task+<>c__DisplayClass1_0.<Queue>b__0 (System.Object state) [0x0001a] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Threading\Task.cs:72 
+  at System.Threading.QueueUserWorkItemCallback.WaitCallback_Context (System.Object state) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ExecutionContext.RunInternal (System.Threading.ExecutionContext executionContext, System.Threading.ContextCallback callback, System.Object state, System.Boolean preserveSyncCtx) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ExecutionContext.Run (System.Threading.ExecutionContext executionContext, System.Threading.ContextCallback callback, System.Object state, System.Boolean preserveSyncCtx) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.QueueUserWorkItemCallback.System.Threading.IThreadPoolWorkItem.ExecuteWorkItem () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ThreadPoolWorkQueue.Dispatch () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading._ThreadPoolWaitCallback.PerformWaitCallback () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+[25/03/2020 02:48:53 - EXCEPTION] Message: 
+  at (wrapper managed-to-native) System.Net.Sockets.Socket.ReceiveFrom_internal(intptr,byte*,int,System.Net.Sockets.SocketFlags,System.Net.SocketAddress&,int&,bool)
+  at System.Net.Sockets.Socket.ReceiveFrom_internal (System.Net.Sockets.SafeSocketHandle safeHandle, System.Byte* buffer, System.Int32 count, System.Net.Sockets.SocketFlags flags, System.Net.SocketAddress& sockaddr, System.Int32& error, System.Boolean blocking) [0x0000c] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Int32 offset, System.Int32 size, System.Net.Sockets.SocketFlags socketFlags, System.Net.EndPoint& remoteEP, System.Net.Sockets.SocketError& errorCode) [0x00024] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Int32 offset, System.Int32 size, System.Net.Sockets.SocketFlags socketFlags, System.Net.EndPoint& remoteEP) [0x00026] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Net.EndPoint& remoteEP) [0x00000] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at BeardedManStudios.Forge.Networking.CachedUdpClient.Receive (System.Net.IPEndPoint& remoteEP, System.String& endpoint) [0x00033] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\CachedUdpClient.cs:340 
+  at BeardedManStudios.Forge.Networking.UDPClient.ReadNetwork () [0x0002d] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\UDPClient.cs:252 
+  at System.Environment.get_StackTrace () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at BMSLogger.PutLogInFile (BeardedManStudios.Forge.Logging.BMSLog+Logtype type, System.String log) [0x00089] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Logging\BMSLogger.cs:200 
+  at BMSLogger.LogException (System.String log) [0x00014] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Logging\BMSLogger.cs:129 
+  at BeardedManStudios.Forge.Logging.BMSLog.InternalLog (BeardedManStudios.Forge.Logging.BMSLog+Logtype type, System.String text, System.Object[] args) [0x000a9] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Logging\BMSLog.cs:107 
+  at BeardedManStudios.Forge.Logging.BMSLog.LogException (System.Exception ex) [0x00001] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Logging\BMSLog.cs:54 
+  at BeardedManStudios.Forge.Networking.UDPClient.ReadNetwork () [0x00355] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\UDPClient.cs:376 
+  at BeardedManStudios.Threading.Task+<>c__DisplayClass1_0.<Queue>b__0 (System.Object state) [0x0001a] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Threading\Task.cs:72 
+  at System.Threading.QueueUserWorkItemCallback.WaitCallback_Context (System.Object state) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ExecutionContext.RunInternal (System.Threading.ExecutionContext executionContext, System.Threading.ContextCallback callback, System.Object state, System.Boolean preserveSyncCtx) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ExecutionContext.Run (System.Threading.ExecutionContext executionContext, System.Threading.ContextCallback callback, System.Object state, System.Boolean preserveSyncCtx) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.QueueUserWorkItemCallback.System.Threading.IThreadPoolWorkItem.ExecuteWorkItem () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ThreadPoolWorkQueue.Dispatch () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading._ThreadPoolWaitCallback.PerformWaitCallback () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+[25/03/2020 02:48:53 - EXCEPTION] Message: 
+  at (wrapper managed-to-native) System.Net.Sockets.Socket.ReceiveFrom_internal(intptr,byte*,int,System.Net.Sockets.SocketFlags,System.Net.SocketAddress&,int&,bool)
+  at System.Net.Sockets.Socket.ReceiveFrom_internal (System.Net.Sockets.SafeSocketHandle safeHandle, System.Byte* buffer, System.Int32 count, System.Net.Sockets.SocketFlags flags, System.Net.SocketAddress& sockaddr, System.Int32& error, System.Boolean blocking) [0x0000c] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Int32 offset, System.Int32 size, System.Net.Sockets.SocketFlags socketFlags, System.Net.EndPoint& remoteEP, System.Net.Sockets.SocketError& errorCode) [0x00024] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Int32 offset, System.Int32 size, System.Net.Sockets.SocketFlags socketFlags, System.Net.EndPoint& remoteEP) [0x00026] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Net.EndPoint& remoteEP) [0x00000] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at BeardedManStudios.Forge.Networking.CachedUdpClient.Receive (System.Net.IPEndPoint& remoteEP, System.String& endpoint) [0x00033] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\CachedUdpClient.cs:340 
+  at BeardedManStudios.Forge.Networking.UDPClient.ReadNetwork () [0x0002d] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\UDPClient.cs:252 
+  at System.Environment.get_StackTrace () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at BMSLogger.PutLogInFile (BeardedManStudios.Forge.Logging.BMSLog+Logtype type, System.String log) [0x00089] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Logging\BMSLogger.cs:200 
+  at BMSLogger.LogException (System.String log) [0x00014] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Logging\BMSLogger.cs:129 
+  at BeardedManStudios.Forge.Logging.BMSLog.InternalLog (BeardedManStudios.Forge.Logging.BMSLog+Logtype type, System.String text, System.Object[] args) [0x000a9] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Logging\BMSLog.cs:107 
+  at BeardedManStudios.Forge.Logging.BMSLog.LogException (System.Exception ex) [0x00001] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Logging\BMSLog.cs:54 
+  at BeardedManStudios.Forge.Networking.UDPClient.ReadNetwork () [0x00355] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\UDPClient.cs:376 
+  at BeardedManStudios.Threading.Task+<>c__DisplayClass1_0.<Queue>b__0 (System.Object state) [0x0001a] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Threading\Task.cs:72 
+  at System.Threading.QueueUserWorkItemCallback.WaitCallback_Context (System.Object state) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ExecutionContext.RunInternal (System.Threading.ExecutionContext executionContext, System.Threading.ContextCallback callback, System.Object state, System.Boolean preserveSyncCtx) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ExecutionContext.Run (System.Threading.ExecutionContext executionContext, System.Threading.ContextCallback callback, System.Object state, System.Boolean preserveSyncCtx) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.QueueUserWorkItemCallback.System.Threading.IThreadPoolWorkItem.ExecuteWorkItem () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ThreadPoolWorkQueue.Dispatch () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading._ThreadPoolWaitCallback.PerformWaitCallback () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+[25/03/2020 02:48:53 - EXCEPTION] Message: 
+  at (wrapper managed-to-native) System.Net.Sockets.Socket.ReceiveFrom_internal(intptr,byte*,int,System.Net.Sockets.SocketFlags,System.Net.SocketAddress&,int&,bool)
+  at System.Net.Sockets.Socket.ReceiveFrom_internal (System.Net.Sockets.SafeSocketHandle safeHandle, System.Byte* buffer, System.Int32 count, System.Net.Sockets.SocketFlags flags, System.Net.SocketAddress& sockaddr, System.Int32& error, System.Boolean blocking) [0x0000c] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Int32 offset, System.Int32 size, System.Net.Sockets.SocketFlags socketFlags, System.Net.EndPoint& remoteEP, System.Net.Sockets.SocketError& errorCode) [0x00024] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Int32 offset, System.Int32 size, System.Net.Sockets.SocketFlags socketFlags, System.Net.EndPoint& remoteEP) [0x00026] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Net.EndPoint& remoteEP) [0x00000] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at BeardedManStudios.Forge.Networking.CachedUdpClient.Receive (System.Net.IPEndPoint& remoteEP, System.String& endpoint) [0x00033] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\CachedUdpClient.cs:340 
+  at BeardedManStudios.Forge.Networking.UDPClient.ReadNetwork () [0x0002d] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\UDPClient.cs:252 
+  at System.Environment.get_StackTrace () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at BMSLogger.PutLogInFile (BeardedManStudios.Forge.Logging.BMSLog+Logtype type, System.String log) [0x00089] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Logging\BMSLogger.cs:200 
+  at BMSLogger.LogException (System.String log) [0x00014] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Logging\BMSLogger.cs:129 
+  at BeardedManStudios.Forge.Logging.BMSLog.InternalLog (BeardedManStudios.Forge.Logging.BMSLog+Logtype type, System.String text, System.Object[] args) [0x000a9] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Logging\BMSLog.cs:107 
+  at BeardedManStudios.Forge.Logging.BMSLog.LogException (System.Exception ex) [0x00001] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Logging\BMSLog.cs:54 
+  at BeardedManStudios.Forge.Networking.UDPClient.ReadNetwork () [0x00355] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\UDPClient.cs:376 
+  at BeardedManStudios.Threading.Task+<>c__DisplayClass1_0.<Queue>b__0 (System.Object state) [0x0001a] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Threading\Task.cs:72 
+  at System.Threading.QueueUserWorkItemCallback.WaitCallback_Context (System.Object state) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ExecutionContext.RunInternal (System.Threading.ExecutionContext executionContext, System.Threading.ContextCallback callback, System.Object state, System.Boolean preserveSyncCtx) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ExecutionContext.Run (System.Threading.ExecutionContext executionContext, System.Threading.ContextCallback callback, System.Object state, System.Boolean preserveSyncCtx) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.QueueUserWorkItemCallback.System.Threading.IThreadPoolWorkItem.ExecuteWorkItem () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ThreadPoolWorkQueue.Dispatch () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading._ThreadPoolWaitCallback.PerformWaitCallback () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+[25/03/2020 02:48:53 - EXCEPTION] Message: 
+  at (wrapper managed-to-native) System.Net.Sockets.Socket.ReceiveFrom_internal(intptr,byte*,int,System.Net.Sockets.SocketFlags,System.Net.SocketAddress&,int&,bool)
+  at System.Net.Sockets.Socket.ReceiveFrom_internal (System.Net.Sockets.SafeSocketHandle safeHandle, System.Byte* buffer, System.Int32 count, System.Net.Sockets.SocketFlags flags, System.Net.SocketAddress& sockaddr, System.Int32& error, System.Boolean blocking) [0x0000c] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Int32 offset, System.Int32 size, System.Net.Sockets.SocketFlags socketFlags, System.Net.EndPoint& remoteEP, System.Net.Sockets.SocketError& errorCode) [0x00024] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Int32 offset, System.Int32 size, System.Net.Sockets.SocketFlags socketFlags, System.Net.EndPoint& remoteEP) [0x00026] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Net.EndPoint& remoteEP) [0x00000] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at BeardedManStudios.Forge.Networking.CachedUdpClient.Receive (System.Net.IPEndPoint& remoteEP, System.String& endpoint) [0x00033] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\CachedUdpClient.cs:340 
+  at BeardedManStudios.Forge.Networking.UDPClient.ReadNetwork () [0x0002d] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\UDPClient.cs:252 
+  at System.Environment.get_StackTrace () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at BMSLogger.PutLogInFile (BeardedManStudios.Forge.Logging.BMSLog+Logtype type, System.String log) [0x00089] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Logging\BMSLogger.cs:200 
+  at BMSLogger.LogException (System.String log) [0x00014] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Logging\BMSLogger.cs:129 
+  at BeardedManStudios.Forge.Logging.BMSLog.InternalLog (BeardedManStudios.Forge.Logging.BMSLog+Logtype type, System.String text, System.Object[] args) [0x000a9] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Logging\BMSLog.cs:107 
+  at BeardedManStudios.Forge.Logging.BMSLog.LogException (System.Exception ex) [0x00001] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Logging\BMSLog.cs:54 
+  at BeardedManStudios.Forge.Networking.UDPClient.ReadNetwork () [0x00355] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\UDPClient.cs:376 
+  at BeardedManStudios.Threading.Task+<>c__DisplayClass1_0.<Queue>b__0 (System.Object state) [0x0001a] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Threading\Task.cs:72 
+  at System.Threading.QueueUserWorkItemCallback.WaitCallback_Context (System.Object state) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ExecutionContext.RunInternal (System.Threading.ExecutionContext executionContext, System.Threading.ContextCallback callback, System.Object state, System.Boolean preserveSyncCtx) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ExecutionContext.Run (System.Threading.ExecutionContext executionContext, System.Threading.ContextCallback callback, System.Object state, System.Boolean preserveSyncCtx) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.QueueUserWorkItemCallback.System.Threading.IThreadPoolWorkItem.ExecuteWorkItem () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ThreadPoolWorkQueue.Dispatch () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading._ThreadPoolWaitCallback.PerformWaitCallback () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+[25/03/2020 02:48:53 - EXCEPTION] Message: 
+  at (wrapper managed-to-native) System.Net.Sockets.Socket.ReceiveFrom_internal(intptr,byte*,int,System.Net.Sockets.SocketFlags,System.Net.SocketAddress&,int&,bool)
+  at System.Net.Sockets.Socket.ReceiveFrom_internal (System.Net.Sockets.SafeSocketHandle safeHandle, System.Byte* buffer, System.Int32 count, System.Net.Sockets.SocketFlags flags, System.Net.SocketAddress& sockaddr, System.Int32& error, System.Boolean blocking) [0x0000c] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Int32 offset, System.Int32 size, System.Net.Sockets.SocketFlags socketFlags, System.Net.EndPoint& remoteEP, System.Net.Sockets.SocketError& errorCode) [0x00024] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Int32 offset, System.Int32 size, System.Net.Sockets.SocketFlags socketFlags, System.Net.EndPoint& remoteEP) [0x00026] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Net.EndPoint& remoteEP) [0x00000] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at BeardedManStudios.Forge.Networking.CachedUdpClient.Receive (System.Net.IPEndPoint& remoteEP, System.String& endpoint) [0x00033] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\CachedUdpClient.cs:340 
+  at BeardedManStudios.Forge.Networking.UDPClient.ReadNetwork () [0x0002d] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\UDPClient.cs:252 
+  at System.Environment.get_StackTrace () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at BMSLogger.PutLogInFile (BeardedManStudios.Forge.Logging.BMSLog+Logtype type, System.String log) [0x00089] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Logging\BMSLogger.cs:200 
+  at BMSLogger.LogException (System.String log) [0x00014] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Logging\BMSLogger.cs:129 
+  at BeardedManStudios.Forge.Logging.BMSLog.InternalLog (BeardedManStudios.Forge.Logging.BMSLog+Logtype type, System.String text, System.Object[] args) [0x000a9] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Logging\BMSLog.cs:107 
+  at BeardedManStudios.Forge.Logging.BMSLog.LogException (System.Exception ex) [0x00001] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Logging\BMSLog.cs:54 
+  at BeardedManStudios.Forge.Networking.UDPClient.ReadNetwork () [0x00355] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\UDPClient.cs:376 
+  at BeardedManStudios.Threading.Task+<>c__DisplayClass1_0.<Queue>b__0 (System.Object state) [0x0001a] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Threading\Task.cs:72 
+  at System.Threading.QueueUserWorkItemCallback.WaitCallback_Context (System.Object state) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ExecutionContext.RunInternal (System.Threading.ExecutionContext executionContext, System.Threading.ContextCallback callback, System.Object state, System.Boolean preserveSyncCtx) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ExecutionContext.Run (System.Threading.ExecutionContext executionContext, System.Threading.ContextCallback callback, System.Object state, System.Boolean preserveSyncCtx) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.QueueUserWorkItemCallback.System.Threading.IThreadPoolWorkItem.ExecuteWorkItem () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ThreadPoolWorkQueue.Dispatch () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading._ThreadPoolWaitCallback.PerformWaitCallback () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+[25/03/2020 02:48:53 - EXCEPTION] Message: 
+  at (wrapper managed-to-native) System.Net.Sockets.Socket.ReceiveFrom_internal(intptr,byte*,int,System.Net.Sockets.SocketFlags,System.Net.SocketAddress&,int&,bool)
+  at System.Net.Sockets.Socket.ReceiveFrom_internal (System.Net.Sockets.SafeSocketHandle safeHandle, System.Byte* buffer, System.Int32 count, System.Net.Sockets.SocketFlags flags, System.Net.SocketAddress& sockaddr, System.Int32& error, System.Boolean blocking) [0x0000c] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Int32 offset, System.Int32 size, System.Net.Sockets.SocketFlags socketFlags, System.Net.EndPoint& remoteEP, System.Net.Sockets.SocketError& errorCode) [0x00024] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Int32 offset, System.Int32 size, System.Net.Sockets.SocketFlags socketFlags, System.Net.EndPoint& remoteEP) [0x00026] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Net.EndPoint& remoteEP) [0x00000] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at BeardedManStudios.Forge.Networking.CachedUdpClient.Receive (System.Net.IPEndPoint& remoteEP, System.String& endpoint) [0x00033] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\CachedUdpClient.cs:340 
+  at BeardedManStudios.Forge.Networking.UDPClient.ReadNetwork () [0x0002d] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\UDPClient.cs:252 
+  at System.Environment.get_StackTrace () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at BMSLogger.PutLogInFile (BeardedManStudios.Forge.Logging.BMSLog+Logtype type, System.String log) [0x00089] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Logging\BMSLogger.cs:200 
+  at BMSLogger.LogException (System.String log) [0x00014] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Logging\BMSLogger.cs:129 
+  at BeardedManStudios.Forge.Logging.BMSLog.InternalLog (BeardedManStudios.Forge.Logging.BMSLog+Logtype type, System.String text, System.Object[] args) [0x000a9] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Logging\BMSLog.cs:107 
+  at BeardedManStudios.Forge.Logging.BMSLog.LogException (System.Exception ex) [0x00001] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Logging\BMSLog.cs:54 
+  at BeardedManStudios.Forge.Networking.UDPClient.ReadNetwork () [0x00355] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\UDPClient.cs:376 
+  at BeardedManStudios.Threading.Task+<>c__DisplayClass1_0.<Queue>b__0 (System.Object state) [0x0001a] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Threading\Task.cs:72 
+  at System.Threading.QueueUserWorkItemCallback.WaitCallback_Context (System.Object state) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ExecutionContext.RunInternal (System.Threading.ExecutionContext executionContext, System.Threading.ContextCallback callback, System.Object state, System.Boolean preserveSyncCtx) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ExecutionContext.Run (System.Threading.ExecutionContext executionContext, System.Threading.ContextCallback callback, System.Object state, System.Boolean preserveSyncCtx) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.QueueUserWorkItemCallback.System.Threading.IThreadPoolWorkItem.ExecuteWorkItem () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ThreadPoolWorkQueue.Dispatch () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading._ThreadPoolWaitCallback.PerformWaitCallback () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+[25/03/2020 02:48:53 - EXCEPTION] Message: 
+  at (wrapper managed-to-native) System.Net.Sockets.Socket.ReceiveFrom_internal(intptr,byte*,int,System.Net.Sockets.SocketFlags,System.Net.SocketAddress&,int&,bool)
+  at System.Net.Sockets.Socket.ReceiveFrom_internal (System.Net.Sockets.SafeSocketHandle safeHandle, System.Byte* buffer, System.Int32 count, System.Net.Sockets.SocketFlags flags, System.Net.SocketAddress& sockaddr, System.Int32& error, System.Boolean blocking) [0x0000c] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Int32 offset, System.Int32 size, System.Net.Sockets.SocketFlags socketFlags, System.Net.EndPoint& remoteEP, System.Net.Sockets.SocketError& errorCode) [0x00024] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Int32 offset, System.Int32 size, System.Net.Sockets.SocketFlags socketFlags, System.Net.EndPoint& remoteEP) [0x00026] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at System.Net.Sockets.Socket.ReceiveFrom (System.Byte[] buffer, System.Net.EndPoint& remoteEP) [0x00000] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at BeardedManStudios.Forge.Networking.CachedUdpClient.Receive (System.Net.IPEndPoint& remoteEP, System.String& endpoint) [0x00033] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\CachedUdpClient.cs:340 
+  at BeardedManStudios.Forge.Networking.UDPClient.ReadNetwork () [0x0002d] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\UDPClient.cs:252 
+  at System.Environment.get_StackTrace () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at BMSLogger.PutLogInFile (BeardedManStudios.Forge.Logging.BMSLog+Logtype type, System.String log) [0x00089] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Logging\BMSLogger.cs:200 
+  at BMSLogger.LogException (System.String log) [0x00014] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Logging\BMSLogger.cs:129 
+  at BeardedManStudios.Forge.Logging.BMSLog.InternalLog (BeardedManStudios.Forge.Logging.BMSLog+Logtype type, System.String text, System.Object[] args) [0x000a9] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Logging\BMSLog.cs:107 
+  at BeardedManStudios.Forge.Logging.BMSLog.LogException (System.Exception ex) [0x00001] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Logging\BMSLog.cs:54 
+  at BeardedManStudios.Forge.Networking.UDPClient.ReadNetwork () [0x00355] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\UDPClient.cs:376 
+  at BeardedManStudios.Threading.Task+<>c__DisplayClass1_0.<Queue>b__0 (System.Object state) [0x0001a] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Threading\Task.cs:72 
+  at System.Threading.QueueUserWorkItemCallback.WaitCallback_Context (System.Object state) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ExecutionContext.RunInternal (System.Threading.ExecutionContext executionContext, System.Threading.ContextCallback callback, System.Object state, System.Boolean preserveSyncCtx) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ExecutionContext.Run (System.Threading.ExecutionContext executionContext, System.Threading.ContextCallback callback, System.Object state, System.Boolean preserveSyncCtx) [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.QueueUserWorkItemCallback.System.Threading.IThreadPoolWorkItem.ExecuteWorkItem () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading.ThreadPoolWorkQueue.Dispatch () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at System.Threading._ThreadPoolWaitCallback.PerformWaitCallback () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+[25/03/2020 02:55:06 - INFO] ========= START RUN =========
+[25/03/2020 03:05:19 - INFO] ========= START RUN =========
+[25/03/2020 03:16:08 - INFO] ========= START RUN =========
+[25/03/2020 03:30:14 - INFO] ========= START RUN =========
+[25/03/2020 03:30:20 - INFO] ========= START RUN =========
+[25/03/2020 03:31:39 - INFO] ========= START RUN =========
+[25/03/2020 03:35:22 - INFO] ========= START RUN =========
+[25/03/2020 03:44:07 - INFO] ========= START RUN =========
+[25/03/2020 03:44:14 - EXCEPTION] Message: Une seule utilisation de chaque adresse de socket (protocole/adresse réseau/port) est habituellement autorisée.
+
+  at System.Net.Sockets.Socket.Bind (System.Net.EndPoint localEP) [0x00043] in <ae22a4e8f83c41d69684ae7f557133d9>:0 
+  at BeardedManStudios.Forge.Networking.CachedUdpClient.InitSocket (System.Net.EndPoint localEP) [0x0003f] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\CachedUdpClient.cs:141 
+  at BeardedManStudios.Forge.Networking.CachedUdpClient..ctor (System.Int32 port) [0x0006b] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\CachedUdpClient.cs:78 
+  at BeardedManStudios.Forge.Networking.UDPServer.Connect (System.String host, System.UInt16 port, System.String natHost, System.UInt16 natPort) [0x0001d] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\UDPServer.cs:170 
+  at System.Environment.get_StackTrace () [0x00000] in <437ba245d8404784b9fbab9b439ac908>:0 
+  at BMSLogger.PutLogInFile (BeardedManStudios.Forge.Logging.BMSLog+Logtype type, System.String log) [0x00089] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Logging\BMSLogger.cs:200 
+  at BMSLogger.LogException (System.String log) [0x00014] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Logging\BMSLogger.cs:129 
+  at BeardedManStudios.Forge.Logging.BMSLog.InternalLog (BeardedManStudios.Forge.Logging.BMSLog+Logtype type, System.String text, System.Object[] args) [0x000a9] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Logging\BMSLog.cs:107 
+  at BeardedManStudios.Forge.Logging.BMSLog.LogException (System.Exception ex) [0x00001] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Logging\BMSLog.cs:54 
+  at BeardedManStudios.Forge.Networking.UDPServer.Connect (System.String host, System.UInt16 port, System.String natHost, System.UInt16 natPort) [0x00134] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Networking\Forge\Networking\UDPServer.cs:208 
+  at MultiplayerMenu.Host () [0x0005f] in D:\Projets\Unity\Swift\Assets\Bearded Man Studios Inc\Scripts\Multiplayer Menu\MultiplayerMenu.cs:149 
+  at UnityEngine.Events.InvokableCall.Invoke () [0x00000] in <94c5f4c38cdc42d2b006f8badef04394>:0 
+  at UnityEngine.Events.UnityEvent.Invoke () [0x00000] in <94c5f4c38cdc42d2b006f8badef04394>:0 
+  at UnityEngine.UI.Button.Press () [0x00027] in C:\Program Files\Unity\Hub\Editor\2019.3.3f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.ugui\Runtime\UI\Core\Button.cs:68 
+  at UnityEngine.UI.Button.OnPointerClick (UnityEngine.EventSystems.PointerEventData eventData) [0x00010] in C:\Program Files\Unity\Hub\Editor\2019.3.3f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.ugui\Runtime\UI\Core\Button.cs:110 
+  at UnityEngine.EventSystems.ExecuteEvents.Execute (UnityEngine.EventSystems.IPointerClickHandler handler, UnityEngine.EventSystems.BaseEventData eventData) [0x00001] in C:\Program Files\Unity\Hub\Editor\2019.3.3f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.ugui\Runtime\EventSystem\ExecuteEvents.cs:50 
+  at UnityEngine.EventSystems.ExecuteEvents.Execute[T] (UnityEngine.GameObject target, UnityEngine.EventSystems.BaseEventData eventData, UnityEngine.EventSystems.ExecuteEvents+EventFunction`1[T1] functor) [0x0006c] in C:\Program Files\Unity\Hub\Editor\2019.3.3f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.ugui\Runtime\EventSystem\ExecuteEvents.cs:261 
+  at UnityEngine.EventSystems.StandaloneInputModule.ReleaseMouse (UnityEngine.EventSystems.PointerEventData pointerEvent, UnityEngine.GameObject currentOverGo) [0x00036] in C:\Program Files\Unity\Hub\Editor\2019.3.3f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.ugui\Runtime\EventSystem\InputModules\StandaloneInputModule.cs:195 
+  at UnityEngine.EventSystems.StandaloneInputModule.ProcessMousePress (UnityEngine.EventSystems.PointerInputModule+MouseButtonEventData data) [0x00158] in C:\Program Files\Unity\Hub\Editor\2019.3.3f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.ugui\Runtime\EventSystem\InputModules\StandaloneInputModule.cs:644 
+  at UnityEngine.EventSystems.StandaloneInputModule.ProcessMouseEvent (System.Int32 id) [0x0002f] in C:\Program Files\Unity\Hub\Editor\2019.3.3f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.ugui\Runtime\EventSystem\InputModules\StandaloneInputModule.cs:552 
+  at UnityEngine.EventSystems.StandaloneInputModule.ProcessMouseEvent () [0x00001] in C:\Program Files\Unity\Hub\Editor\2019.3.3f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.ugui\Runtime\EventSystem\InputModules\StandaloneInputModule.cs:532 
+  at UnityEngine.EventSystems.StandaloneInputModule.Process () [0x0003e] in C:\Program Files\Unity\Hub\Editor\2019.3.3f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.ugui\Runtime\EventSystem\InputModules\StandaloneInputModule.cs:289 
+  at UnityEngine.EventSystems.EventSystem.Update () [0x000f9] in C:\Program Files\Unity\Hub\Editor\2019.3.3f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.ugui\Runtime\EventSystem\EventSystem.cs:377 
+[25/03/2020 03:49:45 - INFO] ========= START RUN =========
+[25/03/2020 04:09:45 - INFO] ========= START RUN =========
+[25/03/2020 04:12:20 - INFO] ========= START RUN =========
+[25/03/2020 04:16:32 - INFO] ========= START RUN =========

@@ -43,3 +43,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f1581ba2242da149b28f0ca71bedce2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  flagZonePrefab: {fileID: 7219515360390634516, guid: 1a02270a956db3247bb82921322627e0,
+    type: 3}
+  flagGoal: 3
+  timer:
+    minutes: 10
+    seconds: 5
