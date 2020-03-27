@@ -5,10 +5,16 @@ using BeardedManStudios.Forge.Networking;
 using BeardedManStudios.Forge.Networking.Unity;
 using BeardedManStudios.Forge.Networking.Generated;
 
+public enum FlagZoneType
+{
+    Altar,
+    Shrine
+}
 
 public class Zone : NetworkedFlagBehavior, ITeamAffilitation
 {
     public int teamIndex = 0;
+    public FlagZoneType type;
 
     [Header("Components")]
     public Flag flag;
