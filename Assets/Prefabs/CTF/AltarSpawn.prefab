@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 6951043875271112743}
   - component: {fileID: 8621751877199408063}
   m_Layer: 0
-  m_Name: FlagZoneSpawn
+  m_Name: AltarSpawn
   m_TagString: Untagged
-  m_Icon: {fileID: 2800000, guid: 1732e542f535d374bbfa7565fc78414e, type: 3}
+  m_Icon: {fileID: 2800000, guid: bb8a218d3ec73774fadb6afd4f187d24, type: 3}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -44,3 +44,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   teamIndex: 0
+  type: 0
