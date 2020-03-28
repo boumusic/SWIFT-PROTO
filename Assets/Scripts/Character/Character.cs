@@ -58,12 +58,14 @@ public class Character : MonoBehaviour
     public Vector3 Right => new Vector3(playerCamera.transform.right.x, 0, playerCamera.transform.right.z);
     public bool Dashing => (CurrentState == CharacterState.Dashing);
     public bool InDashMovement => Dashing && dashProgress < 0.5f;
+    private bool knockbacked => CurrentState == CharacterState.Knockbacked;
     public Vector3 FinalVelocity
     {
         get
         {
             if (grounded || Dashing) return CamRotation * Velocity;
-            else return LastCamRotation * Velocity;
+            else if (!knockbacked) return LastCamRotation * Velocity;
+            else return kbVelocity;
 
         }
     }
@@ -141,6 +143,11 @@ public class Character : MonoBehaviour
         CheckWallClimb();
         OrientModel();
         DashCooldown();
+
+        if(Input.GetKeyDown(KeyCode.K))
+        {
+            Knockbacked((-Forward + Vector3.up).normalized);
+        }
     }
 
     private void FixedUpdate()
@@ -345,15 +352,18 @@ public class Character : MonoBehaviour
 
     #region Falling
 
+    private float fallInitVelocityY;
     private void Falling_Enter()
     {
+        fallInitVelocityY = body.velocity.y;
+        Debug.Log(fallInitVelocityY);
         fallProgress = 0f;
     }
 
     private void Falling_Update()
     {
         fallProgress += Time.deltaTime * m.fallProgressSpeed;
-        yVelocity = -m.fallCurve.Evaluate(fallProgress) * m.fallStrength;
+        yVelocity = Mathf.Lerp(fallInitVelocityY, -m.fallStrength, m.fallCurve.Evaluate(fallProgress));
         if (CastGround())
         {
             stateMachine.ChangeState(CharacterState.Grounded);
@@ -624,6 +634,39 @@ public class Character : MonoBehaviour
 
     #endregion
 
+    #region Knockback
+
+    private float kbProgress = 0f;
+    private Vector3 kbVelocity;
+    private Vector3 kbDir;
+
+    public void Knockbacked(Vector3 direction)
+    {
+        kbDir = new Vector3(direction.x, 0, direction.z).normalized;
+        stateMachine.ChangeState(CharacterState.Knockbacked);
+    }
+
+    private void Knockbacked_Enter()
+    {
+        kbProgress = 0f;
+    }
+
+    private void Knockbacked_Update()
+    {
+        kbProgress += Time.deltaTime * m.kbProgressSpeed;
+        Vector3 horiz = m.kbCurveHoriz.Evaluate(kbProgress) * kbDir * m.kbStrengthHoriz;
+        float y = m.kbCurveVerti.Evaluate(kbProgress) * m.kbStrengthVerti;
+
+        kbVelocity = new Vector3(horiz.x, y, horiz.z) + (CamRotation * velocity * m.kbVelocityInfluence.Evaluate(kbProgress));
+
+        if (kbProgress > 1f)
+        {
+            stateMachine.ChangeState(CharacterState.Falling);
+        }
+    }
+    
+    #endregion
+
     #region TPS
 
     private bool isTPS = false;
@@ -720,5 +763,6 @@ public enum CharacterState
     Jumping,
     Falling,
     WallClimbing,
-    Dashing
+    Dashing,
+    Knockbacked
 }

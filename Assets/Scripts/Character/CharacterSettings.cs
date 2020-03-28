@@ -71,4 +71,13 @@ public class CharacterSettings : ScriptableObject
     public float attackLength = 2f;
     public float attackHeight = 2f;
     public float attackDuration = 0.7f;
+
+    [Header("Knockback")]
+    public float kbStrengthVerti = 10f;
+
+    public float kbStrengthHoriz = 10f;
+    public AnimationCurve kbCurveHoriz;
+    public float kbProgressSpeed = 1f;
+    public AnimationCurve kbCurveVerti;
+    public AnimationCurve kbVelocityInfluence;
 }
