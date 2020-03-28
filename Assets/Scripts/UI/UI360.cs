@@ -6,7 +6,7 @@ public class UI360 : MonoBehaviour
 {
     [Header("Components")]
     public RectTransform rect;
-    public Renderer rend;
+    private GameObject targetGo;
     public Transform arrow;
 
     [Header("Settings")]
@@ -20,7 +20,7 @@ public class UI360 : MonoBehaviour
     private Character Chara => player.Character;
     private Camera Cam => Chara.playerCamera.cam;
 
-    private Vector3 objPos => rend.transform.position;
+    private Vector3 objPos => targetGo.transform.position;
     private Vector3 camPos => Cam.transform.position;
 
     private Vector3[] compare;
@@ -36,6 +36,11 @@ public class UI360 : MonoBehaviour
         }
     }
 
+    public void FeedTarget(GameObject target)
+    {
+        targetGo = target;
+    }
+
     private void Start()
     {
         player = UIManager.Instance.Player;
@@ -43,7 +48,7 @@ public class UI360 : MonoBehaviour
 
     private void Pos()
     {
-        float dot = rend != null ? Vector3.Dot(Cam.transform.forward, (rend.transform.position - Cam.transform.position).normalized) : 0;
+        float dot = targetGo != null ? Vector3.Dot(Cam.transform.forward, (objPos - camPos).normalized) : 0;
         
         Vector3 target = UIManager.Instance.canvas.WorldToCanvas(objPos, Cam) ;
         if (dot < 0)
@@ -77,7 +82,7 @@ public class UI360 : MonoBehaviour
         return vec;
     }
 
-    private void Update()
+    public virtual void Update()
     {
         Pos();
     }

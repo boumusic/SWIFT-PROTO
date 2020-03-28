@@ -20,6 +20,8 @@ public class UIManager : MonoBehaviour
     private Player player;
     public Player Player { get { if (!player) player = FindObjectOfType<Player>(); return player; } }
 
+    public NetworkedPlayer NetworkedPlayer => Player.GetComponentInParent<NetworkedPlayer>();
+
     [Header("Components")]
     public Canvas canvas;
     public Animator hitMarker;
@@ -43,6 +45,10 @@ public class UIManager : MonoBehaviour
 
     [Header("Flag Status")]
     public GameObject flagStatus;
+
+    [Header("UI FlagZone")]
+    public GameObject uiFlagZonePrefab;
+    private List<Zone> flagZones = new List<Zone>();
     
     public void AssignPlayer(Player p)
     {
@@ -78,6 +84,19 @@ public class UIManager : MonoBehaviour
             float a = player.Character.CanDash ? 0.7f : 0.2f;
             dashReset.color = new Color(dashReset.color.r, dashReset.color.g, dashReset.color.b, a) ;
             dashCd.color = new Color(dashCd.color.r, dashCd.color.g, dashCd.color.b, a);
+        }
+    }
+
+    public void RegisterFlagZones(List<Zone> zones)
+    {
+        flagZones = zones;
+
+        for (int i = 0; i < zones.Count; i++)
+        {
+            GameObject newUI = Instantiate(uiFlagZonePrefab, canvas.transform);
+            UIFlag uiFlag = newUI.GetComponent<UIFlag>();
+            uiFlag.FeedTarget(zones[i].gameObject);
+            uiFlag.Init(zones[i].teamIndex, zones[i].type);
         }
     }
 
