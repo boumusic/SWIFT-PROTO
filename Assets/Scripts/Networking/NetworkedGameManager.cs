@@ -31,37 +31,47 @@ public class NetworkedGameManager : MonoBehaviour
         {
             ReplaceFlags();
 
-            NetworkManager.Instance.playerLoadedScene += OnPlayerJoin;
+            ((UDPServer)NetworkManager.Instance.Networker).playerAccepted += OnPlayerJoin;
 
-            // server doesn't have a networkingplayer
-            CreatePlayer(null);
+            NetworkManager.Instance.objectInitialized += (x,y) =>
+            {
+                if (y is NetworkedPlayerNetworkObject)
+                {
+                    NetworkedPlayerNetworkObject obj = (NetworkedPlayerNetworkObject)y;
+
+                    int teamIndex = GetTeamIndex();
+                    obj.teamIndex = teamIndex;
+
+                    teams[teamIndex].Add(obj);
+
+                    Vector3 spawnPos = flagZones.Find(f => f.networkObject.teamIndex == teamIndex).transform.position + Vector3.up;
+
+                    Debug.Log("sending rpc");
+                    obj.SendRpc(NetworkedPlayerBehavior.RPC_INIT, Receivers.AllBuffered, teamIndex, spawnPos);
+
+                    NetworkedPlayerBehavior behavior = obj.AttachedBehavior as NetworkedPlayerBehavior;
+                    behavior.GetComponent<NetworkedPlayer>().Init(teamIndex, spawnPos);
+                }
+            };
         }
+
+        CreatePlayer();
     }
 
     private void OnPlayerJoin(NetworkingPlayer player, NetWorker sender)
     {
-        // if teams are full
-        if (teams[0].Count == 4 && teams[1].Count == 4)
+        MainThreadManager.Run(() =>
         {
-            NetworkCameraNetworkObject camObject = NetworkManager.Instance.InstantiateNetworkCamera().networkObject;
-            camObject.AssignOwnership(player);
-            return;
-        }
-
-        CreatePlayer(player);
+            player.disconnected += x =>
+            {
+                OnPlayerQuit(player);
+            };
+        });
     }
 
-    void CreatePlayer(NetworkingPlayer player)
+    void CreatePlayer()
     {
-        NetworkedPlayerNetworkObject playerObject = NetworkManager.Instance.InstantiateNetworkedPlayer().networkObject;
-
-        if (player != null)
-        {
-            playerObject.AssignOwnership(player);
-            player.disconnected += OnPlayerQuit;
-        }
-
-        playerObject.teamIndex = GetTeamIndex();
+        NetworkedPlayerBehavior playerBehavior = NetworkManager.Instance.InstantiateNetworkedPlayer();
     }
 
     int GetTeamIndex()
@@ -69,12 +79,18 @@ public class NetworkedGameManager : MonoBehaviour
         return teams[0].Count > teams[1].Count ? 1 : 0;
     }
 
-    void OnPlayerQuit(NetWorker sender)
+    void OnPlayerQuit(NetworkingPlayer player)
     {
-        sender.IterateNetworkObjects(x =>
+        for (int i = 0; i < 2; i++)
         {
-            x.Destroy();
-        });
+            for (int j = 0; j < teams[i].Count; j++)
+            {
+                if (teams[i][j].NetworkId == player.NetworkId)
+                {
+                    teams[i][j].Destroy();
+                }
+            }
+        }
     }
 
     void ReplaceFlags()

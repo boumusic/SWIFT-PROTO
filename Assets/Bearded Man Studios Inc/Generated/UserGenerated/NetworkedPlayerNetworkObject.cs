@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedInterpol("{\"inter\":[0.5,0.5,0,0,0,0,0]")]
+	[GeneratedInterpol("{\"inter\":[0.5,0.5,0,0,0,0,0,0]")]
 	public partial class NetworkedPlayerNetworkObject : NetworkObject
 	{
 		public const int IDENTITY = 9;
@@ -232,6 +232,37 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			if (teamIndexChanged != null) teamIndexChanged(_teamIndex, timestep);
 			if (fieldAltered != null) fieldAltered("teamIndex", _teamIndex, timestep);
 		}
+		[ForgeGeneratedField]
+		private Vector3 _spawnPos;
+		public event FieldEvent<Vector3> spawnPosChanged;
+		public InterpolateVector3 spawnPosInterpolation = new InterpolateVector3() { LerpT = 0f, Enabled = false };
+		public Vector3 spawnPos
+		{
+			get { return _spawnPos; }
+			set
+			{
+				// Don't do anything if the value is the same
+				if (_spawnPos == value)
+					return;
+
+				// Mark the field as dirty for the network to transmit
+				_dirtyFields[0] |= 0x80;
+				_spawnPos = value;
+				hasDirtyFields = true;
+			}
+		}
+
+		public void SetspawnPosDirty()
+		{
+			_dirtyFields[0] |= 0x80;
+			hasDirtyFields = true;
+		}
+
+		private void RunChange_spawnPos(ulong timestep)
+		{
+			if (spawnPosChanged != null) spawnPosChanged(_spawnPos, timestep);
+			if (fieldAltered != null) fieldAltered("spawnPos", _spawnPos, timestep);
+		}
 
 		protected override void OwnershipChanged()
 		{
@@ -248,6 +279,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			runningInterpolation.current = runningInterpolation.target;
 			aliveInterpolation.current = aliveInterpolation.target;
 			teamIndexInterpolation.current = teamIndexInterpolation.target;
+			spawnPosInterpolation.current = spawnPosInterpolation.target;
 		}
 
 		public override int UniqueIdentity { get { return IDENTITY; } }
@@ -261,6 +293,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			UnityObjectMapper.Instance.MapBytes(data, _running);
 			UnityObjectMapper.Instance.MapBytes(data, _alive);
 			UnityObjectMapper.Instance.MapBytes(data, _teamIndex);
+			UnityObjectMapper.Instance.MapBytes(data, _spawnPos);
 
 			return data;
 		}
@@ -295,6 +328,10 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			teamIndexInterpolation.current = _teamIndex;
 			teamIndexInterpolation.target = _teamIndex;
 			RunChange_teamIndex(timestep);
+			_spawnPos = UnityObjectMapper.Instance.Map<Vector3>(payload);
+			spawnPosInterpolation.current = _spawnPos;
+			spawnPosInterpolation.target = _spawnPos;
+			RunChange_spawnPos(timestep);
 		}
 
 		protected override BMSByte SerializeDirtyFields()
@@ -316,6 +353,8 @@ namespace BeardedManStudios.Forge.Networking.Generated
 				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _alive);
 			if ((0x40 & _dirtyFields[0]) != 0)
 				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _teamIndex);
+			if ((0x80 & _dirtyFields[0]) != 0)
+				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _spawnPos);
 
 			// Reset all the dirty fields
 			for (int i = 0; i < _dirtyFields.Length; i++)
@@ -423,6 +462,19 @@ namespace BeardedManStudios.Forge.Networking.Generated
 					RunChange_teamIndex(timestep);
 				}
 			}
+			if ((0x80 & readDirtyFlags[0]) != 0)
+			{
+				if (spawnPosInterpolation.Enabled)
+				{
+					spawnPosInterpolation.target = UnityObjectMapper.Instance.Map<Vector3>(data);
+					spawnPosInterpolation.Timestep = timestep;
+				}
+				else
+				{
+					_spawnPos = UnityObjectMapper.Instance.Map<Vector3>(data);
+					RunChange_spawnPos(timestep);
+				}
+			}
 		}
 
 		public override void InterpolateUpdate()
@@ -464,6 +516,11 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			{
 				_teamIndex = (int)teamIndexInterpolation.Interpolate();
 				//RunChange_teamIndex(teamIndexInterpolation.Timestep);
+			}
+			if (spawnPosInterpolation.Enabled && !spawnPosInterpolation.current.UnityNear(spawnPosInterpolation.target, 0.0015f))
+			{
+				_spawnPos = (Vector3)spawnPosInterpolation.Interpolate();
+				//RunChange_spawnPos(spawnPosInterpolation.Timestep);
 			}
 		}
 
