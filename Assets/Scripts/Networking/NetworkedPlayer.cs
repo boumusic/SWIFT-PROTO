@@ -132,6 +132,7 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
     void UpdateTeamColor()
     {
         GetComponentInChildren<SkinnedMeshRenderer>(true).material.SetColor("_Color", TeamManager.Instance.GetTeamColor(teamIndex));
+
     }
 
     void SetName()
@@ -250,6 +251,8 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
 
             flag = null;
             networkObject.hasFlag = false;
+
+            networkObject.SendRpc(RPC_TOGGLE_FLAG, true, Receivers.AllBuffered, false);
         });
     }
 
@@ -273,6 +276,21 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
         if (networkObject.IsOwner)
         {
             networkObject.position = characterTransform.position;
+        }
+
+        for (int i = 0; i < flagVisualsRend.Length; i++)
+        {
+            flagVisualsRend[i].material.SetColor("_Color", TeamManager.Instance.GetOppositeTeamColor(teamIndex));
+        }
+    }
+    
+    public GameObject[] flagVisuals;
+    public Renderer[] flagVisualsRend;
+    public override void ToggleFlag(RpcArgs args)
+    {
+        for (int i = 0; i < flagVisuals.Length; i++)
+        {
+            flagVisuals[i].SetActive(args.GetAt<bool>(0));
         }
     }
 }
