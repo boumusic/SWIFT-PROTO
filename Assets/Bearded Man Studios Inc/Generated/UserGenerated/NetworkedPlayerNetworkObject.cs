@@ -5,12 +5,12 @@ using UnityEngine;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedInterpol("{\"inter\":[0.5,0.5,0,0,0,0]")]
+	[GeneratedInterpol("{\"inter\":[0.5,0.5,0,0,0,0,0,0,0]")]
 	public partial class NetworkedPlayerNetworkObject : NetworkObject
 	{
-		public const int IDENTITY = 7;
+		public const int IDENTITY = 9;
 
-		private byte[] _dirtyFields = new byte[1];
+		private byte[] _dirtyFields = new byte[2];
 
 		#pragma warning disable 0067
 		public event FieldChangedEvent fieldAltered;
@@ -201,6 +201,99 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			if (aliveChanged != null) aliveChanged(_alive, timestep);
 			if (fieldAltered != null) fieldAltered("alive", _alive, timestep);
 		}
+		[ForgeGeneratedField]
+		private int _teamIndex;
+		public event FieldEvent<int> teamIndexChanged;
+		public Interpolated<int> teamIndexInterpolation = new Interpolated<int>() { LerpT = 0f, Enabled = false };
+		public int teamIndex
+		{
+			get { return _teamIndex; }
+			set
+			{
+				// Don't do anything if the value is the same
+				if (_teamIndex == value)
+					return;
+
+				// Mark the field as dirty for the network to transmit
+				_dirtyFields[0] |= 0x40;
+				_teamIndex = value;
+				hasDirtyFields = true;
+			}
+		}
+
+		public void SetteamIndexDirty()
+		{
+			_dirtyFields[0] |= 0x40;
+			hasDirtyFields = true;
+		}
+
+		private void RunChange_teamIndex(ulong timestep)
+		{
+			if (teamIndexChanged != null) teamIndexChanged(_teamIndex, timestep);
+			if (fieldAltered != null) fieldAltered("teamIndex", _teamIndex, timestep);
+		}
+		[ForgeGeneratedField]
+		private Vector3 _spawnPos;
+		public event FieldEvent<Vector3> spawnPosChanged;
+		public InterpolateVector3 spawnPosInterpolation = new InterpolateVector3() { LerpT = 0f, Enabled = false };
+		public Vector3 spawnPos
+		{
+			get { return _spawnPos; }
+			set
+			{
+				// Don't do anything if the value is the same
+				if (_spawnPos == value)
+					return;
+
+				// Mark the field as dirty for the network to transmit
+				_dirtyFields[0] |= 0x80;
+				_spawnPos = value;
+				hasDirtyFields = true;
+			}
+		}
+
+		public void SetspawnPosDirty()
+		{
+			_dirtyFields[0] |= 0x80;
+			hasDirtyFields = true;
+		}
+
+		private void RunChange_spawnPos(ulong timestep)
+		{
+			if (spawnPosChanged != null) spawnPosChanged(_spawnPos, timestep);
+			if (fieldAltered != null) fieldAltered("spawnPos", _spawnPos, timestep);
+		}
+		[ForgeGeneratedField]
+		private bool _hasFlag;
+		public event FieldEvent<bool> hasFlagChanged;
+		public Interpolated<bool> hasFlagInterpolation = new Interpolated<bool>() { LerpT = 0f, Enabled = false };
+		public bool hasFlag
+		{
+			get { return _hasFlag; }
+			set
+			{
+				// Don't do anything if the value is the same
+				if (_hasFlag == value)
+					return;
+
+				// Mark the field as dirty for the network to transmit
+				_dirtyFields[1] |= 0x1;
+				_hasFlag = value;
+				hasDirtyFields = true;
+			}
+		}
+
+		public void SethasFlagDirty()
+		{
+			_dirtyFields[1] |= 0x1;
+			hasDirtyFields = true;
+		}
+
+		private void RunChange_hasFlag(ulong timestep)
+		{
+			if (hasFlagChanged != null) hasFlagChanged(_hasFlag, timestep);
+			if (fieldAltered != null) fieldAltered("hasFlag", _hasFlag, timestep);
+		}
 
 		protected override void OwnershipChanged()
 		{
@@ -216,6 +309,9 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			climbingInterpolation.current = climbingInterpolation.target;
 			runningInterpolation.current = runningInterpolation.target;
 			aliveInterpolation.current = aliveInterpolation.target;
+			teamIndexInterpolation.current = teamIndexInterpolation.target;
+			spawnPosInterpolation.current = spawnPosInterpolation.target;
+			hasFlagInterpolation.current = hasFlagInterpolation.target;
 		}
 
 		public override int UniqueIdentity { get { return IDENTITY; } }
@@ -228,6 +324,9 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			UnityObjectMapper.Instance.MapBytes(data, _climbing);
 			UnityObjectMapper.Instance.MapBytes(data, _running);
 			UnityObjectMapper.Instance.MapBytes(data, _alive);
+			UnityObjectMapper.Instance.MapBytes(data, _teamIndex);
+			UnityObjectMapper.Instance.MapBytes(data, _spawnPos);
+			UnityObjectMapper.Instance.MapBytes(data, _hasFlag);
 
 			return data;
 		}
@@ -258,6 +357,18 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			aliveInterpolation.current = _alive;
 			aliveInterpolation.target = _alive;
 			RunChange_alive(timestep);
+			_teamIndex = UnityObjectMapper.Instance.Map<int>(payload);
+			teamIndexInterpolation.current = _teamIndex;
+			teamIndexInterpolation.target = _teamIndex;
+			RunChange_teamIndex(timestep);
+			_spawnPos = UnityObjectMapper.Instance.Map<Vector3>(payload);
+			spawnPosInterpolation.current = _spawnPos;
+			spawnPosInterpolation.target = _spawnPos;
+			RunChange_spawnPos(timestep);
+			_hasFlag = UnityObjectMapper.Instance.Map<bool>(payload);
+			hasFlagInterpolation.current = _hasFlag;
+			hasFlagInterpolation.target = _hasFlag;
+			RunChange_hasFlag(timestep);
 		}
 
 		protected override BMSByte SerializeDirtyFields()
@@ -277,6 +388,12 @@ namespace BeardedManStudios.Forge.Networking.Generated
 				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _running);
 			if ((0x20 & _dirtyFields[0]) != 0)
 				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _alive);
+			if ((0x40 & _dirtyFields[0]) != 0)
+				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _teamIndex);
+			if ((0x80 & _dirtyFields[0]) != 0)
+				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _spawnPos);
+			if ((0x1 & _dirtyFields[1]) != 0)
+				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _hasFlag);
 
 			// Reset all the dirty fields
 			for (int i = 0; i < _dirtyFields.Length; i++)
@@ -371,6 +488,45 @@ namespace BeardedManStudios.Forge.Networking.Generated
 					RunChange_alive(timestep);
 				}
 			}
+			if ((0x40 & readDirtyFlags[0]) != 0)
+			{
+				if (teamIndexInterpolation.Enabled)
+				{
+					teamIndexInterpolation.target = UnityObjectMapper.Instance.Map<int>(data);
+					teamIndexInterpolation.Timestep = timestep;
+				}
+				else
+				{
+					_teamIndex = UnityObjectMapper.Instance.Map<int>(data);
+					RunChange_teamIndex(timestep);
+				}
+			}
+			if ((0x80 & readDirtyFlags[0]) != 0)
+			{
+				if (spawnPosInterpolation.Enabled)
+				{
+					spawnPosInterpolation.target = UnityObjectMapper.Instance.Map<Vector3>(data);
+					spawnPosInterpolation.Timestep = timestep;
+				}
+				else
+				{
+					_spawnPos = UnityObjectMapper.Instance.Map<Vector3>(data);
+					RunChange_spawnPos(timestep);
+				}
+			}
+			if ((0x1 & readDirtyFlags[1]) != 0)
+			{
+				if (hasFlagInterpolation.Enabled)
+				{
+					hasFlagInterpolation.target = UnityObjectMapper.Instance.Map<bool>(data);
+					hasFlagInterpolation.Timestep = timestep;
+				}
+				else
+				{
+					_hasFlag = UnityObjectMapper.Instance.Map<bool>(data);
+					RunChange_hasFlag(timestep);
+				}
+			}
 		}
 
 		public override void InterpolateUpdate()
@@ -408,12 +564,27 @@ namespace BeardedManStudios.Forge.Networking.Generated
 				_alive = (bool)aliveInterpolation.Interpolate();
 				//RunChange_alive(aliveInterpolation.Timestep);
 			}
+			if (teamIndexInterpolation.Enabled && !teamIndexInterpolation.current.UnityNear(teamIndexInterpolation.target, 0.0015f))
+			{
+				_teamIndex = (int)teamIndexInterpolation.Interpolate();
+				//RunChange_teamIndex(teamIndexInterpolation.Timestep);
+			}
+			if (spawnPosInterpolation.Enabled && !spawnPosInterpolation.current.UnityNear(spawnPosInterpolation.target, 0.0015f))
+			{
+				_spawnPos = (Vector3)spawnPosInterpolation.Interpolate();
+				//RunChange_spawnPos(spawnPosInterpolation.Timestep);
+			}
+			if (hasFlagInterpolation.Enabled && !hasFlagInterpolation.current.UnityNear(hasFlagInterpolation.target, 0.0015f))
+			{
+				_hasFlag = (bool)hasFlagInterpolation.Interpolate();
+				//RunChange_hasFlag(hasFlagInterpolation.Timestep);
+			}
 		}
 
 		private void Initialize()
 		{
 			if (readDirtyFlags == null)
-				readDirtyFlags = new byte[1];
+				readDirtyFlags = new byte[2];
 
 		}
 

@@ -9,6 +9,8 @@ using TMPro;
 
 public class NetworkedPlayer : NetworkedPlayerBehavior
 {
+    public bool owner = false;
+
     public Transform characterTransform;
 
     [Header("To destroy if not owner")]
@@ -33,9 +35,16 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
 
     public bool isAlive;
 
+    private void Start()
+    {
+        //playerCamera.SetActive(false);
+    }
+
     protected override void NetworkStart()
     {
         base.NetworkStart();
+
+        Init(networkObject.teamIndex, networkObject.position);
 
         if (!networkObject.IsOwner)
         {
@@ -46,12 +55,17 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
             Destroy(playerCharacter);
             Destroy(playerCamera);
 
-            nameText.GetComponentInParent<LookAtCamera>().cam = Camera.main.transform;
-
             tpsCharacter.SetActive(true);
         }
         else
         {
+            playerCamera.SetActive(true);
+
+            foreach (var lookat in FindObjectsOfType<LookAtCamera>())
+            {
+                lookat.cam = Camera.main.transform;
+            }
+
             UIManager.Instance.AssignPlayer(this.player);
 
             networkObject.UpdateInterval = (ulong)16.6667f;
@@ -72,21 +86,24 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
             };
 
         }
-        
+
         if (networkObject.IsServer)
         {
             isAlive = true;
             networkObject.alive = isAlive;
         }
+
     }
 
     private void OnApplicationQuit()
     {
-        networkObject.Destroy();
+        if (networkObject.IsOwner) NetworkManager.Instance.Disconnect();
     }
 
     private void Update()
     {
+        owner = networkObject.IsOwner;
+
         if (!networkObject.IsOwner)
         {
             //rotation
@@ -112,6 +129,11 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
         }
     }
 
+    void UpdateTeamColor()
+    {
+        GetComponentInChildren<SkinnedMeshRenderer>(true).material.SetColor("_Color", TeamManager.Instance.GetTeamColor(teamIndex));
+    }
+
     void SetName()
     {
         playerName = PlayerInfoManager.Instance.playerName;
@@ -133,13 +155,13 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
             playerCharacter.enabled = true;
             player.enabled = true;
             playerRb.useGravity = false;
-            characterTransform.position = Vector3.zero;
+
+            characterTransform.position = networkObject.spawnPos;
+            networkObject.position = networkObject.spawnPos;
         }
         else
         {
             coll.enabled = true;
-
-            //todo
         }
 
         if (NetworkManager.Instance.IsServer)
@@ -153,54 +175,104 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
 
     public override void Attack(RpcArgs args)
     {
+        MainThreadManager.Run(() =>
+        {
+        });
         characterAnimator.Attack();
     }
 
     public override void ChangeName(RpcArgs args)
     {
-        playerName = args.GetAt<string>(0);
-        nameText.text = playerName;
+        MainThreadManager.Run(() =>
+        {
+            playerName = args.GetAt<string>(0);
+            nameText.text = playerName;
+        });
     }
 
     public override void Jump(RpcArgs args)
     {
-        characterAnimator.Jump();
+        MainThreadManager.Run(() =>
+        {
+            characterAnimator.Jump();
+        });
     }
 
     public override void Land(RpcArgs args)
     {
-        characterAnimator.Land();
+        MainThreadManager.Run(() =>
+        {
+            characterAnimator.Land();
+        });
     }
 
     public override void Die(RpcArgs args)
     {
-        if (networkObject.IsOwner)
+        MainThreadManager.Run(() =>
         {
-            if (!playerCharacter.tps.activeInHierarchy) playerCharacter.ToggleTPS();
-            playerCharacter.enabled = false;
-            player.enabled = false;
-            playerRb.useGravity = true;
-        }
-        else
-        {
-            coll.enabled = false;
+            if (networkObject.IsOwner)
+            {
+                if (!playerCharacter.tps.activeInHierarchy) playerCharacter.ToggleTPS();
+                playerCharacter.enabled = false;
+                player.enabled = false;
+                playerRb.useGravity = true;
+            }
+            else
+            {
+                coll.enabled = false;
 
-            //todo : flag
-        }
+                //todo : flag
+            }
 
-        characterAnimator.Death();
+            characterAnimator.Death();
 
-        UIManager.Instance.DisplayKillFeed(args.GetNext<string>(), args.GetNext<int>(), playerName, teamIndex);
+            UIManager.Instance.DisplayKillFeed(args.GetNext<string>(), args.GetNext<int>(), playerName, teamIndex);
 
-        StartCoroutine(Respawn());
+            StartCoroutine(Respawn());
+        });
     }
 
     public override void TryHit(RpcArgs args)
     {
-        if (!isAlive) return;
+        MainThreadManager.Run(() =>
+        {
+            if (!isAlive) return;
 
-        isAlive = false;
+            isAlive = false;
 
-        networkObject.SendRpc(RPC_DIE, Receivers.All, args.GetNext<string>(), args.GetNext<int>());
+            networkObject.SendRpc(RPC_DIE, Receivers.All, args.GetNext<string>(), args.GetNext<int>());
+
+            // return flag
+
+            if (flag == null) return;
+
+            flag.GetComponentInParent<Zone>().networkObject.SendRpc(Zone.RPC_RETRIEVED, Receivers.All, args.GetAt<string>(0), playerName);
+
+            flag = null;
+            networkObject.hasFlag = false;
+        });
+    }
+
+    public override void Init(RpcArgs args)
+    {
+        MainThreadManager.Run(() =>
+        {
+            Init(args.GetAt<int>(0), args.GetAt<Vector3>(1));
+        });
+    }
+
+    public void Init(int _teamIndex, Vector3 _spawnPos)
+    {
+        teamIndex = _teamIndex;
+        UpdateTeamColor();
+
+        networkObject.spawnPos = _spawnPos;
+
+        characterTransform.position = networkObject.spawnPos;
+
+        if (networkObject.IsOwner)
+        {
+            networkObject.position = characterTransform.position;
+        }
     }
 }

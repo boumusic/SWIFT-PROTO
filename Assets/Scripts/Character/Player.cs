@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using BeardedManStudios.Forge.Networking;
+using BeardedManStudios.Forge.Networking.Unity;
+using BeardedManStudios.Forge.Networking.Generated;
 
 public class Player : MonoBehaviour
 {
@@ -41,6 +44,9 @@ public class Player : MonoBehaviour
         Cursor.lockState = cursor ? CursorLockMode.None : CursorLockMode.Locked;
 
         InitializeCharacter();
+
+        if (NetworkManager.Instance != null) return;
+
         SetPlayerName(playerName);
 
         if (debugTeamIndex >= 0)

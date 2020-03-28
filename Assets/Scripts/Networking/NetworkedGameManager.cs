@@ -4,9 +4,12 @@ using UnityEngine;
 using BeardedManStudios.Forge.Networking;
 using BeardedManStudios.Forge.Networking.Unity;
 using BeardedManStudios.Forge.Networking.Generated;
+using System;
 
 public class NetworkedGameManager : MonoBehaviour
 {
+    public List<List<NetworkedPlayerNetworkObject>> teams = new List<List<NetworkedPlayerNetworkObject>>();
+
     public static NetworkedGameManager Instance;
 
     public List<Zone> flagZones = new List<Zone>();
@@ -14,19 +17,87 @@ public class NetworkedGameManager : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+
+        for (int i = 0; i < 2; i++)
+        {
+            teams.Add(new List<NetworkedPlayerNetworkObject>());
+        }
     }
 
     private void Start()
     {
-        ReplaceFlags();
 
-        NetworkManager.Instance.InstantiateNetworkedPlayer();
+        if (NetworkManager.Instance.IsServer)
+        {
+            ReplaceFlags();
+
+            ((UDPServer)NetworkManager.Instance.Networker).playerAccepted += OnPlayerJoin;
+
+            NetworkManager.Instance.objectInitialized += (x,y) =>
+            {
+                if (y is NetworkedPlayerNetworkObject)
+                {
+                    NetworkedPlayerNetworkObject obj = (NetworkedPlayerNetworkObject)y;
+
+                    obj.AuthorityUpdateMode = true;
+
+                    int teamIndex = GetTeamIndex();
+                    obj.teamIndex = teamIndex;
+
+                    teams[teamIndex].Add(obj);
+
+                    Vector3 spawnPos = flagZones.Find(f => f.networkObject.teamIndex == teamIndex).transform.position + Vector3.up;
+
+                    obj.SendRpc(NetworkedPlayerBehavior.RPC_INIT, Receivers.AllBuffered, teamIndex, spawnPos);
+
+                    NetworkedPlayerBehavior behavior = obj.AttachedBehavior as NetworkedPlayerBehavior;
+                    behavior.GetComponent<NetworkedPlayer>().Init(teamIndex, spawnPos);
+
+                    Debug.Log("red team is " + teams[0].Count + " players/ blue team is " + teams[1].Count + " players");
+                }
+            };
+        }
+
+        CreatePlayer();
+    }
+
+    private void OnPlayerJoin(NetworkingPlayer player, NetWorker sender)
+    {
+        MainThreadManager.Run(() =>
+        {
+            player.disconnected += x =>
+            {
+                OnPlayerQuit(player);
+            };
+        });
+    }
+
+    void CreatePlayer()
+    {
+        NetworkedPlayerBehavior playerBehavior = NetworkManager.Instance.InstantiateNetworkedPlayer();
+    }
+
+    int GetTeamIndex()
+    {
+        return teams[0].Count > teams[1].Count ? 1 : 0;
+    }
+
+    void OnPlayerQuit(NetworkingPlayer player)
+    {
+        for (int i = 0; i < 2; i++)
+        {
+            for (int j = 0; j < teams[i].Count; j++)
+            {
+                if (teams[i][j].NetworkId == player.NetworkId)
+                {
+                    teams[i][j].Destroy();
+                }
+            }
+        }
     }
 
     void ReplaceFlags()
     {
-        if (!NetworkManager.Instance.IsServer) return;
-
         FlagZoneSpawn[] allFlagZoneSpawns = FindObjectsOfType<FlagZoneSpawn>();
 
         for (int i = 0; i < allFlagZoneSpawns.Length; i++)
