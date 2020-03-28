@@ -27604,6 +27604,11 @@ PrefabInstance:
       propertyPath: m_textInfo.pageCount
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 164534766036338947, guid: 8175ea9241c9abc4dadcd2c439c7523b,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2962433416028965374, guid: 8175ea9241c9abc4dadcd2c439c7523b,
         type: 3}
       propertyPath: m_Name
