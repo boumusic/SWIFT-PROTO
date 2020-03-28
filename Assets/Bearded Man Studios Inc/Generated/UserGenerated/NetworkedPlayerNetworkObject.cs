@@ -5,12 +5,12 @@ using UnityEngine;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedInterpol("{\"inter\":[0.5,0.5,0,0,0,0,0,0]")]
+	[GeneratedInterpol("{\"inter\":[0.5,0.5,0,0,0,0,0,0,0]")]
 	public partial class NetworkedPlayerNetworkObject : NetworkObject
 	{
 		public const int IDENTITY = 9;
 
-		private byte[] _dirtyFields = new byte[1];
+		private byte[] _dirtyFields = new byte[2];
 
 		#pragma warning disable 0067
 		public event FieldChangedEvent fieldAltered;
@@ -263,6 +263,37 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			if (spawnPosChanged != null) spawnPosChanged(_spawnPos, timestep);
 			if (fieldAltered != null) fieldAltered("spawnPos", _spawnPos, timestep);
 		}
+		[ForgeGeneratedField]
+		private bool _hasFlag;
+		public event FieldEvent<bool> hasFlagChanged;
+		public Interpolated<bool> hasFlagInterpolation = new Interpolated<bool>() { LerpT = 0f, Enabled = false };
+		public bool hasFlag
+		{
+			get { return _hasFlag; }
+			set
+			{
+				// Don't do anything if the value is the same
+				if (_hasFlag == value)
+					return;
+
+				// Mark the field as dirty for the network to transmit
+				_dirtyFields[1] |= 0x1;
+				_hasFlag = value;
+				hasDirtyFields = true;
+			}
+		}
+
+		public void SethasFlagDirty()
+		{
+			_dirtyFields[1] |= 0x1;
+			hasDirtyFields = true;
+		}
+
+		private void RunChange_hasFlag(ulong timestep)
+		{
+			if (hasFlagChanged != null) hasFlagChanged(_hasFlag, timestep);
+			if (fieldAltered != null) fieldAltered("hasFlag", _hasFlag, timestep);
+		}
 
 		protected override void OwnershipChanged()
 		{
@@ -280,6 +311,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			aliveInterpolation.current = aliveInterpolation.target;
 			teamIndexInterpolation.current = teamIndexInterpolation.target;
 			spawnPosInterpolation.current = spawnPosInterpolation.target;
+			hasFlagInterpolation.current = hasFlagInterpolation.target;
 		}
 
 		public override int UniqueIdentity { get { return IDENTITY; } }
@@ -294,6 +326,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			UnityObjectMapper.Instance.MapBytes(data, _alive);
 			UnityObjectMapper.Instance.MapBytes(data, _teamIndex);
 			UnityObjectMapper.Instance.MapBytes(data, _spawnPos);
+			UnityObjectMapper.Instance.MapBytes(data, _hasFlag);
 
 			return data;
 		}
@@ -332,6 +365,10 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			spawnPosInterpolation.current = _spawnPos;
 			spawnPosInterpolation.target = _spawnPos;
 			RunChange_spawnPos(timestep);
+			_hasFlag = UnityObjectMapper.Instance.Map<bool>(payload);
+			hasFlagInterpolation.current = _hasFlag;
+			hasFlagInterpolation.target = _hasFlag;
+			RunChange_hasFlag(timestep);
 		}
 
 		protected override BMSByte SerializeDirtyFields()
@@ -355,6 +392,8 @@ namespace BeardedManStudios.Forge.Networking.Generated
 				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _teamIndex);
 			if ((0x80 & _dirtyFields[0]) != 0)
 				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _spawnPos);
+			if ((0x1 & _dirtyFields[1]) != 0)
+				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _hasFlag);
 
 			// Reset all the dirty fields
 			for (int i = 0; i < _dirtyFields.Length; i++)
@@ -475,6 +514,19 @@ namespace BeardedManStudios.Forge.Networking.Generated
 					RunChange_spawnPos(timestep);
 				}
 			}
+			if ((0x1 & readDirtyFlags[1]) != 0)
+			{
+				if (hasFlagInterpolation.Enabled)
+				{
+					hasFlagInterpolation.target = UnityObjectMapper.Instance.Map<bool>(data);
+					hasFlagInterpolation.Timestep = timestep;
+				}
+				else
+				{
+					_hasFlag = UnityObjectMapper.Instance.Map<bool>(data);
+					RunChange_hasFlag(timestep);
+				}
+			}
 		}
 
 		public override void InterpolateUpdate()
@@ -522,12 +574,17 @@ namespace BeardedManStudios.Forge.Networking.Generated
 				_spawnPos = (Vector3)spawnPosInterpolation.Interpolate();
 				//RunChange_spawnPos(spawnPosInterpolation.Timestep);
 			}
+			if (hasFlagInterpolation.Enabled && !hasFlagInterpolation.current.UnityNear(hasFlagInterpolation.target, 0.0015f))
+			{
+				_hasFlag = (bool)hasFlagInterpolation.Interpolate();
+				//RunChange_hasFlag(hasFlagInterpolation.Timestep);
+			}
 		}
 
 		private void Initialize()
 		{
 			if (readDirtyFlags == null)
-				readDirtyFlags = new byte[1];
+				readDirtyFlags = new byte[2];
 
 		}
 

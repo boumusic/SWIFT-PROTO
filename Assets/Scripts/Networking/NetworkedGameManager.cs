@@ -39,6 +39,8 @@ public class NetworkedGameManager : MonoBehaviour
                 {
                     NetworkedPlayerNetworkObject obj = (NetworkedPlayerNetworkObject)y;
 
+                    obj.AuthorityUpdateMode = true;
+
                     int teamIndex = GetTeamIndex();
                     obj.teamIndex = teamIndex;
 
@@ -46,11 +48,12 @@ public class NetworkedGameManager : MonoBehaviour
 
                     Vector3 spawnPos = flagZones.Find(f => f.networkObject.teamIndex == teamIndex).transform.position + Vector3.up;
 
-                    Debug.Log("sending rpc");
                     obj.SendRpc(NetworkedPlayerBehavior.RPC_INIT, Receivers.AllBuffered, teamIndex, spawnPos);
 
                     NetworkedPlayerBehavior behavior = obj.AttachedBehavior as NetworkedPlayerBehavior;
                     behavior.GetComponent<NetworkedPlayer>().Init(teamIndex, spawnPos);
+
+                    Debug.Log("red team is " + teams[0].Count + " players/ blue team is " + teams[1].Count + " players");
                 }
             };
         }

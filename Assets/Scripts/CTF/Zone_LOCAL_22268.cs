@@ -93,7 +93,6 @@ public class Zone : NetworkedFlagBehavior, ITeamAffilitation
                 {
                     if ((player.networkObject.teamIndex != networkObject.teamIndex) && isAltar)
                     {
-                        player.flag = flag;
                         networkObject.SendRpc(RPC_CAPTURED, Receivers.All, player.playerName);
                         networkObject.isFlagThere = false;
 
@@ -130,14 +129,14 @@ public class Zone : NetworkedFlagBehavior, ITeamAffilitation
                 if (chara.TeamIndex != teamIndex && isAltar)
                 {
                     chara.Capture(flag);
-                    capturedFx.Play();                    
+                    capturedFx.Play();
                 }
             }
 
             if (chara.HasFlag && chara.TeamIndex == teamIndex && !isAltar)
             {
                 chara.Score();
-                scoredFx.Play();                
+                scoredFx.Play();
             }
         }
     }
