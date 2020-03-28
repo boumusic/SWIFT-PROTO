@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedRPC("{\"types\":[[][\"string\"][][][\"string\", \"int\"][\"string\", \"int\"][\"int\", \"Vector3\"]]")]
-	[GeneratedRPCVariableNames("{\"types\":[[][\"\"][][][\"killerName\", \"killerTeam\"][\"killerName\", \"killerTeam\"][\"\", \"\"]]")]
+	[GeneratedRPC("{\"types\":[[][\"string\"][][][\"string\", \"int\"][\"string\", \"int\"][\"int\", \"Vector3\"][\"bool\"]]")]
+	[GeneratedRPCVariableNames("{\"types\":[[][\"\"][][][\"killerName\", \"killerTeam\"][\"killerName\", \"killerTeam\"][\"\", \"\"][\"\"]]")]
 	public abstract partial class NetworkedPlayerBehavior : NetworkBehavior
 	{
 		public const byte RPC_ATTACK = 0 + 5;
@@ -15,6 +15,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		public const byte RPC_DIE = 4 + 5;
 		public const byte RPC_TRY_HIT = 5 + 5;
 		public const byte RPC_INIT = 6 + 5;
+		public const byte RPC_TOGGLE_FLAG = 7 + 5;
 		
 		public NetworkedPlayerNetworkObject networkObject = null;
 
@@ -35,6 +36,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			networkObject.RegisterRpc("Die", Die, typeof(string), typeof(int));
 			networkObject.RegisterRpc("TryHit", TryHit, typeof(string), typeof(int));
 			networkObject.RegisterRpc("Init", Init, typeof(int), typeof(Vector3));
+			networkObject.RegisterRpc("ToggleFlag", ToggleFlag, typeof(bool));
 
 			networkObject.onDestroy += DestroyGameObject;
 
@@ -139,6 +141,10 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		/// Arguments:
 		/// </summary>
 		public abstract void Init(RpcArgs args);
+		/// <summary>
+		/// Arguments:
+		/// </summary>
+		public abstract void ToggleFlag(RpcArgs args);
 
 		// DO NOT TOUCH, THIS GETS GENERATED PLEASE EXTEND THIS CLASS IF YOU WISH TO HAVE CUSTOM CODE ADDITIONS
 	}
