@@ -649,6 +649,7 @@ public class Character : MonoBehaviour
     private void Knockbacked_Enter()
     {
         kbProgress = 0f;
+        feedbacks.Play("Parried");
     }
 
     private void Knockbacked_Update()

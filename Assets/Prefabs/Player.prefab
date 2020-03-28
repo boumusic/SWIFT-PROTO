@@ -51,7 +51,10 @@ MonoBehaviour:
   cursor: 0
   jump: 32
   attack: 323
+  dash: 304
   toggleTps: 104
+  pause: 27
+  debugTeamIndex: -1
 --- !u!1001 &6166428449287438271
 PrefabInstance:
   m_ObjectHideFlags: 0
