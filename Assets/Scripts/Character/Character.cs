@@ -314,7 +314,8 @@ public class Character : MonoBehaviour
         if(axis.magnitude != 0)
             LastCamRotation = CamRotation;
 
-        jumpLeft--;
+        if(!CastWall())
+            jumpLeft--;
         SnapAccelToAxis();
         if (m.resetVelocityOnJump) ResetVelocity();
         jumpProgress = 0f;
@@ -438,7 +439,6 @@ public class Character : MonoBehaviour
     {
         if (m.resetDashOnWallclimb) resetDash = true;
         animator.WallClimb(true);
-        jumpLeft++;
     }
 
     private Vector3 WallNormal => hits.Length > 0 ? hits[0].normal : Vector3.zero;

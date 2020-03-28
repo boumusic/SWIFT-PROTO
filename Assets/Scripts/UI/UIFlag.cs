@@ -49,7 +49,23 @@ public class UIFlag : UI360
 
                 else
                 {
-                    newText = "DEFEND";
+                    if (Local)
+                    {
+                        if (!UIManager.Instance.Player.Character.HasFlag)
+                        {
+                            newText = "REACH";
+                        }
+                    }
+
+                    else
+                    {
+                        if (!UIManager.Instance.NetworkedPlayer.HasFlag)
+                        {
+                            newText = "REACH";
+                        }
+                    }
+
+                    
                 }
                 break;
 
