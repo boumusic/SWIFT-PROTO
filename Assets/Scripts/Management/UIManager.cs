@@ -90,10 +90,16 @@ public class UIManager : MonoBehaviour
     public void RegisterFlagZone(Zone zone)
     {
         flagZones.Add(zone);
+        UIPing uiFlag = NewPing(zone);
+        uiFlag.Init(zone.teamIndex, zone.type);
+    }
+
+    private UIPing NewPing(Zone zone)
+    {
         GameObject newUI = Instantiate(uiFlagZonePrefab, canvas.transform);
-        UIFlag uiFlag = newUI.GetComponent<UIFlag>();
+        UIPing uiFlag = newUI.GetComponent<UIPing>();
         uiFlag.FeedTarget(zone.gameObject);
-        uiFlag.Init(zone.teamIndex,zone.type);
+        return uiFlag;
     }
 
     public void RegisterFlagZones(List<Zone> zones)
@@ -102,10 +108,7 @@ public class UIManager : MonoBehaviour
 
         for (int i = 0; i < zones.Count; i++)
         {
-            GameObject newUI = Instantiate(uiFlagZonePrefab, canvas.transform);
-            UIFlag uiFlag = newUI.GetComponent<UIFlag>();
-            uiFlag.FeedTarget(zones[i].gameObject);
-            uiFlag.Init(zones[i].teamIndex, zones[i].type);
+            RegisterFlagZone(zones[i]);
         }
     }
 

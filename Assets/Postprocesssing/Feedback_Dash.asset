@@ -36,7 +36,7 @@ MonoBehaviour:
     defaultState: 1
   color:
     overrideState: 1
-    value: {r: 0.7398095, g: 0.83466226, b: 0.8962264, a: 1}
+    value: {r: 0.16015486, g: 0.40844208, b: 0.5754717, a: 1}
   threshold:
     overrideState: 1
     value: -0.53

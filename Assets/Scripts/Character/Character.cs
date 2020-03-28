@@ -584,10 +584,10 @@ public class Character : MonoBehaviour
         {
             if (NetworkManager.Instance != null)
             {
-                for (int i = 0; i < hits.Length; i++)
-                {
+                //for (int i = 0; i < hits.Length; i++)
+                //{
                     NetworkedPlayer player;
-                    if (hits[i].collider.transform.root.TryGetComponent(out player))
+                    if (hits[0].collider.transform.root.TryGetComponent(out player))
                     {
                         NetworkedPlayer myNetworkerPlayer = transform.root.GetComponent<NetworkedPlayer>();
 
@@ -601,7 +601,7 @@ public class Character : MonoBehaviour
                             UIManager.Instance.HitMarker();
                         }
                     }
-                }
+                //}
 
                 // don't do the "normal" hit dectection
                 yield return null;
