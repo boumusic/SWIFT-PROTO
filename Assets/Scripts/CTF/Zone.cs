@@ -58,6 +58,7 @@ public class Zone : NetworkedFlagBehavior, ITeamAffilitation
         base.NetworkStart();
 
         teamIndex = networkObject.teamIndex;
+        type = (FlagZoneType)networkObject.type;
 
         UpdateAffiliation();
     }
@@ -104,7 +105,7 @@ public class Zone : NetworkedFlagBehavior, ITeamAffilitation
                     }
                 }
 
-                if (player.HasFlag && player.teamIndex == teamIndex && isAltar)
+                if (player.HasFlag && player.teamIndex == teamIndex && !isAltar)
                 {
                     player.flag = null;
                     player.networkObject.hasFlag = false;
