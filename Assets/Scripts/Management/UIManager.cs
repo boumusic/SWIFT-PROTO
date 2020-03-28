@@ -87,6 +87,15 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    public void RegisterFlagZone(Zone zone)
+    {
+        flagZones.Add(zone);
+        GameObject newUI = Instantiate(uiFlagZonePrefab, canvas.transform);
+        UIFlag uiFlag = newUI.GetComponent<UIFlag>();
+        uiFlag.FeedTarget(zone.gameObject);
+        uiFlag.Init(zone.teamIndex,zone.type);
+    }
+
     public void RegisterFlagZones(List<Zone> zones)
     {
         flagZones = zones;

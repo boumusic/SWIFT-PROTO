@@ -58,7 +58,7 @@ public class Zone : NetworkedFlagBehavior, ITeamAffilitation
         base.NetworkStart();
 
         teamIndex = networkObject.teamIndex;
-
+        UIManager.Instance.RegisterFlagZone(this);
         UpdateAffiliation();
     }
 

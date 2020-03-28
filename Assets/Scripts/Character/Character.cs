@@ -549,8 +549,7 @@ public class Character : MonoBehaviour
     #endregion
 
     #region Attack
-
-
+    
     public bool CanAttack => CurrentState != CharacterState.WallClimbing && !isAttacking && !HasFlag && !InDashMovement;
     public void TryAttack()
     {
