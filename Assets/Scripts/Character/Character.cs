@@ -54,7 +54,8 @@ public class Character : MonoBehaviour
 
     public Vector3 Forward => new Vector3(playerCamera.transform.forward.x, 0, playerCamera.transform.forward.z);
     public Vector3 Right => new Vector3(playerCamera.transform.right.x, 0, playerCamera.transform.right.z);
-    public bool Dashing => CurrentState == CharacterState.Dashing;
+    public bool Dashing => (CurrentState == CharacterState.Dashing);
+    public bool InDashMovement => Dashing && dashProgress < 0.5f;
     public Vector3 FinalVelocity
     {
         get
@@ -547,7 +548,7 @@ public class Character : MonoBehaviour
 
     #region Attack
 
-    public bool CanAttack => CurrentState != CharacterState.WallClimbing && !isAttacking && !HasFlag && !Dashing;
+    public bool CanAttack => CurrentState != CharacterState.WallClimbing && !isAttacking && !HasFlag && !InDashMovement;
     public void TryAttack()
     {
         if (CanAttack)
