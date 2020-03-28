@@ -20,7 +20,7 @@ public class UI360 : MonoBehaviour
     private Character Chara => player.Character;
     private Camera Cam => Chara.playerCamera.cam;
 
-    private Vector3 objPos => targetGo.transform.position;
+    private Vector3 objPos => targetGo.transform.position + Vector3.up *5f;
     private Vector3 camPos => Cam.transform.position;
 
     private Vector3[] compare;

@@ -21,8 +21,8 @@ public class Character : MonoBehaviour
 
     [Header("Visuals")]
     public GameObject tps;
-    public GameObject flagVisuals;
-    public Renderer flagVisualsRend;
+    public GameObject[] flagVisuals;
+    public Renderer[] flagVisualsRend;
     public GameObject fps;
     public bool startTps = false;
     private Player player;
@@ -33,7 +33,7 @@ public class Character : MonoBehaviour
 
     private Vector2 accelProgress;
     private Vector2 axis;
-    public Vector2 Axis { get => axis;}
+    public Vector2 Axis { get => axis; }
 
     private Vector3 DesiredVelocity => CamRotation * new Vector3(axis.x, 0, axis.y);
     private Vector3 velocity;
@@ -80,9 +80,9 @@ public class Character : MonoBehaviour
     private bool grounded => CurrentState == CharacterState.Grounded;
     private float CurrentDecelSpeed => grounded ? m.decelerationSpeed : m.jumpDecelerationSpeed;
     private float CurrentAccelSpeed => grounded ? m.accelerationSpeed : m.jumpAccelerationSpeed;
-    
+
     private float dashProgress = 0f;
-    
+
 
     #endregion
 
@@ -166,7 +166,7 @@ public class Character : MonoBehaviour
             Vector2 usedAxis = CurrentState == CharacterState.Grounded ? axis : axis;
             Accel(ref xAccel, usedAxis.x);
             Accel(ref zAccel, usedAxis.y);
-            Vector3 target = new Vector3(xAccel, 0, zAccel) * m.runSpeed * (HasFlag? m.flagMultiplier : 1);
+            Vector3 target = new Vector3(xAccel, 0, zAccel) * m.runSpeed * (HasFlag ? m.flagMultiplier : 1);
 
             velocity = target;
             if (CurrentState == CharacterState.Dashing) velocity = new Vector3(dashVelocity.x, 0f, dashVelocity.z);
@@ -191,11 +191,11 @@ public class Character : MonoBehaviour
 
     private void SnapAccelToAxis()
     {
-        if(axis.magnitude != 0)
+        if (axis.magnitude != 0)
         {
             xAccel = axis.x;
             zAccel = axis.y;
-        }        
+        }
     }
 
     private void ResetVelocity()
@@ -311,10 +311,10 @@ public class Character : MonoBehaviour
 
     private void Jumping_Enter()
     {
-        if(axis.magnitude != 0)
+        if (axis.magnitude != 0)
             LastCamRotation = CamRotation;
 
-        if(!CastWall())
+        if (!CastWall())
             jumpLeft--;
         SnapAccelToAxis();
         if (m.resetVelocityOnJump) ResetVelocity();
@@ -509,7 +509,7 @@ public class Character : MonoBehaviour
         {
             DropFlag();
             ResetVelocity();
-            flagVisuals.SetActive(false);
+            ToggleFlagVisuals(true);
             coll.enabled = false;
             healthPointsLeft = 0;
             isDead = true;
@@ -582,7 +582,7 @@ public class Character : MonoBehaviour
                         {
                             Debug.Log("sending kill rpc");
 
-                            player.networkObject.SendRpc(NetworkedPlayerBehavior.RPC_TRY_HIT, Receivers.Server, 
+                            player.networkObject.SendRpc(NetworkedPlayerBehavior.RPC_TRY_HIT, Receivers.Server,
                                 myNetworkerPlayer.playerName, myNetworkerPlayer.teamIndex);
 
                             UIManager.Instance.HitMarker();
@@ -637,7 +637,7 @@ public class Character : MonoBehaviour
     private void OrientModel()
     {
         if (Forward != Vector3.zero)
-        tps.transform.forward = Forward;
+            tps.transform.forward = Forward;
     }
 
     #endregion
@@ -651,25 +651,25 @@ public class Character : MonoBehaviour
 
     public void Capture(Flag flag)
     {
-        flag.gameObject.SetActive(false);
-        flagVisuals.SetActive(true);
-        UIManager.Instance.LogMessage(PlayerName + " captured the Flag !");
         this.flag = flag;
+        ToggleFlagVisuals(true);
+        flag.gameObject.SetActive(false);
+        //UIManager.Instance.LogMessage(PlayerName + " captured the Flag !");
     }
 
     public void Score()
     {
         string message = PlayerName + " scored for team " + TeamIndex + "!";
-        UIManager.Instance.LogMessage(message);
-        ResetFlag();
-        TeamManager.Instance.Score(TeamIndex);
-        CTFManager.Instance.OnTeamScored?.Invoke();
         OnScore?.Invoke();
+        ResetFlag();
+        //UIManager.Instance.LogMessage(message);
+        //TeamManager.Instance.Score(TeamIndex);
+        //CTFManager.Instance.OnTeamScored?.Invoke();
     }
 
     private void DropFlag()
     {
-        if(HasFlag)
+        if (HasFlag)
         {
             string message = "The flag has been retreived!";
             UIManager.Instance.LogMessage(message);
@@ -679,9 +679,17 @@ public class Character : MonoBehaviour
 
     private void ResetFlag()
     {
+        ToggleFlagVisuals(false);
         flag.gameObject.SetActive(true);
-        flagVisuals.SetActive(false);
         flag = null;
+    }
+
+    private void ToggleFlagVisuals(bool value)
+    {
+        for (int i = 0; i < flagVisuals.Length; i++)
+        {
+            flagVisuals[i].SetActive(value);
+        }
     }
 
     #endregion
@@ -691,8 +699,13 @@ public class Character : MonoBehaviour
     public void UpdateColor()
     {
         GetComponentInChildren<SkinnedMeshRenderer>(true).material.SetColor("_Color", TeamColor);
-        if(player)
-            flagVisualsRend.material.SetColor("_Color", TeamManager.Instance.GetOppositeTeamColor(player.TeamIndex));
+        if (player)
+        {
+            for (int i = 0; i < flagVisualsRend.Length; i++)
+            {
+                flagVisualsRend[i].material.SetColor("_Color", TeamManager.Instance.GetOppositeTeamColor(player.TeamIndex));
+            }
+        }
     }
 
     #endregion
