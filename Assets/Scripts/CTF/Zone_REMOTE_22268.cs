@@ -93,20 +93,17 @@ public class Zone : NetworkedFlagBehavior, ITeamAffilitation
                 {
                     if ((player.networkObject.teamIndex != networkObject.teamIndex) && isAltar)
                     {
+                        player.playerCharacter.Capture(flag);
                         player.flag = flag;
                         networkObject.SendRpc(RPC_CAPTURED, Receivers.All, player.playerName);
                         networkObject.isFlagThere = false;
-
-                        player.flag = flag;
-                        player.networkObject.hasFlag = true;
                     }
                 }
 
                 if (player.HasFlag && player.teamIndex == teamIndex && isAltar)
                 {
                     player.flag = null;
-                    player.networkObject.hasFlag = false;
-
+                    player.playerCharacter.Score();
                     networkObject.SendRpc(RPC_SCORED, Receivers.All, player.playerName, player.teamIndex);
 
                     for (int i = 0; i < NetworkedGameManager.Instance.flagZones.Count; i++)
@@ -144,10 +141,7 @@ public class Zone : NetworkedFlagBehavior, ITeamAffilitation
 
     public override void Retrieved(RpcArgs args)
     {
-        string message = args.GetAt<string>(0) + " retrieved the flag from " + args.GetAt<string>(1) + "!";
-        UIManager.Instance.LogMessage(message);
-
-        flag.gameObject.SetActive(true);
+        throw new System.NotImplementedException();
     }
 
     public override void Scored(RpcArgs args)
