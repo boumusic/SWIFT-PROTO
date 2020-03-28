@@ -20,6 +20,8 @@ public class UIManager : MonoBehaviour
     private Player player;
     public Player Player { get { if (!player) player = FindObjectOfType<Player>(); return player; } }
 
+    public NetworkedPlayer NetworkedPlayer => Player.GetComponentInParent<NetworkedPlayer>();
+
     [Header("Components")]
     public Canvas canvas;
     public Animator hitMarker;
@@ -89,6 +91,13 @@ public class UIManager : MonoBehaviour
     {
         flagZones = zones;
 
+        for (int i = 0; i < zones.Count; i++)
+        {
+            GameObject newUI = Instantiate(uiFlagZonePrefab, canvas.transform);
+            UIFlag uiFlag = newUI.GetComponent<UIFlag>();
+            uiFlag.FeedTarget(zones[i].gameObject);
+            uiFlag.Init(zones[i].teamIndex, zones[i].type);
+        }
     }
 
     public void TogglePause()
