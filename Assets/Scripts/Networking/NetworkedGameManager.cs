@@ -46,7 +46,9 @@ public class NetworkedGameManager : MonoBehaviour
 
                     teams[teamIndex].Add(obj);
 
-                    Vector3 spawnPos = flagZones.Find(f => f.networkObject.teamIndex == teamIndex).transform.position + Vector3.up;
+                    Vector3 spawnPos = flagZones.Find(f => 
+                        (f.networkObject.teamIndex == teamIndex) && (f.networkObject.type == (int)FlagZoneType.Shrine)
+                    ).transform.position + Vector3.up;
 
                     obj.SendRpc(NetworkedPlayerBehavior.RPC_INIT, Receivers.AllBuffered, teamIndex, spawnPos);
 
@@ -103,6 +105,7 @@ public class NetworkedGameManager : MonoBehaviour
         for (int i = 0; i < allFlagZoneSpawns.Length; i++)
         {
             NetworkedFlagBehavior flag =  NetworkManager.Instance.InstantiateNetworkedFlag(position: allFlagZoneSpawns[i].transform.position, rotation: allFlagZoneSpawns[i].transform.rotation);
+
             flag.networkObject.teamIndex = allFlagZoneSpawns[i].teamIndex;
             flag.networkObject.type = (int)allFlagZoneSpawns[i].type;
             flag.networkObject.radius = allFlagZoneSpawns[i].radius;
