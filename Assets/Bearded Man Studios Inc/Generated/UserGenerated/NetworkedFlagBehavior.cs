@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedRPC("{\"types\":[[\"string\"][][\"string\", \"int\"][]]")]
-	[GeneratedRPCVariableNames("{\"types\":[[\"\"][][\"\", \"\"][]]")]
+	[GeneratedRPC("{\"types\":[[\"string\"][\"string\", \"string\"][\"string\", \"int\"][]]")]
+	[GeneratedRPCVariableNames("{\"types\":[[\"\"][\"\", \"\"][\"\", \"\"][]]")]
 	public abstract partial class NetworkedFlagBehavior : NetworkBehavior
 	{
 		public const byte RPC_CAPTURED = 0 + 5;
@@ -26,7 +26,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 
 			base.SetupHelperRpcs(networkObject);
 			networkObject.RegisterRpc("Captured", Captured, typeof(string));
-			networkObject.RegisterRpc("Retrieved", Retrieved);
+			networkObject.RegisterRpc("Retrieved", Retrieved, typeof(string), typeof(string));
 			networkObject.RegisterRpc("Scored", Scored, typeof(string), typeof(int));
 			networkObject.RegisterRpc("RespawnFlag", RespawnFlag);
 
@@ -112,10 +112,14 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		public abstract void Captured(RpcArgs args);
 		/// <summary>
 		/// Arguments:
+		/// string 
+		/// string
 		/// </summary>
 		public abstract void Retrieved(RpcArgs args);
 		/// <summary>
 		/// Arguments:
+		/// string 
+		/// int
 		/// </summary>
 		public abstract void Scored(RpcArgs args);
 		/// <summary>

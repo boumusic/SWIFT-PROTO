@@ -156,13 +156,12 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
             player.enabled = true;
             playerRb.useGravity = false;
 
+            characterTransform.position = networkObject.spawnPos;
             networkObject.position = networkObject.spawnPos;
         }
         else
         {
             coll.enabled = true;
-
-            //todo
         }
 
         if (NetworkManager.Instance.IsServer)
@@ -170,9 +169,6 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
             isAlive = true;
             networkObject.alive = isAlive;
         }
-
-        networkObject.SnapInterpolations();
-        characterTransform.position = networkObject.spawnPos;
 
         characterAnimator.Land();
     }
@@ -245,6 +241,15 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
             isAlive = false;
 
             networkObject.SendRpc(RPC_DIE, Receivers.All, args.GetNext<string>(), args.GetNext<int>());
+
+            // return flag
+
+            if (flag == null) return;
+
+            flag.GetComponentInParent<Zone>().networkObject.SendRpc(Zone.RPC_RETRIEVED, Receivers.All, args.GetAt<string>(0), playerName);
+
+            flag = null;
+            networkObject.hasFlag = false;
         });
     }
 

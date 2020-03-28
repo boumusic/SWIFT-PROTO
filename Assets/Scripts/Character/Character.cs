@@ -580,8 +580,6 @@ public class Character : MonoBehaviour
 
                         if (player.player == null && (player.teamIndex != myNetworkerPlayer.teamIndex))
                         {
-                            Debug.Log("sending kill rpc");
-
                             player.networkObject.SendRpc(NetworkedPlayerBehavior.RPC_TRY_HIT, Receivers.Server, 
                                 myNetworkerPlayer.playerName, myNetworkerPlayer.teamIndex);
 
