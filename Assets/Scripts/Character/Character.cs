@@ -26,6 +26,8 @@ public class Character : MonoBehaviour
     public GameObject fps;
     public bool startTps = false;
     private Player player;
+    private NetworkedPlayer nPlayer;
+    private NetworkedPlayer NPlayer { get { if (nPlayer == null) nPlayer = GetComponentInParent<NetworkedPlayer>(); return nPlayer; } }
     public string PlayerName => player != null ? player.PlayerName : "NPC";
     public Color TeamColor => player != null ? player.TeamColor : Color.white;
 
@@ -548,6 +550,7 @@ public class Character : MonoBehaviour
 
     #region Attack
 
+
     public bool CanAttack => CurrentState != CharacterState.WallClimbing && !isAttacking && !HasFlag && !InDashMovement;
     public void TryAttack()
     {
@@ -648,7 +651,7 @@ public class Character : MonoBehaviour
     private Flag flag = null;
     public Flag Flag { get => flag; }
     public int TeamIndex => player.TeamIndex;
-    public bool HasFlag => flag != null;
+    public bool HasFlag { get { if (NPlayer != null) return NPlayer.HasFlag; else return flag != null; } }
 
     public void Capture(Flag flag)
     {
