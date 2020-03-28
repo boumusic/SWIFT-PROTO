@@ -93,6 +93,7 @@ public class NetworkedGameManager : MonoBehaviour
                 if (teams[i][j].NetworkId == player.NetworkId)
                 {
                     teams[i][j].Destroy();
+                    teams[i].RemoveAt(j);
                 }
             }
         }
