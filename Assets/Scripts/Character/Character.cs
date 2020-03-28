@@ -576,9 +576,12 @@ public class Character : MonoBehaviour
                     NetworkedPlayer player;
                     if (hits[i].collider.transform.root.TryGetComponent(out player))
                     {
-                        if (player.player == null)
+                        NetworkedPlayer myNetworkerPlayer = transform.root.GetComponent<NetworkedPlayer>();
+
+                        if (player.player == null && (player.teamIndex != myNetworkerPlayer.teamIndex))
                         {
-                            NetworkedPlayer myNetworkerPlayer = transform.root.GetComponent<NetworkedPlayer>();
+                            Debug.Log("sending kill rpc");
+
                             player.networkObject.SendRpc(NetworkedPlayerBehavior.RPC_TRY_HIT, Receivers.Server, 
                                 myNetworkerPlayer.playerName, myNetworkerPlayer.teamIndex);
 

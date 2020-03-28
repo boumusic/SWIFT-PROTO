@@ -91,7 +91,7 @@ public class Zone : NetworkedFlagBehavior, ITeamAffilitation
             {
                 if (!IsCaptured)
                 {
-                    if (player.teamIndex != networkObject.teamIndex && isAltar)
+                    if ((player.networkObject.teamIndex != networkObject.teamIndex) && isAltar)
                     {
                         player.flag = flag;
                         networkObject.SendRpc(RPC_CAPTURED, Receivers.All, player.playerName);
@@ -99,7 +99,7 @@ public class Zone : NetworkedFlagBehavior, ITeamAffilitation
                     }
                 }
 
-                if (player.HasFlag && player.teamIndex == teamIndex && !isAltar)
+                if (player.HasFlag && player.teamIndex == teamIndex && isAltar)
                 {
                     player.flag = null;
 
@@ -149,6 +149,7 @@ public class Zone : NetworkedFlagBehavior, ITeamAffilitation
         UIManager.Instance.LogMessage(message);
 
         TeamManager.Instance.Score(args.GetAt<int>(1));
+        CTFManager.Instance.OnTeamScored?.Invoke();
 
         scoredFx.Play();
     }
