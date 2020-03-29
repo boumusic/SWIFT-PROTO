@@ -25,17 +25,6 @@ public class UI360 : MonoBehaviour
 
     private Vector3[] compare;
 
-    private void OnDrawGizmos()
-    {
-        if (Application.isPlaying)
-        {
-            for (int i = 0; i < compare.Length; i++)
-            {
-                Gizmos.DrawSphere(compare[i], 0.1f);
-            }
-        }
-    }
-
     public void FeedTarget(GameObject target)
     {
         targetGo = target;
@@ -48,6 +37,12 @@ public class UI360 : MonoBehaviour
 
     private void Pos()
     {
+        // temp fix
+        if (Cam == null)
+        {
+            player = UIManager.Instance.Player;
+        }
+
         float dot = targetGo != null ? Vector3.Dot(Cam.transform.forward, (objPos - camPos).normalized) : 0;
         
         Vector3 target = UIManager.Instance.canvas.WorldToCanvas(objPos, Cam) ;

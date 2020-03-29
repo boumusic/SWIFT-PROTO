@@ -11,6 +11,7 @@ public class Player : MonoBehaviour
     [Header("Components")]
     [SerializeField] private Character character;
     [SerializeField] private TextMeshPro nameText;
+    public PlayerScore score;
 
     [Header("Mouse")]
     public float sensitivity = 1f;
@@ -24,6 +25,7 @@ public class Player : MonoBehaviour
 
     [Header("Inputs")]
     public KeyCode jump = KeyCode.Space;
+    public bool Tab => Input.GetKey(KeyCode.Tab);
     public KeyCode attack = KeyCode.Mouse0;
     public KeyCode dash = KeyCode.LeftShift;
     public KeyCode toggleTps = KeyCode.H;
@@ -98,6 +100,7 @@ public class Player : MonoBehaviour
             {
                 character.ToggleTPS();
             }
+            
         }
 
         if (Input.GetKeyDown(pause) || Input.GetKeyDown(KeyCode.P))

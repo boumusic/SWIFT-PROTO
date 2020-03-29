@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedInterpol("{\"inter\":[0.5,0.5,0,0,0,0,0,0,0]")]
+	[GeneratedInterpol("{\"inter\":[0.5,0.5,0,0,0,0,0,0,0,0,0]")]
 	public partial class NetworkedPlayerNetworkObject : NetworkObject
 	{
 		public const int IDENTITY = 9;
@@ -294,6 +294,68 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			if (hasFlagChanged != null) hasFlagChanged(_hasFlag, timestep);
 			if (fieldAltered != null) fieldAltered("hasFlag", _hasFlag, timestep);
 		}
+		[ForgeGeneratedField]
+		private bool _attacking;
+		public event FieldEvent<bool> attackingChanged;
+		public Interpolated<bool> attackingInterpolation = new Interpolated<bool>() { LerpT = 0f, Enabled = false };
+		public bool attacking
+		{
+			get { return _attacking; }
+			set
+			{
+				// Don't do anything if the value is the same
+				if (_attacking == value)
+					return;
+
+				// Mark the field as dirty for the network to transmit
+				_dirtyFields[1] |= 0x2;
+				_attacking = value;
+				hasDirtyFields = true;
+			}
+		}
+
+		public void SetattackingDirty()
+		{
+			_dirtyFields[1] |= 0x2;
+			hasDirtyFields = true;
+		}
+
+		private void RunChange_attacking(ulong timestep)
+		{
+			if (attackingChanged != null) attackingChanged(_attacking, timestep);
+			if (fieldAltered != null) fieldAltered("attacking", _attacking, timestep);
+		}
+		[ForgeGeneratedField]
+		private Vector3 _viewDir;
+		public event FieldEvent<Vector3> viewDirChanged;
+		public InterpolateVector3 viewDirInterpolation = new InterpolateVector3() { LerpT = 0f, Enabled = false };
+		public Vector3 viewDir
+		{
+			get { return _viewDir; }
+			set
+			{
+				// Don't do anything if the value is the same
+				if (_viewDir == value)
+					return;
+
+				// Mark the field as dirty for the network to transmit
+				_dirtyFields[1] |= 0x4;
+				_viewDir = value;
+				hasDirtyFields = true;
+			}
+		}
+
+		public void SetviewDirDirty()
+		{
+			_dirtyFields[1] |= 0x4;
+			hasDirtyFields = true;
+		}
+
+		private void RunChange_viewDir(ulong timestep)
+		{
+			if (viewDirChanged != null) viewDirChanged(_viewDir, timestep);
+			if (fieldAltered != null) fieldAltered("viewDir", _viewDir, timestep);
+		}
 
 		protected override void OwnershipChanged()
 		{
@@ -312,6 +374,8 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			teamIndexInterpolation.current = teamIndexInterpolation.target;
 			spawnPosInterpolation.current = spawnPosInterpolation.target;
 			hasFlagInterpolation.current = hasFlagInterpolation.target;
+			attackingInterpolation.current = attackingInterpolation.target;
+			viewDirInterpolation.current = viewDirInterpolation.target;
 		}
 
 		public override int UniqueIdentity { get { return IDENTITY; } }
@@ -327,6 +391,8 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			UnityObjectMapper.Instance.MapBytes(data, _teamIndex);
 			UnityObjectMapper.Instance.MapBytes(data, _spawnPos);
 			UnityObjectMapper.Instance.MapBytes(data, _hasFlag);
+			UnityObjectMapper.Instance.MapBytes(data, _attacking);
+			UnityObjectMapper.Instance.MapBytes(data, _viewDir);
 
 			return data;
 		}
@@ -369,6 +435,14 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			hasFlagInterpolation.current = _hasFlag;
 			hasFlagInterpolation.target = _hasFlag;
 			RunChange_hasFlag(timestep);
+			_attacking = UnityObjectMapper.Instance.Map<bool>(payload);
+			attackingInterpolation.current = _attacking;
+			attackingInterpolation.target = _attacking;
+			RunChange_attacking(timestep);
+			_viewDir = UnityObjectMapper.Instance.Map<Vector3>(payload);
+			viewDirInterpolation.current = _viewDir;
+			viewDirInterpolation.target = _viewDir;
+			RunChange_viewDir(timestep);
 		}
 
 		protected override BMSByte SerializeDirtyFields()
@@ -394,6 +468,10 @@ namespace BeardedManStudios.Forge.Networking.Generated
 				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _spawnPos);
 			if ((0x1 & _dirtyFields[1]) != 0)
 				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _hasFlag);
+			if ((0x2 & _dirtyFields[1]) != 0)
+				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _attacking);
+			if ((0x4 & _dirtyFields[1]) != 0)
+				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _viewDir);
 
 			// Reset all the dirty fields
 			for (int i = 0; i < _dirtyFields.Length; i++)
@@ -527,6 +605,32 @@ namespace BeardedManStudios.Forge.Networking.Generated
 					RunChange_hasFlag(timestep);
 				}
 			}
+			if ((0x2 & readDirtyFlags[1]) != 0)
+			{
+				if (attackingInterpolation.Enabled)
+				{
+					attackingInterpolation.target = UnityObjectMapper.Instance.Map<bool>(data);
+					attackingInterpolation.Timestep = timestep;
+				}
+				else
+				{
+					_attacking = UnityObjectMapper.Instance.Map<bool>(data);
+					RunChange_attacking(timestep);
+				}
+			}
+			if ((0x4 & readDirtyFlags[1]) != 0)
+			{
+				if (viewDirInterpolation.Enabled)
+				{
+					viewDirInterpolation.target = UnityObjectMapper.Instance.Map<Vector3>(data);
+					viewDirInterpolation.Timestep = timestep;
+				}
+				else
+				{
+					_viewDir = UnityObjectMapper.Instance.Map<Vector3>(data);
+					RunChange_viewDir(timestep);
+				}
+			}
 		}
 
 		public override void InterpolateUpdate()
@@ -578,6 +682,16 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			{
 				_hasFlag = (bool)hasFlagInterpolation.Interpolate();
 				//RunChange_hasFlag(hasFlagInterpolation.Timestep);
+			}
+			if (attackingInterpolation.Enabled && !attackingInterpolation.current.UnityNear(attackingInterpolation.target, 0.0015f))
+			{
+				_attacking = (bool)attackingInterpolation.Interpolate();
+				//RunChange_attacking(attackingInterpolation.Timestep);
+			}
+			if (viewDirInterpolation.Enabled && !viewDirInterpolation.current.UnityNear(viewDirInterpolation.target, 0.0015f))
+			{
+				_viewDir = (Vector3)viewDirInterpolation.Interpolate();
+				//RunChange_viewDir(viewDirInterpolation.Timestep);
 			}
 		}
 

@@ -33,7 +33,7 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
     public Flag flag;
     public bool HasFlag => flag != null;
 
-    public bool isAlive;
+    public bool isAlive = true;
 
     private void Start()
     {
@@ -56,6 +56,12 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
             Destroy(playerCamera);
 
             tpsCharacter.SetActive(true);
+
+            foreach (var lookat in FindObjectsOfType<LookAtCamera>())
+            {
+                lookat.cam = Camera.main.transform;
+            }
+
         }
         else
         {
@@ -63,7 +69,7 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
 
             foreach (var lookat in FindObjectsOfType<LookAtCamera>())
             {
-                lookat.cam = Camera.main.transform;
+                lookat.cam = playerCamera.transform;
             }
 
             UIManager.Instance.AssignPlayer(this.player);
@@ -86,18 +92,11 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
             };
 
         }
-
-        if (networkObject.IsServer)
-        {
-            isAlive = true;
-            networkObject.alive = isAlive;
-        }
-
     }
 
-    private void OnApplicationQuit()
+    private void OnDestroy()
     {
-        if (networkObject.IsOwner) NetworkManager.Instance.Disconnect();
+        networkObject.Destroy();
     }
 
     private void Update()
@@ -125,13 +124,46 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
             networkObject.localVelocity = playerCharacter.Velocity;
             networkObject.climbing = playerCharacter.CurrentState == CharacterState.WallClimbing;
             networkObject.running = playerCharacter.Axis.magnitude != 0;
+            networkObject.attacking = playerCharacter.isStartingAttack || playerCharacter.IsAttacking;
+            networkObject.viewDir = playerCamera.transform.forward;
 
+            //DebugParry();
+
+        }
+    }
+
+    void DebugParry()
+    {
+        NetworkedPlayer attackingPlayer = null;
+        foreach (var player in FindObjectsOfType<NetworkedPlayer>())
+        {
+            if (player.networkObject.NetworkId == networkObject.NetworkId) continue;
+
+            attackingPlayer = player;
+            break;
+        }
+
+        if (attackingPlayer != null)
+        {
+            if (Input.GetMouseButtonDown(1))
+            {
+                playerCharacter.TryAttack();
+                attackingPlayer.networkObject.SendRpc(NetworkedPlayer.RPC_DEBUG_ATTACK, Receivers.Owner);
+            }
+        }
+        else
+        {
+            if (Input.GetMouseButtonDown(1))
+            {
+                Debug.Log("No matching player found");
+            }
         }
     }
 
     void UpdateTeamColor()
     {
         GetComponentInChildren<SkinnedMeshRenderer>(true).material.SetColor("_Color", TeamManager.Instance.GetTeamColor(teamIndex));
+
     }
 
     void SetName()
@@ -175,90 +207,112 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
 
     public override void Attack(RpcArgs args)
     {
-        MainThreadManager.Run(() =>
-        {
-        });
         characterAnimator.Attack();
     }
 
     public override void ChangeName(RpcArgs args)
     {
-        MainThreadManager.Run(() =>
-        {
-            playerName = args.GetAt<string>(0);
-            nameText.text = playerName;
-        });
+        playerName = args.GetAt<string>(0);
+        nameText.text = playerName;
     }
 
     public override void Jump(RpcArgs args)
     {
-        MainThreadManager.Run(() =>
-        {
-            characterAnimator.Jump();
-        });
+        characterAnimator.Jump();
     }
 
     public override void Land(RpcArgs args)
     {
-        MainThreadManager.Run(() =>
-        {
-            characterAnimator.Land();
-        });
+        characterAnimator.Land();
     }
 
     public override void Die(RpcArgs args)
     {
-        MainThreadManager.Run(() =>
+
+        if (networkObject.IsOwner)
         {
-            if (networkObject.IsOwner)
-            {
-                if (!playerCharacter.tps.activeInHierarchy) playerCharacter.ToggleTPS();
-                playerCharacter.enabled = false;
-                player.enabled = false;
-                playerRb.useGravity = true;
-            }
-            else
-            {
-                coll.enabled = false;
+            if (!playerCharacter.tps.activeInHierarchy) playerCharacter.ToggleTPS();
+            playerCharacter.enabled = false;
+            player.enabled = false;
+            playerRb.useGravity = true;
+        }
+        else
+        {
+            coll.enabled = false;
 
-                //todo : flag
-            }
+            //todo : flag
+        }
 
-            characterAnimator.Death();
+        characterAnimator.Death();
 
-            UIManager.Instance.DisplayKillFeed(args.GetNext<string>(), args.GetNext<int>(), playerName, teamIndex);
+        UIManager.Instance.DisplayKillFeed(args.GetNext<string>(), args.GetNext<int>(), playerName, teamIndex);
 
-            StartCoroutine(Respawn());
-        });
+        StartCoroutine(Respawn());
     }
 
     public override void TryHit(RpcArgs args)
     {
-        MainThreadManager.Run(() =>
+        if (!isAlive)
         {
-            if (!isAlive) return;
+            Debug.Log("client is dead");
+            return;
+        }
 
-            isAlive = false;
+        uint killerID = args.GetAt<uint>(0);
+        string killerName = args.GetAt<string>(1);
+        int killerTeam = args.GetAt<int>(2);
+        Vector3 killerViewDir = args.GetAt<Vector3>(3);
 
-            networkObject.SendRpc(RPC_DIE, Receivers.All, args.GetNext<string>(), args.GetNext<int>());
+        //check for attacking and viewDir
 
-            // return flag
+        NetworkedPlayer attackingPlayer = null;
+        foreach (var player in FindObjectsOfType<NetworkedPlayer>())
+        {
+            if (player.networkObject.NetworkId != killerID) continue;
 
-            if (flag == null) return;
+            attackingPlayer = player;
+            break;
+        }
 
-            flag.GetComponentInParent<Zone>().networkObject.SendRpc(Zone.RPC_RETRIEVED, Receivers.All, args.GetAt<string>(0), playerName);
+        if (attackingPlayer == null)
+        {
+            Debug.Log("No matching player found");
+            return;
+        }
 
-            flag = null;
-            networkObject.hasFlag = false;
-        });
+        if (networkObject.attacking && Vector3.Dot(killerViewDir, networkObject.viewDir) < 0)
+        {
+            Vector3 direction = attackingPlayer.characterTransform.position - characterTransform.position;
+
+            attackingPlayer.networkObject.SendRpc(NetworkedPlayer.RPC_KNOCKBACK, Receivers.Owner, direction);
+            networkObject.SendRpc(NetworkedPlayer.RPC_KNOCKBACK, Receivers.Owner, -direction);
+
+            return;
+        }
+
+        // Death
+
+        isAlive = false;
+        networkObject.alive = false;
+
+        networkObject.SendRpc(RPC_DIE, Receivers.All, killerName, killerTeam);
+        attackingPlayer.networkObject.SendRpc(RPC_HITMARKER, Receivers.Owner);
+
+        // return flag
+
+        if (flag == null) return;
+
+        flag.GetComponentInParent<Zone>().networkObject.SendRpc(Zone.RPC_RETRIEVED, Receivers.All, killerName, playerName);
+
+        flag = null;
+        networkObject.hasFlag = false;
+
+        networkObject.SendRpc(RPC_TOGGLE_FLAG, true, Receivers.AllBuffered, false);
     }
 
     public override void Init(RpcArgs args)
     {
-        MainThreadManager.Run(() =>
-        {
-            Init(args.GetAt<int>(0), args.GetAt<Vector3>(1));
-        });
+        Init(args.GetAt<int>(0), args.GetAt<Vector3>(1));
     }
 
     public void Init(int _teamIndex, Vector3 _spawnPos)
@@ -266,13 +320,46 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
         teamIndex = _teamIndex;
         UpdateTeamColor();
 
-        networkObject.spawnPos = _spawnPos;
-
-        characterTransform.position = networkObject.spawnPos;
+        characterTransform.position = _spawnPos;
 
         if (networkObject.IsOwner)
         {
             networkObject.position = characterTransform.position;
+
+            foreach (var uiTeamColor in FindObjectsOfType<UITeamColor>())
+            {
+                uiTeamColor.SetColor(TeamManager.Instance.GetTeamColor(teamIndex));
+            }
         }
+
+        for (int i = 0; i < flagVisualsRend.Length; i++)
+        {
+            flagVisualsRend[i].material.SetColor("_Color", TeamManager.Instance.GetOppositeTeamColor(teamIndex));
+        }
+    }
+    
+    public GameObject[] flagVisuals;
+    public Renderer[] flagVisualsRend;
+    public override void ToggleFlag(RpcArgs args)
+    {
+        for (int i = 0; i < flagVisuals.Length; i++)
+        {
+            flagVisuals[i].SetActive(args.GetAt<bool>(0));
+        }
+    }
+
+    public override void Knockback(RpcArgs args)
+    {
+        playerCharacter.Knockbacked(args.GetNext<Vector3>());
+    }
+
+    public override void DebugAttack(RpcArgs args)
+    {
+        playerCharacter.TryAttack();
+    }
+
+    public override void Hitmarker(RpcArgs args)
+    {
+        UIManager.Instance.HitMarker();
     }
 }

@@ -58,7 +58,8 @@ public class Zone : NetworkedFlagBehavior, ITeamAffilitation
         base.NetworkStart();
 
         teamIndex = networkObject.teamIndex;
-
+        type = (FlagZoneType)networkObject.type;
+        UIManager.Instance.RegisterFlagZone(this);
         UpdateAffiliation();
     }
 
@@ -99,19 +100,23 @@ public class Zone : NetworkedFlagBehavior, ITeamAffilitation
 
                         player.flag = flag;
                         player.networkObject.hasFlag = true;
+
+                        player.networkObject.SendRpc(NetworkedPlayer.RPC_TOGGLE_FLAG, true, Receivers.AllBuffered, true);
                     }
                 }
 
-                if (player.HasFlag && player.teamIndex == teamIndex && isAltar)
+                if (player.HasFlag && player.teamIndex == teamIndex && !isAltar)
                 {
                     player.flag = null;
                     player.networkObject.hasFlag = false;
+
+                    player.networkObject.SendRpc(NetworkedPlayer.RPC_TOGGLE_FLAG, true, Receivers.AllBuffered, false);
 
                     networkObject.SendRpc(RPC_SCORED, Receivers.All, player.playerName, player.teamIndex);
 
                     for (int i = 0; i < NetworkedGameManager.Instance.flagZones.Count; i++)
                     {
-                        if (NetworkedGameManager.Instance.flagZones[i] == this) continue;
+                        if (NetworkedGameManager.Instance.flagZones[i].teamIndex == teamIndex || !NetworkedGameManager.Instance.flagZones[i].isAltar) continue;
 
                         NetworkedGameManager.Instance.flagZones[i].networkObject.SendRpc(RPC_RESPAWN_FLAG, Receivers.All);
                     }

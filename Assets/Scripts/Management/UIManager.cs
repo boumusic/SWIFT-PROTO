@@ -26,6 +26,7 @@ public class UIManager : MonoBehaviour
     public Canvas canvas;
     public Animator hitMarker;
     public UIGeneralMessage generalMessage;
+    public UIScoreboard scoreboard;
 
     [Header("Kill Feed")]
     public GameObject prefabKillFeed;
@@ -60,6 +61,8 @@ public class UIManager : MonoBehaviour
         PositionKillFeeds();
         UpdateFlagStatus();
         UpdateDashCooldown();
+
+        scoreboard.gameObject.SetActive(player.Tab);
     }
 
     public void HitMarker()
@@ -87,16 +90,26 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    public void RegisterFlagZone(Zone zone)
+    {
+        flagZones.Add(zone);
+        UIPing uiFlag = NewPing(zone);
+        uiFlag.Init(zone.teamIndex, zone.type);
+    }
+
+    private UIPing NewPing(Zone zone)
+    {
+        GameObject newUI = Instantiate(uiFlagZonePrefab, canvas.transform);
+        UIPing uiFlag = newUI.GetComponent<UIPing>();
+        uiFlag.FeedTarget(zone.gameObject);
+        return uiFlag;
+    }
+
     public void RegisterFlagZones(List<Zone> zones)
     {
-        flagZones = zones;
-
         for (int i = 0; i < zones.Count; i++)
         {
-            GameObject newUI = Instantiate(uiFlagZonePrefab, canvas.transform);
-            UIFlag uiFlag = newUI.GetComponent<UIFlag>();
-            uiFlag.FeedTarget(zones[i].gameObject);
-            uiFlag.Init(zones[i].teamIndex, zones[i].type);
+            RegisterFlagZone(zones[i]);
         }
     }
 
@@ -120,13 +133,7 @@ public class UIManager : MonoBehaviour
 
     public void DisplayKillFeed(Character killer, Character killed)
     {
-        GameObject newKillFeed = Instantiate(prefabKillFeed, killFeedParent);
-        newKillFeed.transform.parent = killFeedParent;
-        newKillFeed.transform.localPosition = new Vector3(newKillFeed.transform.localPosition.x, -800f, 0f);
-        newKillFeed.gameObject.SetActive(true);
-        UIKillFeed kf = newKillFeed.GetComponent<UIKillFeed>();
-        kf.Init(killer, killed);
-        killFeeds.Add(kf);
+        DisplayKillFeed(killer.PlayerName, killer.TeamIndex, killed.PlayerName, killed.TeamIndex);
     }
 
     public void DisplayKillFeed(string killerName, int killerTeam, string killedName, int killedTeam)

@@ -26,6 +26,8 @@ public class Character : MonoBehaviour
     public GameObject fps;
     public bool startTps = false;
     private Player player;
+    private NetworkedPlayer nPlayer;
+    private NetworkedPlayer NPlayer { get { if (nPlayer == null) nPlayer = GetComponentInParent<NetworkedPlayer>(); return nPlayer; } }
     public string PlayerName => player != null ? player.PlayerName : "NPC";
     public Color TeamColor => player != null ? player.TeamColor : Color.white;
 
@@ -56,12 +58,14 @@ public class Character : MonoBehaviour
     public Vector3 Right => new Vector3(playerCamera.transform.right.x, 0, playerCamera.transform.right.z);
     public bool Dashing => (CurrentState == CharacterState.Dashing);
     public bool InDashMovement => Dashing && dashProgress < 0.5f;
+    private bool knockbacked => CurrentState == CharacterState.Knockbacked;
     public Vector3 FinalVelocity
     {
         get
         {
             if (grounded || Dashing) return CamRotation * Velocity;
-            else return LastCamRotation * Velocity;
+            else if (!knockbacked) return LastCamRotation * Velocity;
+            else return kbVelocity;
 
         }
     }
@@ -139,6 +143,11 @@ public class Character : MonoBehaviour
         CheckWallClimb();
         OrientModel();
         DashCooldown();
+
+        //if(Input.GetKeyDown(KeyCode.K))
+        //{
+        //    Knockbacked((-Forward + Vector3.up).normalized);
+        //}
     }
 
     private void FixedUpdate()
@@ -343,15 +352,18 @@ public class Character : MonoBehaviour
 
     #region Falling
 
+    private float fallInitVelocityY;
     private void Falling_Enter()
     {
+        fallInitVelocityY = body.velocity.y;
+        //Debug.Log(fallInitVelocityY);
         fallProgress = 0f;
     }
 
     private void Falling_Update()
     {
         fallProgress += Time.deltaTime * m.fallProgressSpeed;
-        yVelocity = -m.fallCurve.Evaluate(fallProgress) * m.fallStrength;
+        yVelocity = Mathf.Lerp(fallInitVelocityY, -m.fallStrength, m.fallCurve.Evaluate(fallProgress));
         if (CastGround())
         {
             stateMachine.ChangeState(CharacterState.Grounded);
@@ -370,6 +382,7 @@ public class Character : MonoBehaviour
     private float dashCooldownProgress = 1f;
     public float DashCooldownProgress => dashCooldownProgress;
     public bool ResetDash => resetDash;
+    private float CurrentDashCooldown => HasFlag ? m.dashFlagCooldown : m.dashCooldown;
 
     public void StartDash()
     {
@@ -405,13 +418,14 @@ public class Character : MonoBehaviour
         }
     }
 
+
     private void DashCooldown()
     {
         if (!cooldownDashDone)
         {
             if (dashCooldownProgress < 1f)
             {
-                dashCooldownProgress += Time.deltaTime / m.dashCooldown;
+                dashCooldownProgress += Time.deltaTime / CurrentDashCooldown;
             }
 
             else
@@ -547,7 +561,7 @@ public class Character : MonoBehaviour
     #endregion
 
     #region Attack
-
+    
     public bool CanAttack => CurrentState != CharacterState.WallClimbing && !isAttacking && !HasFlag && !InDashMovement;
     public void TryAttack()
     {
@@ -558,12 +572,27 @@ public class Character : MonoBehaviour
         }
     }
 
+    [HideInInspector] public bool isStartingAttack;
     private IEnumerator AttackDelay()
     {
+        isStartingAttack = true;
+
         yield return new WaitForSeconds(m.attackDelay);
+
         OnAttack?.Invoke();
         isAttacking = true;
         StartCoroutine(AttackDuration());
+
+        isStartingAttack = false;
+
+        if (stateMachine.State == CharacterState.Knockbacked) yield return null;
+
+        NetworkedPlayer myNetworkerPlayer = transform.root.GetComponent<NetworkedPlayer>();
+        if (NetworkManager.Instance != null)
+        {
+            if (!myNetworkerPlayer.networkObject.alive) yield return null;
+        }
+
         Vector3 center = transform.position + Vector3.up * 1.8f + playerCamera.transform.forward * m.attackLength / 2f;
         Vector3 halfExtents = new Vector3(m.attackWidth, m.attackHeight, m.attackLength) / 2f;
         RaycastHit[] hits = Physics.BoxCastAll(center, halfExtents, Vector3.forward, Quaternion.identity, m.attackLength);
@@ -577,16 +606,13 @@ public class Character : MonoBehaviour
                     NetworkedPlayer player;
                     if (hits[i].collider.transform.root.TryGetComponent(out player))
                     {
-                        NetworkedPlayer myNetworkerPlayer = transform.root.GetComponent<NetworkedPlayer>();
-
                         if (player.player == null && (player.teamIndex != myNetworkerPlayer.teamIndex))
                         {
                             Debug.Log("sending kill rpc");
 
                             player.networkObject.SendRpc(NetworkedPlayerBehavior.RPC_TRY_HIT, Receivers.Server,
-                                myNetworkerPlayer.playerName, myNetworkerPlayer.teamIndex);
+                                myNetworkerPlayer.networkObject.NetworkId, myNetworkerPlayer.playerName, myNetworkerPlayer.teamIndex, myNetworkerPlayer.playerCamera.transform.forward);
 
-                            UIManager.Instance.HitMarker();
                         }
                     }
                 }
@@ -622,6 +648,40 @@ public class Character : MonoBehaviour
 
     #endregion
 
+    #region Knockback
+
+    private float kbProgress = 0f;
+    private Vector3 kbVelocity;
+    private Vector3 kbDir;
+
+    public void Knockbacked(Vector3 direction)
+    {
+        kbDir = new Vector3(direction.x, 0, direction.z).normalized;
+        stateMachine.ChangeState(CharacterState.Knockbacked);
+    }
+
+    private void Knockbacked_Enter()
+    {
+        kbProgress = 0f;
+        feedbacks.Play("Parried");
+    }
+
+    private void Knockbacked_Update()
+    {
+        kbProgress += Time.deltaTime * m.kbProgressSpeed;
+        Vector3 horiz = m.kbCurveHoriz.Evaluate(kbProgress) * kbDir * m.kbStrengthHoriz;
+        float y = m.kbCurveVerti.Evaluate(kbProgress) * m.kbStrengthVerti;
+
+        kbVelocity = new Vector3(horiz.x, y, horiz.z) + (CamRotation * velocity * m.kbVelocityInfluence.Evaluate(kbProgress));
+
+        if (kbProgress > 1f)
+        {
+            stateMachine.ChangeState(CharacterState.Falling);
+        }
+    }
+    
+    #endregion
+
     #region TPS
 
     private bool isTPS = false;
@@ -647,8 +707,8 @@ public class Character : MonoBehaviour
 
     private Flag flag = null;
     public Flag Flag { get => flag; }
-    public int TeamIndex => player.TeamIndex;
-    public bool HasFlag => flag != null;
+    public int TeamIndex => player == null? -1 : player.TeamIndex;
+    public bool HasFlag { get { if (NPlayer != null) return NPlayer.networkObject.hasFlag; else return flag != null; } }
 
     public void Capture(Flag flag)
     {
@@ -718,5 +778,6 @@ public enum CharacterState
     Jumping,
     Falling,
     WallClimbing,
-    Dashing
+    Dashing,
+    Knockbacked
 }
