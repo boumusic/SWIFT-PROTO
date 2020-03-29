@@ -356,7 +356,7 @@ public class Character : MonoBehaviour
     private void Falling_Enter()
     {
         fallInitVelocityY = body.velocity.y;
-        Debug.Log(fallInitVelocityY);
+        //Debug.Log(fallInitVelocityY);
         fallProgress = 0f;
     }
 
@@ -570,12 +570,27 @@ public class Character : MonoBehaviour
         }
     }
 
+    [HideInInspector] public bool isStartingAttack;
     private IEnumerator AttackDelay()
     {
+        isStartingAttack = true;
+
         yield return new WaitForSeconds(m.attackDelay);
+
         OnAttack?.Invoke();
         isAttacking = true;
         StartCoroutine(AttackDuration());
+
+        isStartingAttack = false;
+
+        if (stateMachine.State == CharacterState.Knockbacked) yield return null;
+
+        NetworkedPlayer myNetworkerPlayer = transform.root.GetComponent<NetworkedPlayer>();
+        if (NetworkManager.Instance != null)
+        {
+            if (!myNetworkerPlayer.networkObject.alive) yield return null;
+        }
+
         Vector3 center = transform.position + Vector3.up * 1.8f + playerCamera.transform.forward * m.attackLength / 2f;
         Vector3 halfExtents = new Vector3(m.attackWidth, m.attackHeight, m.attackLength) / 2f;
         RaycastHit[] hits = Physics.BoxCastAll(center, halfExtents, Vector3.forward, Quaternion.identity, m.attackLength);
@@ -584,24 +599,21 @@ public class Character : MonoBehaviour
         {
             if (NetworkManager.Instance != null)
             {
-                //for (int i = 0; i < hits.Length; i++)
-                //{
+                for (int i = 0; i < hits.Length; i++)
+                {
                     NetworkedPlayer player;
-                    if (hits[0].collider.transform.root.TryGetComponent(out player))
+                    if (hits[i].collider.transform.root.TryGetComponent(out player))
                     {
-                        NetworkedPlayer myNetworkerPlayer = transform.root.GetComponent<NetworkedPlayer>();
-
                         if (player.player == null && (player.teamIndex != myNetworkerPlayer.teamIndex))
                         {
                             Debug.Log("sending kill rpc");
 
                             player.networkObject.SendRpc(NetworkedPlayerBehavior.RPC_TRY_HIT, Receivers.Server,
-                                myNetworkerPlayer.playerName, myNetworkerPlayer.teamIndex);
+                                myNetworkerPlayer.networkObject.NetworkId, myNetworkerPlayer.playerName, myNetworkerPlayer.teamIndex, myNetworkerPlayer.playerCamera.transform.forward);
 
-                            UIManager.Instance.HitMarker();
                         }
                     }
-                //}
+                }
 
                 // don't do the "normal" hit dectection
                 yield return null;
@@ -694,7 +706,7 @@ public class Character : MonoBehaviour
     private Flag flag = null;
     public Flag Flag { get => flag; }
     public int TeamIndex => player.TeamIndex;
-    public bool HasFlag { get { if (NPlayer != null) return NPlayer.HasFlag; else return flag != null; } }
+    public bool HasFlag { get { if (NPlayer != null) return NPlayer.networkObject.hasFlag; else return flag != null; } }
 
     public void Capture(Flag flag)
     {

@@ -50,11 +50,12 @@ public class NetworkedGameManager : MonoBehaviour
                         (f.networkObject.teamIndex == teamIndex) && (f.networkObject.type == (int)FlagZoneType.Shrine)
                     ).transform.position + Vector3.up;
 
+                    obj.spawnPos = spawnPos;
                     obj.SendRpc(NetworkedPlayerBehavior.RPC_INIT, Receivers.AllBuffered, teamIndex, spawnPos);
 
                     NetworkedPlayerBehavior behavior = obj.AttachedBehavior as NetworkedPlayerBehavior;
                     behavior.GetComponent<NetworkedPlayer>().Init(teamIndex, spawnPos);
-
+                    
                     Debug.Log("red team is " + teams[0].Count + " players/ blue team is " + teams[1].Count + " players");
                 }
             };
