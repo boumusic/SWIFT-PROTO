@@ -57,7 +57,7 @@ MonoBehaviour:
   playerName: DefaultName
   teamIndex: 0
   flag: {fileID: 0}
-  isAlive: 0
+  isAlive: 1
   flagVisuals:
   - {fileID: 3768478154875016439}
   flagVisualsRend:

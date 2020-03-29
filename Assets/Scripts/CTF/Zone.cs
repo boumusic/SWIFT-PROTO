@@ -116,7 +116,7 @@ public class Zone : NetworkedFlagBehavior, ITeamAffilitation
 
                     for (int i = 0; i < NetworkedGameManager.Instance.flagZones.Count; i++)
                     {
-                        if (NetworkedGameManager.Instance.flagZones[i] == this) continue;
+                        if (NetworkedGameManager.Instance.flagZones[i].teamIndex == teamIndex || !NetworkedGameManager.Instance.flagZones[i].isAltar) continue;
 
                         NetworkedGameManager.Instance.flagZones[i].networkObject.SendRpc(RPC_RESPAWN_FLAG, Receivers.All);
                     }

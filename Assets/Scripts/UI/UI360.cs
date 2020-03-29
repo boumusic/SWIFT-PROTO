@@ -48,6 +48,12 @@ public class UI360 : MonoBehaviour
 
     private void Pos()
     {
+        // temp fix
+        if (Cam == null)
+        {
+            player = UIManager.Instance.Player;
+        }
+
         float dot = targetGo != null ? Vector3.Dot(Cam.transform.forward, (objPos - camPos).normalized) : 0;
         
         Vector3 target = UIManager.Instance.canvas.WorldToCanvas(objPos, Cam) ;
