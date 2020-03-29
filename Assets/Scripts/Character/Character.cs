@@ -144,10 +144,10 @@ public class Character : MonoBehaviour
         OrientModel();
         DashCooldown();
 
-        if(Input.GetKeyDown(KeyCode.K))
-        {
-            Knockbacked((-Forward + Vector3.up).normalized);
-        }
+        //if(Input.GetKeyDown(KeyCode.K))
+        //{
+        //    Knockbacked((-Forward + Vector3.up).normalized);
+        //}
     }
 
     private void FixedUpdate()
@@ -382,6 +382,7 @@ public class Character : MonoBehaviour
     private float dashCooldownProgress = 1f;
     public float DashCooldownProgress => dashCooldownProgress;
     public bool ResetDash => resetDash;
+    private float CurrentDashCooldown => HasFlag ? m.dashFlagCooldown : m.dashCooldown;
 
     public void StartDash()
     {
@@ -417,13 +418,14 @@ public class Character : MonoBehaviour
         }
     }
 
+
     private void DashCooldown()
     {
         if (!cooldownDashDone)
         {
             if (dashCooldownProgress < 1f)
             {
-                dashCooldownProgress += Time.deltaTime / m.dashCooldown;
+                dashCooldownProgress += Time.deltaTime / CurrentDashCooldown;
             }
 
             else
@@ -705,7 +707,7 @@ public class Character : MonoBehaviour
 
     private Flag flag = null;
     public Flag Flag { get => flag; }
-    public int TeamIndex => player.TeamIndex;
+    public int TeamIndex => player == null? -1 : player.TeamIndex;
     public bool HasFlag { get { if (NPlayer != null) return NPlayer.networkObject.hasFlag; else return flag != null; } }
 
     public void Capture(Flag flag)

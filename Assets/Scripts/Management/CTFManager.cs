@@ -32,6 +32,7 @@ public class CTFManager : MonoBehaviour
 
     private void Start()
     {
+        
         if (NetworkManager.Instance == null)
         {
             FlagZoneSpawn[] allFlagZoneSpawns = FindObjectsOfType<FlagZoneSpawn>();
@@ -50,6 +51,7 @@ public class CTFManager : MonoBehaviour
         }
 
         timer.Start();
+        
     }
 
     private void Update()

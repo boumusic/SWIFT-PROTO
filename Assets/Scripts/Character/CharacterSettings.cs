@@ -38,6 +38,7 @@ public class CharacterSettings : ScriptableObject
     public float dashStrength = 1f;
     public AnimationCurve dashCurve;
     public float dashCooldown = 3f;
+    public float dashFlagCooldown = 5f;
     public float dashProgressSpeed = 2f;
     public bool resetDashOnLand = true;
     public bool resetDashOnWallclimb = true;
@@ -74,7 +75,6 @@ public class CharacterSettings : ScriptableObject
 
     [Header("Knockback")]
     public float kbStrengthVerti = 10f;
-
     public float kbStrengthHoriz = 10f;
     public AnimationCurve kbCurveHoriz;
     public float kbProgressSpeed = 1f;

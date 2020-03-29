@@ -27,12 +27,14 @@ public class UIPing : UI360
     private void UpdateText()
     {
         string newText = "";
+        bool important = false;
+       
         switch (type)
         {
             case FlagZoneType.Altar:
                 if (!SameTeam)
                 {
-                    if(PlayerHasFlag)
+                    if(!PlayerHasFlag)
                             newText = "CAPTURE";
                 }
 
@@ -52,13 +54,16 @@ public class UIPing : UI360
                 else
                 {
                     if(PlayerHasFlag)
+                    {
                         newText = "REACH";
+                        important = true;
+                    }
                 }
                 break;
         }
 
         text.text = newText;
-
+        UpdateVisuals(important);
         bool toggle = newText == "";
         for (int i = 0; i < images.Length; i++)
         {
@@ -72,10 +77,18 @@ public class UIPing : UI360
         type = t;
         teamIndex = index;
 
+        UpdateVisuals(false);
+    }
+
+    private void UpdateVisuals(bool important)
+    {
         for (int i = 0; i < images.Length; i++)
         {
             Color col = TeamManager.Instance.GetTeamColor(teamIndex);
-            images[i].color = new Color(col.r, col.g, col.b, images[i].color.a);
+            float a = important ? 1 : 0.5f;
+            images[i].color = new Color(col.r, col.g, col.b, a);
+            float scale = important ? 0.45f : 0.3f;
+            transform.localScale = new Vector3(scale, scale, scale);
         }
     }
 }
