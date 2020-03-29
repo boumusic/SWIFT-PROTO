@@ -98,14 +98,14 @@ public class UIManager : MonoBehaviour
     public void RegisterFlagZone(Zone zone)
     {
         flagZones.Add(zone);
-        UIPing uiFlag = NewPing(zone);
+        UIFlag uiFlag = NewPing(zone);
         uiFlag.Init(zone.teamIndex, zone.type);
     }
 
-    private UIPing NewPing(Zone zone)
+    private UIFlag NewPing(Zone zone)
     {
         GameObject newUI = Instantiate(uiFlagZonePrefab, canvas.transform);
-        UIPing uiFlag = newUI.GetComponent<UIPing>();
+        UIFlag uiFlag = newUI.GetComponent<UIFlag>();
         uiFlag.FeedTarget(zone.gameObject);
         return uiFlag;
     }

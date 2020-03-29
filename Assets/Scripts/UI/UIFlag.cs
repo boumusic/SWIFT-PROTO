@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class UIPing : UI360
+public class UIFlag : UI360
 {
     [Header("UI Ping")]
     public FlagZoneType type;
