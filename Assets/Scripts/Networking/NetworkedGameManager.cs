@@ -87,6 +87,8 @@ public class NetworkedGameManager : MonoBehaviour
 
     void OnPlayerQuit(NetworkingPlayer player)
     {
+        return;
+
         for (int i = 0; i < 2; i++)
         {
             for (int j = 0; j < teams[i].Count; j++)
