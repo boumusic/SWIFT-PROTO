@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class UIManager : MonoBehaviour
 {
@@ -50,6 +51,9 @@ public class UIManager : MonoBehaviour
     [Header("UI FlagZone")]
     public GameObject uiFlagZonePrefab;
     private List<Zone> flagZones = new List<Zone>();
+
+    [Header("Sensitivity")]
+    public TextMeshProUGUI sensText;
     
     public void AssignPlayer(Player p)
     {
@@ -63,6 +67,7 @@ public class UIManager : MonoBehaviour
         UpdateDashCooldown();
 
         scoreboard.gameObject.SetActive(player.Tab);
+        sensText.text = "sensitivity : " + player.sensitivity.ToString("F3") + "/1";
     }
 
     public void HitMarker()

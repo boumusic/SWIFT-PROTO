@@ -46,7 +46,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   character: {fileID: 3943239952513736106}
   nameText: {fileID: 6071799687989192460}
+  score:
+    rank: 0
+    kills: 0
+    deaths: 0
+    captured: 0
+    scored: 0
+    retreived: 0
   sensitivity: 0.1
+  scrollSpeed: 4
   attackSensitivity: 0.1
   cursor: 0
   jump: 32

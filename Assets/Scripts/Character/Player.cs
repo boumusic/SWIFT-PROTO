@@ -110,8 +110,8 @@ public class Player : MonoBehaviour
             UIManager.Instance.TogglePause();
         }
 
-        sensitivity += Time.deltaTime * Input.GetAxis("Mouse Scroll") * scrollSpeed;
-        sensitivity = Mathf.Clamp(sensitivity, 0, 50);
+        sensitivity += Time.deltaTime * Input.GetAxis("Mouse ScrollWheel") * scrollSpeed;
+        sensitivity = Mathf.Clamp(sensitivity, 0, 1);
     }
 
     private void UpdateAxis()

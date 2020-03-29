@@ -99,6 +99,7 @@ public class Zone : NetworkedFlagBehavior, ITeamAffilitation
                         networkObject.isFlagThere = false;
 
                         player.flag = flag;
+                        player.playerCharacter.Capture(flag);
                         player.networkObject.hasFlag = true;
 
                         player.networkObject.SendRpc(NetworkedPlayer.RPC_TOGGLE_FLAG, true, Receivers.AllBuffered, true);
@@ -109,7 +110,7 @@ public class Zone : NetworkedFlagBehavior, ITeamAffilitation
                 {
                     player.flag = null;
                     player.networkObject.hasFlag = false;
-
+                    player.playerCharacter.Score();
                     player.networkObject.SendRpc(NetworkedPlayer.RPC_TOGGLE_FLAG, true, Receivers.AllBuffered, false);
 
                     networkObject.SendRpc(RPC_SCORED, Receivers.All, player.playerName, player.teamIndex);

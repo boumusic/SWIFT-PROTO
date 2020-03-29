@@ -31,6 +31,7 @@ public class Character : MonoBehaviour
     public string PlayerName => player != null ? player.PlayerName : "NPC";
     public Color TeamColor => player != null ? player.TeamColor : Color.white;
 
+
     #region Movement
 
     private Vector2 accelProgress;
@@ -98,6 +99,8 @@ public class Character : MonoBehaviour
     public Action OnKill;
     public Action OnScore;
     public Action OnDash;
+
+    private bool local => NetworkedGameManager.Instance == null;
 
     private void OnDrawGizmos()
     {
@@ -727,8 +730,11 @@ public class Character : MonoBehaviour
     {
         this.flag = flag;
         ToggleFlagVisuals(true);
-        flag.gameObject.SetActive(false);
-        //UIManager.Instance.LogMessage(PlayerName + " captured the Flag !");
+        if (local)
+        {
+            UIManager.Instance.LogMessage(PlayerName + " captured the Flag !");
+            flag.gameObject.SetActive(false);
+        }
     }
 
     public void Score()
@@ -736,9 +742,13 @@ public class Character : MonoBehaviour
         string message = PlayerName + " scored for team " + TeamIndex + "!";
         OnScore?.Invoke();
         ResetFlag();
-        //UIManager.Instance.LogMessage(message);
-        //TeamManager.Instance.Score(TeamIndex);
-        //CTFManager.Instance.OnTeamScored?.Invoke();
+
+        if (local)
+        {
+            UIManager.Instance.LogMessage(message);
+            TeamManager.Instance.Score(TeamIndex);
+            CTFManager.Instance.OnTeamScored?.Invoke();
+        }
     }
 
     private void DropFlag()
@@ -754,7 +764,7 @@ public class Character : MonoBehaviour
     private void ResetFlag()
     {
         ToggleFlagVisuals(false);
-        flag.gameObject.SetActive(true);
+        if (local) flag.gameObject.SetActive(true);
         flag = null;
     }
 
