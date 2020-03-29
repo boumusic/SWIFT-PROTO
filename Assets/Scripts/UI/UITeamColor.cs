@@ -16,4 +16,10 @@ public class UITeamColor : MonoBehaviour
         Image image = GetComponent<Image>();
         image.color = new Color(col.r, col.g, col.b, image.color.a);
     }
+
+    public void SetColor(Color col)
+    {
+        Image image = GetComponent<Image>();
+        image.color = new Color(col.r, col.g, col.b, image.color.a);
+    }
 }

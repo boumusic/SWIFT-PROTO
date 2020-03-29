@@ -56,6 +56,12 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
             Destroy(playerCamera);
 
             tpsCharacter.SetActive(true);
+
+            foreach (var lookat in FindObjectsOfType<LookAtCamera>())
+            {
+                lookat.cam = Camera.main.transform;
+            }
+
         }
         else
         {
@@ -63,7 +69,7 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
 
             foreach (var lookat in FindObjectsOfType<LookAtCamera>())
             {
-                lookat.cam = Camera.main.transform;
+                lookat.cam = playerCamera.transform;
             }
 
             UIManager.Instance.AssignPlayer(this.player);
@@ -88,9 +94,9 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
         }
     }
 
-    private void OnApplicationQuit()
+    private void OnDestroy()
     {
-        if (networkObject.IsOwner) NetworkManager.Instance.Disconnect();
+        networkObject.Destroy();
     }
 
     private void Update()
@@ -319,6 +325,11 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
         if (networkObject.IsOwner)
         {
             networkObject.position = characterTransform.position;
+
+            foreach (var uiTeamColor in FindObjectsOfType<UITeamColor>())
+            {
+                uiTeamColor.SetColor(TeamManager.Instance.GetTeamColor(teamIndex));
+            }
         }
 
         for (int i = 0; i < flagVisualsRend.Length; i++)
