@@ -55,6 +55,10 @@ namespace BeardedManStudios.Forge.Networking.Generated
 						availableCallback = true;
 						obj = new TestNetworkObject(networker, id, frame);
 						break;
+					case CTFGameStateNetworkObject.IDENTITY:
+						availableCallback = true;
+						obj = new CTFGameStateNetworkObject(networker, id, frame);
+						break;
 				}
 
 				if (!availableCallback)
