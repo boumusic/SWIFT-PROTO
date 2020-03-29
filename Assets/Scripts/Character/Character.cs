@@ -561,14 +561,26 @@ public class Character : MonoBehaviour
     #endregion
 
     #region Attack
-    
+
     public bool CanAttack => CurrentState != CharacterState.WallClimbing && !isAttacking && !HasFlag && !InDashMovement;
+    private Coroutine attackDelay;
+    private Coroutine attackDuration;
+
+    public void CancelAttack()
+    {
+        if (attackDelay != null) StopCoroutine(attackDelay);
+        if (attackDuration != null) StopCoroutine(attackDuration);
+        isStartingAttack = false;
+        isAttacking = false;
+    }
+
     public void TryAttack()
     {
         if (CanAttack)
         {
             animator.Attack();
-            StartCoroutine(AttackDelay());
+            if (attackDelay != null) StopCoroutine(attackDelay);
+            attackDelay = StartCoroutine(AttackDelay());
         }
     }
 
@@ -581,7 +593,8 @@ public class Character : MonoBehaviour
 
         OnAttack?.Invoke();
         isAttacking = true;
-        StartCoroutine(AttackDuration());
+        if (attackDuration != null) StopCoroutine(attackDuration);
+        attackDuration = StartCoroutine(AttackDuration());
 
         isStartingAttack = false;
 
@@ -679,7 +692,7 @@ public class Character : MonoBehaviour
             stateMachine.ChangeState(CharacterState.Falling);
         }
     }
-    
+
     #endregion
 
     #region TPS
@@ -707,7 +720,7 @@ public class Character : MonoBehaviour
 
     private Flag flag = null;
     public Flag Flag { get => flag; }
-    public int TeamIndex => player == null? -1 : player.TeamIndex;
+    public int TeamIndex => player == null ? -1 : player.TeamIndex;
     public bool HasFlag { get { if (NPlayer != null) return NPlayer.networkObject.hasFlag; else return flag != null; } }
 
     public void Capture(Flag flag)

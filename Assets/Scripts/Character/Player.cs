@@ -15,6 +15,7 @@ public class Player : MonoBehaviour
 
     [Header("Mouse")]
     public float sensitivity = 1f;
+    public float scrollSpeed = 1f;
     public float attackSensitivity = 0.2f;
 
     public float CurrentSensitivity => character.IsAttacking ? attackSensitivity : sensitivity;
@@ -108,6 +109,9 @@ public class Player : MonoBehaviour
             character.InputAxis(Vector2.zero);
             UIManager.Instance.TogglePause();
         }
+
+        sensitivity += Time.deltaTime * Input.GetAxis("Mouse Scroll") * scrollSpeed;
+        sensitivity = Mathf.Clamp(sensitivity, 0, 50);
     }
 
     private void UpdateAxis()
@@ -122,7 +126,7 @@ public class Player : MonoBehaviour
     {
         float x = Input.GetAxis("Mouse X");
         float y = Input.GetAxis("Mouse Y");
-        mouse += new Vector2(x, y) * Time.deltaTime * 1000 * CurrentSensitivity;
+        mouse += new Vector2(x, y) * Time.deltaTime * 1000 * sensitivity;
         mouse.y = Mathf.Clamp(mouse.y, -90, 90);
         character.playerCamera.InputMouse(mouse);
     }
