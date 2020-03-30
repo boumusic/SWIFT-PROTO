@@ -21,6 +21,11 @@ public class CharacterAnimator : MonoBehaviour
         }
     }
 
+    public void IsFalling(bool value)
+    {
+        Bool("isFalling", value);
+    }
+
     public void Grounded(bool value)
     {
         Bool("isGrounded", value);

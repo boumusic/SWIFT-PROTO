@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7fc0041c472b09c42abbf9790ff77b54, type: 3}
-  m_Name: Character
+  m_Name: Character 1
   m_EditorClassIdentifier: 
-  runSpeed: 7.5
-  accelerationSpeed: 19
+  runSpeed: 10
+  accelerationSpeed: 20
   accelerationCurve:
     serializedVersion: 2
     m_Curve:
@@ -47,7 +47,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  decelerationSpeed: 1.45
+  decelerationSpeed: 1.8
   decelerationCurve:
     serializedVersion: 2
     m_Curve:
@@ -74,8 +74,8 @@ MonoBehaviour:
     m_RotationOrder: 4
   dotSpeedMultiplier: 0.9
   flagMultiplier: 0.95
-  jumpCount: 2
-  jumpStrength: 13
+  jumpCount: 3
+  jumpStrength: 15
   jumpProgressSpeed: 3.4
   jumpCurve:
     serializedVersion: 2
@@ -132,7 +132,7 @@ MonoBehaviour:
   coyoteTime: 0.3
   jumpDecelerationSpeed: 1.04
   jumpAccelerationSpeed: 7
-  fallStrength: 28
+  fallStrength: 30
   fallProgressSpeed: 1.2
   fallCurve:
     serializedVersion: 2
@@ -158,7 +158,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  dashStrength: 30
+  dashStrength: 35
   dashCurve:
     serializedVersion: 2
     m_Curve:
@@ -201,8 +201,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  dashCooldown: 3
-  dashFlagCooldown: 6
+  dashCooldown: 2
+  dashFlagCooldown: 5
   dashProgressSpeed: 4
   resetDashOnLand: 1
   resetDashOnWallclimb: 1
@@ -268,60 +268,6 @@ MonoBehaviour:
   attackLength: 2
   attackHeight: 2
   attackDuration: 0.7
-  impulseStrength: 40
-  impulseFall: 2
-  impulseDuration: 0.3
-  impulseCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.1536028
-      value: 0.95560634
-      inSlope: -1.1707716
-      outSlope: -1.1707716
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.21374476
-      value: 0.38292587
-      inSlope: -0.672694
-      outSlope: -0.672694
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.09865375
-    - serializedVersion: 3
-      time: 0.8849327
-      value: 0.13435408
-      inSlope: -0.07264461
-      outSlope: -0.07264461
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: -0.91275924
-      outSlope: -0.91275924
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.59174806
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
   kbStrengthVerti: 10
   kbStrengthHoriz: 40
   kbCurveHoriz:
