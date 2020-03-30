@@ -269,7 +269,8 @@ MonoBehaviour:
   attackWidth: 1.5
   attackLength: 2
   attackHeight: 2
-  attackDuration: 0.7
+  attackDuration: 0.04
+  attackCooldown: 0.7
   impulseStrength: 40
   impulseFall: 2
   impulseDuration: 0.3

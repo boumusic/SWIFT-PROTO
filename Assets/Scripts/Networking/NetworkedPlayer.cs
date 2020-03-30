@@ -127,7 +127,7 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
             networkObject.localVelocity = playerCharacter.Velocity;
             networkObject.climbing = playerCharacter.CurrentState == CharacterState.WallClimbing;
             networkObject.running = playerCharacter.Axis.magnitude != 0;
-            networkObject.attacking = playerCharacter.isStartingAttack;
+            networkObject.attacking = playerCharacter.isStartingAttack || playerCharacter.IsAttacking;
             networkObject.viewDir = playerCamera.transform.forward;
 
             //DebugParry();

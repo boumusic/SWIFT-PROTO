@@ -74,12 +74,12 @@ public class CharacterSettings : ScriptableObject
 
     [Header("Attack")]
     public float attackDelay = 0.1f;
+    public float attackDuration = 0.7f;
+    public float attackCooldown = 0.7f;
     public int damage = 1;
     public float attackWidth = 2f;
     public float attackLength = 2f;
     public float attackHeight = 2f;
-    public float attackDuration = 0.7f;
-    public float attackCooldown = 0.7f;
 
     [Header("Attack Impulse")]
     public float impulseStrength = 2f;

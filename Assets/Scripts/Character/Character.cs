@@ -101,21 +101,9 @@ public class Character : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.red;
-        Vector3 origin = FeetOrigin;
-        //Gizmos.DrawWireCube(origin, CastBox * m.groundCastRadius * 2);
-        //Gizmos.DrawLine(transform.position + Vector3.up, transform.position + Vector3.up + DesiredVelocity * m.slideWallCastLength);
-
-        if (hits.Length > 0)
-        {
-            //Vector3 point = hits[0].point;
-            //Gizmos.DrawLine(point, point + hits[0].normal * 10);
-
-            //Gizmos.color = Color.green;
-            //Gizmos.DrawLine(point, point + wallSlideVector);
-
-            Gizmos.DrawLine(transform.position, transform.position + WallUp * 10);
-        }
+        Vector3 center = transform.position + Vector3.up * 1.8f + playerCamera.transform.forward * m.attackLength / 2f;
+        Vector3 halfExtents = new Vector3(m.attackWidth, m.attackHeight, m.attackLength) / 2f;
+        Gizmos.DrawWireCube(transform.position + Vector3.up * 1.8f + playerCamera.transform.forward * m.attackLength / 2f, new Vector3(m.attackWidth, m.attackHeight, m.attackLength));
     }
 
     private void Awake()
@@ -140,6 +128,8 @@ public class Character : MonoBehaviour
         isRunning = axis.magnitude != 0f;
         animator.Run(isRunning, velocity.normalized);
         animator.IsFalling(CurrentState == CharacterState.Falling);
+        animator.JumpLeft(jumpLeft);
+        animator.Jumping(isJumping);
 
         CheckWallClimb();
         OrientModel();
@@ -359,6 +349,7 @@ public class Character : MonoBehaviour
     private bool hasReleasedJump = true;
     private bool shortJump = false;
     private float CurrentJumpStrength => shortJump ? m.shortJumpStrength : m.jumpStrength;
+    private bool isJumping => CurrentState == CharacterState.Jumping;
 
     public void Jump(bool shortJump = false)
     {
@@ -456,6 +447,7 @@ public class Character : MonoBehaviour
         cooldownDashDone = false;
         resetDash = false;
         feedbacks.Play("Dash");
+        animator.Dash();
     }
 
     private void Dashing_Update()

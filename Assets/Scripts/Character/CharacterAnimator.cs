@@ -21,6 +21,16 @@ public class CharacterAnimator : MonoBehaviour
         }
     }
 
+    public void JumpLeft(float value)
+    {
+        Float("JumpLeft", value);
+    }
+
+    public void Jumping(bool value)
+    {
+        Bool("isJumping", value);
+    }
+
     public void IsFalling(bool value)
     {
         Bool("isFalling", value);
@@ -55,6 +65,11 @@ public class CharacterAnimator : MonoBehaviour
         onDeathAnim?.Invoke();
     }
 
+    public void Dash()
+    {
+        Trigger("Dash");
+    }
+
     public void WallClimb(bool climb)
     {
         Bool("isWallclimbing", climb);
@@ -75,6 +90,14 @@ public class CharacterAnimator : MonoBehaviour
         {
             if (animators[i] == null) continue;
             animators[i].SetBool(name, value);
+        }
+    }
+    private void Float(string name, float value)
+    {
+        for (int i = 0; i < animators.Length; i++)
+        {
+            if (animators[i] == null) continue;
+            animators[i].SetFloat(name, value);
         }
     }
 }
