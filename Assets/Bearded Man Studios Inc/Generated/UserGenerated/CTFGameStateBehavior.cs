@@ -4,11 +4,12 @@ using UnityEngine;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedRPC("{\"types\":[[\"int\"]]")]
-	[GeneratedRPCVariableNames("{\"types\":[[\"winningTeam\"]]")]
+	[GeneratedRPC("{\"types\":[[\"int\"][\"int\"]]")]
+	[GeneratedRPCVariableNames("{\"types\":[[\"winningTeam\"][\"team\"]]")]
 	public abstract partial class CTFGameStateBehavior : NetworkBehavior
 	{
 		public const byte RPC_END_GAME = 0 + 5;
+		public const byte RPC_ADD_POINT = 1 + 5;
 		
 		public CTFGameStateNetworkObject networkObject = null;
 
@@ -23,6 +24,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 
 			base.SetupHelperRpcs(networkObject);
 			networkObject.RegisterRpc("EndGame", EndGame, typeof(int));
+			networkObject.RegisterRpc("AddPoint", AddPoint, typeof(int));
 
 			networkObject.onDestroy += DestroyGameObject;
 
@@ -104,6 +106,11 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		/// int winningTeam
 		/// </summary>
 		public abstract void EndGame(RpcArgs args);
+		/// <summary>
+		/// Arguments:
+		/// int team
+		/// </summary>
+		public abstract void AddPoint(RpcArgs args);
 
 		// DO NOT TOUCH, THIS GETS GENERATED PLEASE EXTEND THIS CLASS IF YOU WISH TO HAVE CUSTOM CODE ADDITIONS
 	}

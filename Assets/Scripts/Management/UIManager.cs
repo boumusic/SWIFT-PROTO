@@ -62,6 +62,8 @@ public class UIManager : MonoBehaviour
 
     private void Update()
     {
+        if (player == null) return;
+
         PositionKillFeeds();
         UpdateFlagStatus();
         UpdateDashCooldown();

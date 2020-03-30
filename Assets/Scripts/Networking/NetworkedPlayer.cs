@@ -96,7 +96,10 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
 
     private void OnDestroy()
     {
-        networkObject.Destroy();
+        if (networkObject.IsOwner)
+        {
+            networkObject.Destroy();
+        }
     }
 
     private void Update()
@@ -196,13 +199,16 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
             coll.enabled = true;
         }
 
+        characterAnimator.Land();
+
+        yield return new WaitForSeconds(1);
+
         if (NetworkManager.Instance.IsServer)
         {
             isAlive = true;
             networkObject.alive = isAlive;
         }
 
-        characterAnimator.Land();
     }
 
     public override void Attack(RpcArgs args)
@@ -280,6 +286,8 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
             return;
         }
 
+        if (attackingPlayer.isAlive == false) return;
+
         if (networkObject.attacking && Vector3.Dot(killerViewDir, networkObject.viewDir) < 0)
         {
             Vector3 direction = attackingPlayer.characterTransform.position - characterTransform.position;
@@ -351,6 +359,7 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
     public override void Knockback(RpcArgs args)
     {
         playerCharacter.Knockbacked(args.GetNext<Vector3>());
+        playerCharacter.CancelAttack();
     }
 
     public override void DebugAttack(RpcArgs args)
@@ -361,5 +370,10 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
     public override void Hitmarker(RpcArgs args)
     {
         UIManager.Instance.HitMarker();
+    }
+
+    public override void Respawn(RpcArgs args)
+    {
+        characterTransform.position = networkObject.spawnPos + new Vector3(Random.Range(-2f,2f), 0, Random.Range(-2f, 2f));
     }
 }

@@ -31,6 +31,10 @@ namespace BeardedManStudios.Forge.Networking.Generated
 						availableCallback = true;
 						obj = new ChatManagerNetworkObject(networker, id, frame);
 						break;
+					case CTFGameStateNetworkObject.IDENTITY:
+						availableCallback = true;
+						obj = new CTFGameStateNetworkObject(networker, id, frame);
+						break;
 					case CubeForgeGameNetworkObject.IDENTITY:
 						availableCallback = true;
 						obj = new CubeForgeGameNetworkObject(networker, id, frame);
@@ -54,10 +58,6 @@ namespace BeardedManStudios.Forge.Networking.Generated
 					case TestNetworkObject.IDENTITY:
 						availableCallback = true;
 						obj = new TestNetworkObject(networker, id, frame);
-						break;
-					case CTFGameStateNetworkObject.IDENTITY:
-						availableCallback = true;
-						obj = new CTFGameStateNetworkObject(networker, id, frame);
 						break;
 				}
 
