@@ -84,6 +84,7 @@ public class TeamManager : MonoBehaviour
 
     private void InitializeTeams()
     {
+        teams.Clear();
         for (int i = 0; i < TeamCount; i++)
         {
             teams.Add(new Team(i, colors[i]));
@@ -114,9 +115,15 @@ public class TeamManager : MonoBehaviour
 
     public Color GetTeamColor(int i)
     {
+        if (teams.Count <= i)
+        {
+            InitializeTeams();
+        }
+
         if (teams.Count > 0)
         {
-            return teams[i].Color;
+            //if(i < teams.Count && i >0)
+                return teams[i].Color;
         }
 
         return Color.white;
