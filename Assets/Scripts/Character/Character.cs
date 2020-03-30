@@ -17,7 +17,6 @@ public class Character : MonoBehaviour
     public CharacterAnimator animator;
     public CharacterFeedbacks feedbacks;
 
-
     [Header("Visuals")]
     public GameObject tps;
     public GameObject[] flagVisuals;
@@ -232,9 +231,40 @@ public class Character : MonoBehaviour
         this.axis = axis;
     }
 
+    private float spacebarCharge = 0f;
+    private bool wasSpacebar = false;
     public void InputSpacebar(bool space)
     {
+        wasSpacebar = spacebar;
         spacebar = space;
+
+
+        if(CurrentState != CharacterState.Jumping)
+        {
+            if (space)
+            {
+                spacebarCharge += Time.deltaTime * m.jumpChargeSpeed;
+            }
+        }
+
+        spacebarCharge = Mathf.Clamp01(spacebarCharge);
+
+        if(wasSpacebar && !spacebar && hasReleasedJump)
+        {
+            hasReleasedJump = true;
+            Jump(spacebarCharge < 0.5f);
+            spacebarCharge = 0f;
+        }
+
+        if (space)
+        {
+            hasReleasedJump = false;
+        }
+
+        if (spacebarCharge > 1f)
+        {
+
+        }
     }
 
     #endregion
@@ -326,11 +356,15 @@ public class Character : MonoBehaviour
     #endregion
 
     #region Jump
+    private bool hasReleasedJump = true;
+    private bool shortJump = false;
+    private float CurrentJumpStrength => shortJump ? m.shortJumpStrength : m.jumpStrength;
 
-    public void Jump()
+    public void Jump(bool shortJump = false)
     {
         if (jumpLeft > 0 && !IsDashing && !isImpulsing)
         {
+            this.shortJump = shortJump;
             stateMachine.ChangeState(CharacterState.Jumping);
         }
     }
@@ -352,7 +386,7 @@ public class Character : MonoBehaviour
     private void Jumping_Update()
     {
         jumpProgress += Time.deltaTime * m.jumpProgressSpeed;
-        yVelocity = m.jumpCurve.Evaluate(jumpProgress) * m.jumpStrength;
+        yVelocity = m.jumpCurve.Evaluate(jumpProgress) * CurrentJumpStrength;
         if (jumpProgress >= 1f)
         {
             stateMachine.ChangeState(CharacterState.Falling);
@@ -616,7 +650,8 @@ public class Character : MonoBehaviour
 
     #region Attack
 
-    public bool CanAttack => CurrentState != CharacterState.WallClimbing && !isAttacking && !HasFlag && !InDashMovement && !isImpulsing;
+    public bool CanAttack => CurrentState != CharacterState.WallClimbing && !isAttacking && !HasFlag && !InDashMovement && !isImpulsing && cooldownAttackDone;
+    private bool cooldownAttackDone = true;
     private Coroutine attackDelay;
     private Coroutine attackDuration;
     private float impulseProgress = 0f;
@@ -631,6 +666,7 @@ public class Character : MonoBehaviour
         if (attackDuration != null) StopCoroutine(attackDuration);
         isStartingAttack = false;
         isAttacking = false;
+        cooldownAttackDone = true;
     }
 
     public void TryAttack()
@@ -647,6 +683,7 @@ public class Character : MonoBehaviour
     [HideInInspector] public bool isStartingAttack;
     private IEnumerator AttackDelay()
     {
+        cooldownAttackDone = false;
         isStartingAttack = true;
 
         yield return new WaitForSeconds(m.attackDelay);
@@ -668,7 +705,7 @@ public class Character : MonoBehaviour
 
         Vector3 center = transform.position + Vector3.up * 1.8f + playerCamera.transform.forward * m.attackLength / 2f;
         Vector3 halfExtents = new Vector3(m.attackWidth, m.attackHeight, m.attackLength) / 2f;
-        RaycastHit[] hits = Physics.BoxCastAll(center, halfExtents, Vector3.forward, Quaternion.identity, m.attackLength);
+        RaycastHit[] hits = Physics.BoxCastAll(center, halfExtents, Vector3.forward, CamRotation, m.attackLength);
 
         if (hits.Length > 0)
         {
@@ -717,6 +754,8 @@ public class Character : MonoBehaviour
     {
         yield return new WaitForSeconds(m.attackDuration);
         isAttacking = false;
+        yield return new WaitForSeconds(m.attackCooldown);
+        cooldownAttackDone = true;
     }
 
     private void Impulsing_Enter()

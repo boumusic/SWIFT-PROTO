@@ -20,7 +20,9 @@ public class CharacterSettings : ScriptableObject
 
     [Header("Jump")]
     public int jumpCount = 2;
+    public float shortJumpStrength = 5f;
     public float jumpStrength = 5f;
+    public float jumpChargeSpeed = 5f;
     public float jumpProgressSpeed = 2f;
     public AnimationCurve jumpCurve = new AnimationCurve();
     public bool resetVelocityOnJump = false;
@@ -77,6 +79,7 @@ public class CharacterSettings : ScriptableObject
     public float attackLength = 2f;
     public float attackHeight = 2f;
     public float attackDuration = 0.7f;
+    public float attackCooldown = 0.7f;
 
     [Header("Attack Impulse")]
     public float impulseStrength = 2f;

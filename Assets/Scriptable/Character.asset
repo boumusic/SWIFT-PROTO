@@ -75,7 +75,9 @@ MonoBehaviour:
   dotSpeedMultiplier: 0.9
   flagMultiplier: 0.95
   jumpCount: 2
-  jumpStrength: 13
+  shortJumpStrength: 2
+  jumpStrength: 14
+  jumpChargeSpeed: 10
   jumpProgressSpeed: 3.4
   jumpCurve:
     serializedVersion: 2
