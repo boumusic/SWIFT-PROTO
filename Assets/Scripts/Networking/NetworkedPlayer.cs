@@ -127,7 +127,7 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
             networkObject.localVelocity = playerCharacter.Velocity;
             networkObject.climbing = playerCharacter.CurrentState == CharacterState.WallClimbing;
             networkObject.running = playerCharacter.Axis.magnitude != 0;
-            networkObject.attacking = playerCharacter.isStartingAttack || playerCharacter.IsAttacking;
+            networkObject.attacking = playerCharacter.isStartingAttack;
             networkObject.viewDir = playerCamera.transform.forward;
 
             //DebugParry();
@@ -288,7 +288,7 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
 
         if (attackingPlayer.isAlive == false) return;
 
-        if (networkObject.attacking && Vector3.Dot(killerViewDir, networkObject.viewDir) < 0)
+        if (networkObject.attacking && Vector3.Dot(attackingPlayer.networkObject.viewDir, networkObject.viewDir) < 0)
         {
             Vector3 direction = attackingPlayer.characterTransform.position - characterTransform.position;
 
