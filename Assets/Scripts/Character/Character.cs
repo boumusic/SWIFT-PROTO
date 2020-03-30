@@ -30,8 +30,7 @@ public class Character : MonoBehaviour
     private NetworkedPlayer NPlayer { get { if (nPlayer == null) nPlayer = GetComponentInParent<NetworkedPlayer>(); return nPlayer; } }
     public string PlayerName => player != null ? player.PlayerName : "NPC";
     public Color TeamColor => player != null ? player.TeamColor : Color.white;
-
-
+    
     #region Movement
 
     private Vector2 accelProgress;
@@ -246,6 +245,7 @@ public class Character : MonoBehaviour
         animator.Land();
         animator.Grounded(true);
         if (m.resetDashOnLand) resetDash = true;
+        canWallClimb = true;
     }
 
     private Vector3 wallSlideVector;
@@ -442,36 +442,52 @@ public class Character : MonoBehaviour
 
     #region Wall
 
+    private Vector3 WallNormal => hits.Length > 0 ? hits[0].normal : Vector3.zero;
+    private Vector3 WallUp => Vector3.Cross(WallNormal, -Right);
+    private float wallClimbProgress;
+    private bool canWallClimb = true;
+
     private void CheckWallClimb()
     {
-        if (CastWall())
+        if (CastWall() && canWallClimb)
         {
             if (CurrentState != CharacterState.WallClimbing && spacebar)
             {
                 stateMachine.ChangeState(CharacterState.WallClimbing);
             }
         }
+
+        if(CastLedge() && !canWallClimb)
+        {
+            canWallClimb = true;
+        }
     }
 
     private void WallClimbing_Enter()
     {
+        wallClimbProgress = 0f;
         if (m.resetDashOnWallclimb) resetDash = true;
         animator.WallClimb(true);
     }
 
-    private Vector3 WallNormal => hits.Length > 0 ? hits[0].normal : Vector3.zero;
-    private Vector3 WallUp => Vector3.Cross(WallNormal, -Right);
-
     private void WallClimbing_Update()
     {
+        wallClimbProgress += Time.deltaTime / m.wallClimbDuration;
+        Debug.Log(wallClimbProgress);
         if (!spacebar || !CastWall())
         {
-            //stateMachine.ChangeState(CharacterState.Falling);
             jumpLeft++;
             Jump();
+            canWallClimb = false;
         }
 
-        yVelocity = m.wallClimbSpeed;
+        if(wallClimbProgress > 1f)
+        {
+            canWallClimb = false;
+            stateMachine.ChangeState(CharacterState.Falling);
+        }
+
+        yVelocity = m.wallClimbSpeed * m.curveWallClimb.Evaluate(wallClimbProgress);
         velocity = Vector3.zero;
     }
 
@@ -482,8 +498,8 @@ public class Character : MonoBehaviour
 
     public bool CastWall()
     {
-        RaycastHit[] down = Physics.RaycastAll(transform.position, DesiredVelocity, m.slideWallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
-        RaycastHit[] up = Physics.RaycastAll(transform.position + Vector3.up * 2f, DesiredVelocity, m.slideWallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
+        RaycastHit[] down = Physics.RaycastAll(transform.position, DesiredVelocity, m.wallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
+        RaycastHit[] up = Physics.RaycastAll(transform.position + Vector3.up * 1.2f, DesiredVelocity, m.wallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
         List<RaycastHit> final = new List<RaycastHit>();
         for (int i = 0; i < down.Length; i++)
         {
@@ -496,7 +512,15 @@ public class Character : MonoBehaviour
         }
 
         hits = final.ToArray();
+        //hits = Physics.CapsuleCastAll(transform.position, transform.position + Vector3.up, 0.1f, DesiredVelocity, m.slideWallCastLength);
         return hits.Length > 0;
+    }
+
+    public bool CastLedge()
+    {
+        RaycastHit[] down = Physics.RaycastAll(transform.position, DesiredVelocity, m.wallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
+        RaycastHit[] up = Physics.RaycastAll(transform.position + Vector3.up * m.ledgeCastHeight, DesiredVelocity, m.wallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
+        return down.Length > 0 && up.Length == 0;
     }
 
     #endregion

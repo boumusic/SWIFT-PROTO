@@ -50,15 +50,18 @@ public class CharacterSettings : ScriptableObject
     public float castBoxWidth = 0.2f;
     public LayerMask groundMask;
 
-    [Header("Slide Against Walls")]
-    public bool slideAgainstWalls = true;
-    public float slideWallCastLength;
-    public AnimationCurve curveWallSlide;
-    public float minSlideWallSpeed = 0.15f;
-    public float maxSlideWallSpeed = 0.5f;
+    //[Header("Slide Against Walls")]
+    //public bool slideAgainstWalls = true;
+    //public AnimationCurve curveWallSlide;
+    //public float minSlideWallSpeed = 0.15f;
+    //public float maxSlideWallSpeed = 0.5f;
 
     [Header("Wall Climb")]
     public float wallClimbSpeed = 1f;
+    public float wallClimbDuration = 1.8f;
+    public AnimationCurve curveWallClimb;
+    public float wallCastLength = 0.8f;
+    public float ledgeCastHeight = 2f;
 
     #endregion
 
