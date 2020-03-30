@@ -5,10 +5,10 @@ using UnityEngine;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedInterpol("{\"inter\":[0,0,0]")]
+	[GeneratedInterpol("{\"inter\":[0,0,0,0]")]
 	public partial class CTFGameStateNetworkObject : NetworkObject
 	{
-		public const int IDENTITY = 9;
+		public const int IDENTITY = 3;
 
 		private byte[] _dirtyFields = new byte[1];
 
@@ -78,10 +78,10 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			if (fieldAltered != null) fieldAltered("team1Score", _team1Score, timestep);
 		}
 		[ForgeGeneratedField]
-		private int _timer;
-		public event FieldEvent<int> timerChanged;
-		public Interpolated<int> timerInterpolation = new Interpolated<int>() { LerpT = 0f, Enabled = false };
-		public int timer
+		private float _timer;
+		public event FieldEvent<float> timerChanged;
+		public InterpolateFloat timerInterpolation = new InterpolateFloat() { LerpT = 0f, Enabled = false };
+		public float timer
 		{
 			get { return _timer; }
 			set
@@ -108,6 +108,37 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			if (timerChanged != null) timerChanged(_timer, timestep);
 			if (fieldAltered != null) fieldAltered("timer", _timer, timestep);
 		}
+		[ForgeGeneratedField]
+		private float _originalTimer;
+		public event FieldEvent<float> originalTimerChanged;
+		public InterpolateFloat originalTimerInterpolation = new InterpolateFloat() { LerpT = 0f, Enabled = false };
+		public float originalTimer
+		{
+			get { return _originalTimer; }
+			set
+			{
+				// Don't do anything if the value is the same
+				if (_originalTimer == value)
+					return;
+
+				// Mark the field as dirty for the network to transmit
+				_dirtyFields[0] |= 0x8;
+				_originalTimer = value;
+				hasDirtyFields = true;
+			}
+		}
+
+		public void SetoriginalTimerDirty()
+		{
+			_dirtyFields[0] |= 0x8;
+			hasDirtyFields = true;
+		}
+
+		private void RunChange_originalTimer(ulong timestep)
+		{
+			if (originalTimerChanged != null) originalTimerChanged(_originalTimer, timestep);
+			if (fieldAltered != null) fieldAltered("originalTimer", _originalTimer, timestep);
+		}
 
 		protected override void OwnershipChanged()
 		{
@@ -120,6 +151,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			team0ScoreInterpolation.current = team0ScoreInterpolation.target;
 			team1ScoreInterpolation.current = team1ScoreInterpolation.target;
 			timerInterpolation.current = timerInterpolation.target;
+			originalTimerInterpolation.current = originalTimerInterpolation.target;
 		}
 
 		public override int UniqueIdentity { get { return IDENTITY; } }
@@ -129,6 +161,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			UnityObjectMapper.Instance.MapBytes(data, _team0Score);
 			UnityObjectMapper.Instance.MapBytes(data, _team1Score);
 			UnityObjectMapper.Instance.MapBytes(data, _timer);
+			UnityObjectMapper.Instance.MapBytes(data, _originalTimer);
 
 			return data;
 		}
@@ -143,10 +176,14 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			team1ScoreInterpolation.current = _team1Score;
 			team1ScoreInterpolation.target = _team1Score;
 			RunChange_team1Score(timestep);
-			_timer = UnityObjectMapper.Instance.Map<int>(payload);
+			_timer = UnityObjectMapper.Instance.Map<float>(payload);
 			timerInterpolation.current = _timer;
 			timerInterpolation.target = _timer;
 			RunChange_timer(timestep);
+			_originalTimer = UnityObjectMapper.Instance.Map<float>(payload);
+			originalTimerInterpolation.current = _originalTimer;
+			originalTimerInterpolation.target = _originalTimer;
+			RunChange_originalTimer(timestep);
 		}
 
 		protected override BMSByte SerializeDirtyFields()
@@ -160,6 +197,8 @@ namespace BeardedManStudios.Forge.Networking.Generated
 				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _team1Score);
 			if ((0x4 & _dirtyFields[0]) != 0)
 				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _timer);
+			if ((0x8 & _dirtyFields[0]) != 0)
+				UnityObjectMapper.Instance.MapBytes(dirtyFieldsData, _originalTimer);
 
 			// Reset all the dirty fields
 			for (int i = 0; i < _dirtyFields.Length; i++)
@@ -206,13 +245,26 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			{
 				if (timerInterpolation.Enabled)
 				{
-					timerInterpolation.target = UnityObjectMapper.Instance.Map<int>(data);
+					timerInterpolation.target = UnityObjectMapper.Instance.Map<float>(data);
 					timerInterpolation.Timestep = timestep;
 				}
 				else
 				{
-					_timer = UnityObjectMapper.Instance.Map<int>(data);
+					_timer = UnityObjectMapper.Instance.Map<float>(data);
 					RunChange_timer(timestep);
+				}
+			}
+			if ((0x8 & readDirtyFlags[0]) != 0)
+			{
+				if (originalTimerInterpolation.Enabled)
+				{
+					originalTimerInterpolation.target = UnityObjectMapper.Instance.Map<float>(data);
+					originalTimerInterpolation.Timestep = timestep;
+				}
+				else
+				{
+					_originalTimer = UnityObjectMapper.Instance.Map<float>(data);
+					RunChange_originalTimer(timestep);
 				}
 			}
 		}
@@ -234,8 +286,13 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			}
 			if (timerInterpolation.Enabled && !timerInterpolation.current.UnityNear(timerInterpolation.target, 0.0015f))
 			{
-				_timer = (int)timerInterpolation.Interpolate();
+				_timer = (float)timerInterpolation.Interpolate();
 				//RunChange_timer(timerInterpolation.Timestep);
+			}
+			if (originalTimerInterpolation.Enabled && !originalTimerInterpolation.current.UnityNear(originalTimerInterpolation.target, 0.0015f))
+			{
+				_originalTimer = (float)originalTimerInterpolation.Interpolate();
+				//RunChange_originalTimer(originalTimerInterpolation.Timestep);
 			}
 		}
 

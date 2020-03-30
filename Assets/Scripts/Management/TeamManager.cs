@@ -9,7 +9,7 @@ public class Team
     public List<Player> players = new List<Player>();
     public int PlayerCount => players.Count;
     public Color Color { get => color; }
-    public int Score { get => score; }
+    public int Score { get => score; set => score = value; }
 
     private int score;
     private Color color;
