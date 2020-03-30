@@ -6,7 +6,6 @@ using System;
 using BeardedManStudios.Forge.Networking;
 using BeardedManStudios.Forge.Networking.Unity;
 using BeardedManStudios.Forge.Networking.Generated;
-using MonsterLove.StateMachine;
 
 public class Character : MonoBehaviour
 {
@@ -27,7 +26,7 @@ public class Character : MonoBehaviour
     public bool startTps = false;
     private Player player;
     private NetworkedPlayer nPlayer;
-    private NetworkedPlayer NPlayer { get { if (nPlayer == null) nPlayer = GetComponentInParent<NetworkedPlayer>(); return nPlayer; } }
+    public NetworkedPlayer NPlayer { get { if (nPlayer == null) nPlayer = GetComponentInParent<NetworkedPlayer>(); return nPlayer; } }
     public string PlayerName => player != null ? player.PlayerName : "NPC";
     public Color TeamColor => player != null ? player.TeamColor : Color.white;
 
@@ -97,6 +96,7 @@ public class Character : MonoBehaviour
     public Action OnKill;
     public Action OnScore;
     public Action OnDash;
+    
 
     private bool local => NetworkedGameManager.Instance == null;
 
@@ -246,6 +246,7 @@ public class Character : MonoBehaviour
         TryStopCoyote();
         yVelocity = 0f;
         ResetJumpCount();
+
         if (shouldLandAnim)
         {
             animator.Land();
@@ -253,9 +254,11 @@ public class Character : MonoBehaviour
 
         else
             shouldLandAnim = true;
+
         animator.Grounded(true);
         if (m.resetDashOnLand) resetDash = true;
         canWallClimb = true;
+        canUseWallClimbThreshold = true;
     }
 
     private Vector3 wallSlideVector;
@@ -337,7 +340,7 @@ public class Character : MonoBehaviour
         if (axis.magnitude != 0)
             LastCamRotation = CamRotation;
 
-        if (!CastWall())
+        //if (!CastWall())
             jumpLeft--;
         SnapAccelToAxis();
         if (m.resetVelocityOnJump) ResetVelocity();
@@ -455,6 +458,7 @@ public class Character : MonoBehaviour
     private Vector3 WallUp => Vector3.Cross(WallNormal, -Right);
     private float wallClimbProgress;
     private bool canWallClimb = true;
+    private bool canUseWallClimbThreshold = true;
 
     private void CheckWallClimb()
     {
@@ -474,6 +478,7 @@ public class Character : MonoBehaviour
 
     private void WallClimbing_Enter()
     {
+        //if (canUseWallClimbThreshold) canUseWallClimbThreshold = false;
         wallClimbProgress = 0f;
         if (m.resetDashOnWallclimb) resetDash = true;
         animator.WallClimb(true);
@@ -491,6 +496,14 @@ public class Character : MonoBehaviour
             if (wallClimbProgress > m.wallClimbConsumeThreshold)
             {
                 canWallClimb = false;
+            }
+
+            else
+            {
+                if (!canUseWallClimbThreshold)
+                    canWallClimb = false;
+                else
+                    canUseWallClimbThreshold = false;
             }
         }
 
