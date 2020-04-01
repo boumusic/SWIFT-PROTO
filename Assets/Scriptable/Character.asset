@@ -264,7 +264,7 @@ MonoBehaviour:
   ledgeCastMinHeight: 1
   wallClimbConsumeThreshold: 0.07
   healthPoints: 1
-  attackDelay: 0.2
+  attackDelay: 0.08
   attackDuration: 0.08
   attackCooldown: 0.7
   damage: 1
