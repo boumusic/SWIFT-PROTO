@@ -259,18 +259,18 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  wallCastLength: 0.8
+  wallCastLength: 1.1
   ledgeCastMaxHeight: 2.6
   ledgeCastMinHeight: 1
   wallClimbConsumeThreshold: 0.07
   healthPoints: 1
-  attackDelay: 0.03
+  attackDelay: 0.2
+  attackDuration: 0.08
+  attackCooldown: 0.7
   damage: 1
   attackWidth: 1.5
   attackLength: 2
   attackHeight: 2
-  attackDuration: 0.04
-  attackCooldown: 0.7
   impulseStrength: 40
   impulseFall: 2
   impulseDuration: 0.3

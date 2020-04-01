@@ -1,11 +1,17 @@
 fileFormatVersion: 2
-guid: 60bd33cb0beda4841864aa93e7844796
+guid: cc04c617ec4b79a45a991b57d1864101
 ModelImporter:
   serializedVersion: 19300
   internalIDToNameTable:
   - first:
+      74: 3930510663103283364
+    second: root|EmptyAction
+  - first:
       74: 1401651198070150309
-    second: M_Land
+    second: M_WallclimbV2
+  - first:
+      74: -5572541973309549404
+    second: Empty|EmptyAction
   externalObjects: {}
   materials:
     materialImportMode: 1
@@ -35,25 +41,25 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: M_Land
+      name: M_WallclimbV2
       takeName: root|rootAction
       internalID: 0
       firstFrame: 0
-      lastFrame: 27
+      lastFrame: 20
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 0
+      loopTime: 1
       loopBlend: 0
       loopBlendOrientation: 1
       loopBlendPositionY: 1
       loopBlendPositionXZ: 1
       keepOriginalOrientation: 0
       keepOriginalPositionY: 1
-      keepOriginalPositionXZ: 1
+      keepOriginalPositionXZ: 0
       heightFromFeet: 0
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000

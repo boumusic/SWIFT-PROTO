@@ -1,11 +1,11 @@
 fileFormatVersion: 2
-guid: 60bd33cb0beda4841864aa93e7844796
+guid: d6245bb7524dfcd4daed63c473967c10
 ModelImporter:
   serializedVersion: 19300
   internalIDToNameTable:
   - first:
       74: 1401651198070150309
-    second: M_Land
+    second: LandV2
   externalObjects: {}
   materials:
     materialImportMode: 1
@@ -35,7 +35,7 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: M_Land
+      name: LandV2
       takeName: root|rootAction
       internalID: 0
       firstFrame: 0
@@ -53,7 +53,7 @@ ModelImporter:
       loopBlendPositionXZ: 1
       keepOriginalOrientation: 0
       keepOriginalPositionY: 1
-      keepOriginalPositionXZ: 1
+      keepOriginalPositionXZ: 0
       heightFromFeet: 0
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000

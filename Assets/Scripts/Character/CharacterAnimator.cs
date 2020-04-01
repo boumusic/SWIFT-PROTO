@@ -9,16 +9,16 @@ public class CharacterAnimator : MonoBehaviour
     public Action onJumpAnim;
     public Action onAttackAnim;
     public Action onDeathAnim;
-    
-    public void Run(bool value, Vector3 planarVelocity)
+
+    public void Run(bool value)
     {
         Bool("isRunning", value);
-        for (int i = 0; i < animators.Length; i++)
-        {
-            if (animators[i] == null) continue;
-            animators[i].SetFloat("x", planarVelocity.x);
-            animators[i].SetFloat("z", planarVelocity.z);
-        }
+    }
+
+    public void Velocity(Vector3 planarVelocity)
+    {
+        Float("x", planarVelocity.x);
+        Float("z", planarVelocity.z);
     }
 
     public void JumpLeft(float value)
@@ -47,9 +47,13 @@ public class CharacterAnimator : MonoBehaviour
         onAttackAnim?.Invoke();
     }
 
-    public void Jump()
+    public void Jump(bool doubleJ)
     {
-        Trigger("Jump");
+        if (doubleJ)
+            Trigger("DoubleJump");
+
+            else
+            Trigger("Jump");
         onJumpAnim?.Invoke();
     }
 

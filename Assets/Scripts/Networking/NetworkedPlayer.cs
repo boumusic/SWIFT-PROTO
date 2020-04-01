@@ -115,7 +115,8 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
             characterTransform.position = networkObject.position;
 
             // run animation
-            characterAnimator.Run(networkObject.running, networkObject.localVelocity);
+            characterAnimator.Run(networkObject.running);
+            characterAnimator.Velocity(networkObject.localVelocity.normalized);
 
             // climb animation
             characterAnimator.WallClimb(networkObject.climbing);
@@ -224,7 +225,7 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
 
     public override void Jump(RpcArgs args)
     {
-        characterAnimator.Jump();
+        characterAnimator.Jump(playerCharacter.JumpLeft < 2);
     }
 
     public override void Land(RpcArgs args)

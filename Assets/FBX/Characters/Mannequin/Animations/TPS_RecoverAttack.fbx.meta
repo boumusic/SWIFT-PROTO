@@ -1,11 +1,17 @@
 fileFormatVersion: 2
-guid: 60bd33cb0beda4841864aa93e7844796
+guid: 988bf721271a7d04ba97c7d1c552673c
 ModelImporter:
   serializedVersion: 19300
   internalIDToNameTable:
   - first:
+      74: 3930510663103283364
+    second: root|EmptyAction
+  - first:
       74: 1401651198070150309
-    second: M_Land
+    second: M_RecoverAttack
+  - first:
+      74: -5572541973309549404
+    second: Empty|EmptyAction
   externalObjects: {}
   materials:
     materialImportMode: 1
@@ -21,7 +27,10 @@ ModelImporter:
     rigImportErrors: 
     rigImportWarnings: 
     animationImportErrors: 
-    animationImportWarnings: 
+    animationImportWarnings: "\nClip 'root|rootAction' has import animation warnings
+      that might lower retargeting quality:\nNote: Activate translation DOF on avatar
+      to improve retargeting quality.\n\t'neck_01' has translation animation that
+      will be discarded.\n"
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
     importAnimatedCustomProperties: 0
@@ -35,11 +44,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: M_Land
+      name: M_RecoverAttack
       takeName: root|rootAction
       internalID: 0
       firstFrame: 0
-      lastFrame: 27
+      lastFrame: 30
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -51,7 +60,7 @@ ModelImporter:
       loopBlendOrientation: 1
       loopBlendPositionY: 1
       loopBlendPositionXZ: 1
-      keepOriginalOrientation: 0
+      keepOriginalOrientation: 1
       keepOriginalPositionY: 1
       keepOriginalPositionXZ: 1
       heightFromFeet: 0
