@@ -788,7 +788,6 @@ public class Character : MonoBehaviour
     private void Impulsing_Enter()
     {
         shouldLandAnim = false;
-        yVelocity = -m.impulseFall;
         impulseProgress = 0;
         impulseDir = Forward;
     }
