@@ -956,11 +956,11 @@ public class Character : MonoBehaviour
 
     private Vector3 currentVelAnim;
     private Vector3 animVelocity;
-    private float smoothAnim = 0.15f;
+    private float smoothAnim = 0.05f;
 
     private void Animations()
     {
-        isRunning = axis.magnitude != 0f;
+        isRunning = velocity.magnitude != 0f;
         Vector3 target = velocity / CurrentRunSpeed;
         if (target.z != 0)
         {

@@ -7,7 +7,7 @@ using BeardedManStudios.Forge.Networking;
 using BeardedManStudios.Forge.Networking.Unity;
 using BeardedManStudios.Forge.Networking.Generated;
 
-public class UIFlag : NetworkedUIFlagBehavior
+public class UIFlag : MonoBehaviour
 {
     [Header("UI Ping")]
     public FlagZoneType type;
@@ -16,7 +16,7 @@ public class UIFlag : NetworkedUIFlagBehavior
 
     public TextMeshProUGUI text;
 
-    private bool SameTeam => teamIndex == UIManager.Instance.Player.TeamIndex;
+    private bool SameTeam => Local ? teamIndex == UIManager.Instance.Player.TeamIndex : teamIndex == UIManager.Instance.NetworkedPlayer.networkObject.teamIndex;
     private bool Local => NetworkedGameManager.Instance == null;
 
     public void Update()
@@ -25,7 +25,7 @@ public class UIFlag : NetworkedUIFlagBehavior
         UpdateText();
     }
 
-    private bool PlayerHasFlag => Local ? UIManager.Instance.Player.Character.HasFlag : UIManager.Instance.NetworkedPlayer.HasFlag;
+    private bool PlayerHasFlag => Local ? UIManager.Instance.Player.Character.HasFlag : UIManager.Instance.NetworkedPlayer.networkObject.hasFlag;
 
     private void UpdateText()
     {

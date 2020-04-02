@@ -58,18 +58,14 @@ public class UIManager : MonoBehaviour
     [Header("Sensitivity")]
     public TextMeshProUGUI sensText;
 
-    private void Start()
-    {
-        if (player)
-        {
-            dashJauge.Init(ref character.OnStartDash,ref character.OnDashReady);
-            wallJauge.Init(ref character.OnStartWallclimb, ref character.OnWallclimbReady);
-        }
-    }
-
     public void AssignPlayer(Player p)
     {
         player = p;
+        if (player)
+        {
+            dashJauge.Init(ref character.OnStartDash, ref character.OnDashReady);
+            wallJauge.Init(ref character.OnStartWallclimb, ref character.OnWallclimbReady);
+        }
     }
 
     private void Update()
