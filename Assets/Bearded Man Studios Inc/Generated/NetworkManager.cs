@@ -221,6 +221,7 @@ namespace BeardedManStudios.Forge.Networking.Unity
 						objectInitialized(newObj, obj);
 				});
 			}
+            /*
 			else if (obj is NetworkedUIFlagNetworkObject)
 			{
 				MainThreadManager.Run(() =>
@@ -244,6 +245,7 @@ namespace BeardedManStudios.Forge.Networking.Unity
 						objectInitialized(newObj, obj);
 				});
 			}
+            */
 			else if (obj is TestNetworkObject)
 			{
 				MainThreadManager.Run(() =>
@@ -373,6 +375,7 @@ namespace BeardedManStudios.Forge.Networking.Unity
 			
 			return netBehavior;
 		}
+        /*
 		[Obsolete("Use InstantiateNetworkedUIFlag instead, its shorter and easier to type out ;)")]
 		public NetworkedUIFlagBehavior InstantiateNetworkedUIFlagNetworkObject(int index = 0, Vector3? position = null, Quaternion? rotation = null, bool sendTransform = true)
 		{
@@ -385,6 +388,7 @@ namespace BeardedManStudios.Forge.Networking.Unity
 			
 			return netBehavior;
 		}
+        */
 		[Obsolete("Use InstantiateTest instead, its shorter and easier to type out ;)")]
 		public TestBehavior InstantiateTestNetworkObject(int index = 0, Vector3? position = null, Quaternion? rotation = null, bool sendTransform = true)
 		{
@@ -854,6 +858,8 @@ namespace BeardedManStudios.Forge.Networking.Unity
 			
 			return netBehavior;
 		}
+
+        /*
 		/// <summary>
 		/// Instantiate an instance of NetworkedUIFlag
 		/// </summary>
@@ -911,6 +917,7 @@ namespace BeardedManStudios.Forge.Networking.Unity
 			
 			return netBehavior;
 		}
+        */
 		/// <summary>
 		/// Instantiate an instance of Test
 		/// </summary>
