@@ -9,6 +9,8 @@ public class CharacterAnimator : MonoBehaviour
     public Action onJumpAnim;
     public Action onAttackAnim;
     public Action onDeathAnim;
+    public Action onDoubleJumpAnim;
+    public Action onDashAnim;
 
     public void Run(bool value)
     {
@@ -50,11 +52,16 @@ public class CharacterAnimator : MonoBehaviour
     public void Jump(bool doubleJ)
     {
         if (doubleJ)
+        {
             Trigger("DoubleJump");
+            onDoubleJumpAnim?.Invoke();
+        }
 
-            else
+        else
+        {
             Trigger("Jump");
-        onJumpAnim?.Invoke();
+            onJumpAnim?.Invoke();
+        }
     }
 
     public void Land()
@@ -72,6 +79,7 @@ public class CharacterAnimator : MonoBehaviour
     public void Dash()
     {
         Trigger("Dash");
+        onDashAnim?.Invoke();
     }
 
     public void WallClimb(bool climb)

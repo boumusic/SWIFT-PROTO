@@ -23,6 +23,8 @@ public class UIManager : MonoBehaviour
 
     public NetworkedPlayer NetworkedPlayer => Player.GetComponentInParent<NetworkedPlayer>();
 
+    private Character character => player == null ? null : player.Character;
+
     [Header("Components")]
     public Canvas canvas;
     public Animator hitMarker;
@@ -35,10 +37,11 @@ public class UIManager : MonoBehaviour
     public float killFeedSpacing = 100f;
     public float killFeedOffset = 50f;
 
-    [Header("Dash")]
-    public Image dashCd;
-    public Image dashReset;
     private List<UIKillFeed> killFeeds = new List<UIKillFeed>();
+
+    [Header("Jauges")]
+    public UIJauge wallJauge;
+    public UIJauge dashJauge;
 
     [Header("Pause")]
     public GameObject pause;
@@ -54,7 +57,16 @@ public class UIManager : MonoBehaviour
 
     [Header("Sensitivity")]
     public TextMeshProUGUI sensText;
-    
+
+    private void Start()
+    {
+        if (player)
+        {
+            dashJauge.Init(ref character.OnStartDash,ref character.OnDashReady);
+            wallJauge.Init(ref character.OnStartWallclimb, ref character.OnWallclimbReady);
+        }
+    }
+
     public void AssignPlayer(Player p)
     {
         player = p;
@@ -66,7 +78,7 @@ public class UIManager : MonoBehaviour
 
         PositionKillFeeds();
         UpdateFlagStatus();
-        UpdateDashCooldown();
+        UpdateCooldowns();
 
         scoreboard.gameObject.SetActive(player.Tab);
         sensText.text = "sensitivity : " + player.sensitivity.ToString("F3") + "/1";
@@ -84,16 +96,12 @@ public class UIManager : MonoBehaviour
         generalMessage.Message(message);
     }
 
-    public void UpdateDashCooldown()
+    public void UpdateCooldowns()
     {
         if (player)
         {
-            dashCd.fillAmount = player.Character.DashCooldownProgress;
-            dashReset.gameObject.SetActive(player.Character.ResetDash);
-
-            float a = player.Character.CanDash ? 0.7f : 0.2f;
-            dashReset.color = new Color(dashReset.color.r, dashReset.color.g, dashReset.color.b, a) ;
-            dashCd.color = new Color(dashCd.color.r, dashCd.color.g, dashCd.color.b, a);
+            dashJauge.UpdateJauge(player.Character.DashCooldownProgress);
+            wallJauge.UpdateJauge(player.Character.WallClimbCharge);
         }
     }
 
@@ -108,7 +116,7 @@ public class UIManager : MonoBehaviour
     {
         GameObject newUI = Instantiate(uiFlagZonePrefab, canvas.transform);
         UIFlag uiFlag = newUI.GetComponent<UIFlag>();
-        uiFlag.FeedTarget(zone.gameObject);
+        uiFlag.GetComponent<UI360>().FeedTarget(zone.gameObject);
         return uiFlag;
     }
 
@@ -130,7 +138,7 @@ public class UIManager : MonoBehaviour
 
     private void UpdateFlagStatus()
     {
-        if(player)
+        if (player)
         {
             flagStatus.SetActive(player.Character.HasFlag);
         }
