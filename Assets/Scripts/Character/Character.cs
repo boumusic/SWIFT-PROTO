@@ -930,7 +930,7 @@ public class Character : MonoBehaviour
         flag = null;
     }
 
-    private void ToggleFlagVisuals(bool value)
+    public void ToggleFlagVisuals(bool value)
     {
         for (int i = 0; i < flagVisuals.Length; i++)
         {

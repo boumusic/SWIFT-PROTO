@@ -84,13 +84,20 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
             };
             characterAnimator.onJumpAnim += () =>
             {
-                networkObject.SendRpc(RPC_JUMP, Receivers.Others);
+                networkObject.SendRpc(RPC_JUMP, Receivers.Others, false);
+            };
+            characterAnimator.onDoubleJumpAnim += () =>
+            {
+                networkObject.SendRpc(RPC_JUMP, Receivers.Others, true);
             };
             characterAnimator.onAttackAnim += () =>
             {
                 networkObject.SendRpc(RPC_ATTACK, Receivers.Others);
             };
-
+            characterAnimator.onDashAnim += () =>
+            {
+                networkObject.SendRpc(RPC_DASH, Receivers.Others);
+            };
         }
     }
 
@@ -225,7 +232,7 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
 
     public override void Jump(RpcArgs args)
     {
-        characterAnimator.Jump(playerCharacter.JumpLeft < 2);
+        characterAnimator.Jump(args.GetAt<bool>(0));
     }
 
     public override void Land(RpcArgs args)
@@ -351,6 +358,12 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
     public Renderer[] flagVisualsRend;
     public override void ToggleFlag(RpcArgs args)
     {
+        if (networkObject.IsOwner)
+        {
+            playerCharacter.ToggleFlagVisuals(args.GetAt<bool>(0));
+            return;
+        }
+
         for (int i = 0; i < flagVisuals.Length; i++)
         {
             flagVisuals[i].SetActive(args.GetAt<bool>(0));
@@ -376,5 +389,10 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
     public override void Respawn(RpcArgs args)
     {
         characterTransform.position = networkObject.spawnPos + new Vector3(Random.Range(-2f,2f), 0, Random.Range(-2f, 2f));
+    }
+
+    public override void Dash(RpcArgs args)
+    {
+        characterAnimator.Dash();
     }
 }
