@@ -59,9 +59,9 @@ MonoBehaviour:
   flag: {fileID: 0}
   isAlive: 1
   flagVisuals:
-  - {fileID: 3768478154875016439}
+  - {fileID: 2670349730746946581}
   flagVisualsRend:
-  - {fileID: 1376655108788939975}
+  - {fileID: 169010896810093605}
 --- !u!1001 &7210525686735752730
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -218,15 +218,15 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 7210525686735752730}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &3768478154875016439 stripped
+--- !u!1 &2670349730746946581 stripped
 GameObject:
-  m_CorrespondingSourceObject: {fileID: 5790709941368249069, guid: cd71e6b2ab118ad49beea1339ceaf6be,
+  m_CorrespondingSourceObject: {fileID: 4692207679526771215, guid: cd71e6b2ab118ad49beea1339ceaf6be,
     type: 3}
   m_PrefabInstance: {fileID: 7210525686735752730}
   m_PrefabAsset: {fileID: 0}
---- !u!23 &1376655108788939975 stripped
+--- !u!23 &169010896810093605 stripped
 MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 8577723895424066269, guid: cd71e6b2ab118ad49beea1339ceaf6be,
+  m_CorrespondingSourceObject: {fileID: 7370312775081386559, guid: cd71e6b2ab118ad49beea1339ceaf6be,
     type: 3}
   m_PrefabInstance: {fileID: 7210525686735752730}
   m_PrefabAsset: {fileID: 0}
