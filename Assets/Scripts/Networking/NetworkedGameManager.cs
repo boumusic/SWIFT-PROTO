@@ -82,7 +82,7 @@ public class NetworkedGameManager : MonoBehaviour
 
     int GetTeamIndex()
     {
-        return teams[0].Count > teams[1].Count ? 1 : 0;
+        return teams[0].Count >= 4 ? 1 : 0;
     }
 
     void OnPlayerQuit(NetworkingPlayer player)
