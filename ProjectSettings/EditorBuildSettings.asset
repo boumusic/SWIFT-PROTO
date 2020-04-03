@@ -15,6 +15,6 @@ EditorBuildSettings:
     path: Assets/_Scenes/Nicolas/Nicolas.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
   - enabled: 0
-    path: Assets/_Scenes/Nils/Nils.unity
+    path: Assets/_Scenes/Nils/Nils_Temple.unity
     guid: e64dc9ffc8539f14ca8ad2462b6f8524
   m_configObjects: {}
