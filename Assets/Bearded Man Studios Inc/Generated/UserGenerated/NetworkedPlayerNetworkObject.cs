@@ -5,10 +5,10 @@ using UnityEngine;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedInterpol("{\"inter\":[0.5,0.5,0,0,0,0,0,0,0,0,0]")]
+	[GeneratedInterpol("{\"inter\":[0.35,0.6,0.35,0,0,0,0,0,0,0,0]")]
 	public partial class NetworkedPlayerNetworkObject : NetworkObject
 	{
-		public const int IDENTITY = 7;
+		public const int IDENTITY = 11;
 
 		private byte[] _dirtyFields = new byte[2];
 
@@ -18,7 +18,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		[ForgeGeneratedField]
 		private Vector3 _position;
 		public event FieldEvent<Vector3> positionChanged;
-		public InterpolateVector3 positionInterpolation = new InterpolateVector3() { LerpT = 0.5f, Enabled = true };
+		public InterpolateVector3 positionInterpolation = new InterpolateVector3() { LerpT = 0.35f, Enabled = true };
 		public Vector3 position
 		{
 			get { return _position; }
@@ -49,7 +49,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		[ForgeGeneratedField]
 		private Quaternion _rotation;
 		public event FieldEvent<Quaternion> rotationChanged;
-		public InterpolateQuaternion rotationInterpolation = new InterpolateQuaternion() { LerpT = 0.5f, Enabled = true };
+		public InterpolateQuaternion rotationInterpolation = new InterpolateQuaternion() { LerpT = 0.6f, Enabled = true };
 		public Quaternion rotation
 		{
 			get { return _rotation; }
@@ -80,7 +80,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		[ForgeGeneratedField]
 		private Vector3 _localVelocity;
 		public event FieldEvent<Vector3> localVelocityChanged;
-		public InterpolateVector3 localVelocityInterpolation = new InterpolateVector3() { LerpT = 0f, Enabled = false };
+		public InterpolateVector3 localVelocityInterpolation = new InterpolateVector3() { LerpT = 0.35f, Enabled = true };
 		public Vector3 localVelocity
 		{
 			get { return _localVelocity; }

@@ -59,7 +59,10 @@ public class Zone : NetworkedFlagBehavior, ITeamAffilitation
 
         teamIndex = networkObject.teamIndex;
         type = (FlagZoneType)networkObject.type;
+        radius = networkObject.radius;
+
         UpdateAffiliation();
+        UpdateRadius();
         UIManager.Instance.RegisterFlagZone(this);
     }
 
@@ -92,28 +95,36 @@ public class Zone : NetworkedFlagBehavior, ITeamAffilitation
             {
                 if (!IsCaptured)
                 {
-                    if ((player.networkObject.teamIndex != networkObject.teamIndex) && isAltar)
+                    if (player.isAlive && (player.networkObject.teamIndex != networkObject.teamIndex) && isAltar)
                     {
                         player.flag = flag;
                         networkObject.SendRpc(RPC_CAPTURED, Receivers.All, player.playerName);
                         networkObject.isFlagThere = false;
 
                         player.flag = flag;
-                        player.playerCharacter.Capture(flag);
+
+                        //wtf nico les joueurs en remote n'ont plus de playerCharacter
+                        //player.playerCharacter.Capture(flag);
+
                         player.networkObject.hasFlag = true;
 
                         player.networkObject.SendRpc(NetworkedPlayer.RPC_TOGGLE_FLAG, true, Receivers.AllBuffered, true);
                     }
                 }
 
-                if (player.HasFlag && player.teamIndex == teamIndex && !isAltar)
+                if (player.isAlive && player.HasFlag && player.teamIndex == teamIndex && !isAltar)
                 {
                     player.flag = null;
                     player.networkObject.hasFlag = false;
-                    player.playerCharacter.Score();
+
+                    //wtf nico les joueurs en remote n'ont plus de playerCharacter
+                    //player.playerCharacter.Score();
+
                     player.networkObject.SendRpc(NetworkedPlayer.RPC_TOGGLE_FLAG, true, Receivers.AllBuffered, false);
 
                     networkObject.SendRpc(RPC_SCORED, Receivers.All, player.playerName, player.teamIndex);
+
+                    GameState.Instance.networkObject.SendRpc(GameState.RPC_ADD_POINT, Receivers.AllBuffered, player.teamIndex);
 
                     for (int i = 0; i < NetworkedGameManager.Instance.flagZones.Count; i++)
                     {
@@ -160,9 +171,6 @@ public class Zone : NetworkedFlagBehavior, ITeamAffilitation
     {
         string message = args.GetAt<string>(0) + " scored for team " + args.GetAt<int>(1) + "!";
         UIManager.Instance.LogMessage(message);
-
-        TeamManager.Instance.Score(args.GetAt<int>(1));
-        CTFManager.Instance.OnTeamScored?.Invoke();
 
         scoredFx.Play();
     }

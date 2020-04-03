@@ -9,16 +9,33 @@ public class CharacterAnimator : MonoBehaviour
     public Action onJumpAnim;
     public Action onAttackAnim;
     public Action onDeathAnim;
-    
-    public void Run(bool value, Vector3 planarVelocity)
+    public Action onDoubleJumpAnim;
+    public Action onDashAnim;
+
+    public void Run(bool value)
     {
         Bool("isRunning", value);
-        for (int i = 0; i < animators.Length; i++)
-        {
-            if (animators[i] == null) continue;
-            animators[i].SetFloat("x", planarVelocity.x);
-            animators[i].SetFloat("z", planarVelocity.z);
-        }
+    }
+
+    public void Velocity(Vector3 planarVelocity)
+    {
+        Float("x", planarVelocity.x);
+        Float("z", planarVelocity.z);
+    }
+
+    public void JumpLeft(float value)
+    {
+        Float("JumpLeft", value);
+    }
+
+    public void Jumping(bool value)
+    {
+        Bool("isJumping", value);
+    }
+
+    public void IsFalling(bool value)
+    {
+        Bool("isFalling", value);
     }
 
     public void Grounded(bool value)
@@ -32,10 +49,19 @@ public class CharacterAnimator : MonoBehaviour
         onAttackAnim?.Invoke();
     }
 
-    public void Jump()
+    public void Jump(bool doubleJ)
     {
-        Trigger("Jump");
-        onJumpAnim?.Invoke();
+        if (doubleJ)
+        {
+            Trigger("DoubleJump");
+            onDoubleJumpAnim?.Invoke();
+        }
+
+        else
+        {
+            Trigger("Jump");
+            onJumpAnim?.Invoke();
+        }
     }
 
     public void Land()
@@ -48,6 +74,12 @@ public class CharacterAnimator : MonoBehaviour
     {
         Trigger("Death");
         onDeathAnim?.Invoke();
+    }
+
+    public void Dash()
+    {
+        Trigger("Dash");
+        onDashAnim?.Invoke();
     }
 
     public void WallClimb(bool climb)
@@ -70,6 +102,14 @@ public class CharacterAnimator : MonoBehaviour
         {
             if (animators[i] == null) continue;
             animators[i].SetBool(name, value);
+        }
+    }
+    private void Float(string name, float value)
+    {
+        for (int i = 0; i < animators.Length; i++)
+        {
+            if (animators[i] == null) continue;
+            animators[i].SetFloat(name, value);
         }
     }
 }

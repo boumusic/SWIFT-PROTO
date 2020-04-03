@@ -6,7 +6,6 @@ using System;
 using BeardedManStudios.Forge.Networking;
 using BeardedManStudios.Forge.Networking.Unity;
 using BeardedManStudios.Forge.Networking.Generated;
-using MonsterLove.StateMachine;
 
 public class Character : MonoBehaviour
 {
@@ -18,19 +17,19 @@ public class Character : MonoBehaviour
     public CharacterAnimator animator;
     public CharacterFeedbacks feedbacks;
 
-
     [Header("Visuals")]
     public GameObject tps;
+    public GameObject ragdollPrefab;
     public GameObject[] flagVisuals;
     public Renderer[] flagVisualsRend;
-    public GameObject fps;
+    public GameObject sword;
     public bool startTps = false;
     private Player player;
     private NetworkedPlayer nPlayer;
-    private NetworkedPlayer NPlayer { get { if (nPlayer == null) nPlayer = GetComponentInParent<NetworkedPlayer>(); return nPlayer; } }
+    public NetworkedPlayer NPlayer { get { if (nPlayer == null) nPlayer = GetComponentInParent<NetworkedPlayer>(); return nPlayer; } }
     public string PlayerName => player != null ? player.PlayerName : "NPC";
     public Color TeamColor => player != null ? player.TeamColor : Color.white;
-    
+
     #region Movement
 
     private Vector2 accelProgress;
@@ -56,17 +55,17 @@ public class Character : MonoBehaviour
 
     public Vector3 Forward => new Vector3(playerCamera.transform.forward.x, 0, playerCamera.transform.forward.z);
     public Vector3 Right => new Vector3(playerCamera.transform.right.x, 0, playerCamera.transform.right.z);
-    public bool Dashing => (CurrentState == CharacterState.Dashing);
-    public bool InDashMovement => Dashing && dashProgress < 0.5f;
+    public bool IsDashing => (CurrentState == CharacterState.Dashing);
+    public bool InDashMovement => IsDashing && dashProgress < 0.5f;
     private bool knockbacked => CurrentState == CharacterState.Knockbacked;
     public Vector3 FinalVelocity
     {
         get
         {
-            if (grounded || Dashing) return CamRotation * Velocity;
-            else if (!knockbacked) return LastCamRotation * Velocity;
-            else return kbVelocity;
-
+            if (grounded || IsDashing) return CamRotation * Velocity;
+            else if (!knockbacked && !isImpulsing) return LastCamRotation * Velocity;
+            else if (knockbacked) return kbVelocity;
+            else return new Vector3(impulseVelocity.x, yVelocity, impulseVelocity.z);
         }
     }
     public float FacingVelocity => Mathf.Clamp01(Vector3.Dot(Forward, FinalVelocity));
@@ -88,7 +87,6 @@ public class Character : MonoBehaviour
 
     private float dashProgress = 0f;
 
-
     #endregion
 
     private bool isAttacking;
@@ -97,27 +95,20 @@ public class Character : MonoBehaviour
     public Action OnAttack;
     public Action OnKill;
     public Action OnScore;
-    public Action OnDash;
+    public Action OnStartDash;
+    public Action OnDashReady;
+    public Action OnStartWallclimb;
+    public Action OnWallclimbReady;
 
     private bool local => NetworkedGameManager.Instance == null;
 
+    public float Radius => (coll as CapsuleCollider).radius;
+
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.red;
-        Vector3 origin = FeetOrigin;
-        //Gizmos.DrawWireCube(origin, CastBox * m.groundCastRadius * 2);
-        //Gizmos.DrawLine(transform.position + Vector3.up, transform.position + Vector3.up + DesiredVelocity * m.slideWallCastLength);
-
-        if (hits.Length > 0)
-        {
-            //Vector3 point = hits[0].point;
-            //Gizmos.DrawLine(point, point + hits[0].normal * 10);
-
-            //Gizmos.color = Color.green;
-            //Gizmos.DrawLine(point, point + wallSlideVector);
-
-            Gizmos.DrawLine(transform.position, transform.position + WallUp * 10);
-        }
+        Vector3 center = transform.position + Vector3.up * 1.8f + playerCamera.transform.forward * m.attackLength / 2f;
+        Vector3 halfExtents = new Vector3(m.attackWidth, m.attackHeight, m.attackLength) / 2f;
+        Gizmos.DrawWireCube(transform.position + Vector3.up * 1.8f + playerCamera.transform.forward * m.attackLength / 2f, new Vector3(m.attackWidth, m.attackHeight, m.attackLength));
     }
 
     private void Awake()
@@ -139,8 +130,7 @@ public class Character : MonoBehaviour
         stateMachine.UpdateManually();
         CalculateHorizontalVelocity();
 
-        isRunning = axis.magnitude != 0f;
-        animator.Run(isRunning, velocity.normalized);
+        Animations();
 
         CheckWallClimb();
         OrientModel();
@@ -151,7 +141,7 @@ public class Character : MonoBehaviour
         //    Knockbacked((-Forward + Vector3.up).normalized);
         //}
     }
-
+    
     private void FixedUpdate()
     {
         ApplyVelocity();
@@ -166,26 +156,29 @@ public class Character : MonoBehaviour
     {
         this.player = player;
     }
+    
+    #region Velocity
 
     private float xAccel = 0f;
     private float zAccel = 0f;
+    private float CurrentRunSpeed => m.runSpeed * (HasFlag ? m.flagMultiplier : 1);
 
     private void CalculateHorizontalVelocity()
     {
         if (axis.magnitude != 0) LastCamRotation = CamRotation;
         if (CurrentState != CharacterState.WallClimbing)
         {
-            Vector2 usedAxis = CurrentState == CharacterState.Grounded ? axis : axis;
-            Accel(ref xAccel, usedAxis.x);
-            Accel(ref zAccel, usedAxis.y);
-            Vector3 target = new Vector3(xAccel, 0, zAccel) * m.runSpeed * (HasFlag ? m.flagMultiplier : 1);
+            Vector2 usedAxis = axis;
+            Accel(ref xAccel, usedAxis.x, usedAxis);
+            Accel(ref zAccel, usedAxis.y, usedAxis);
+            Vector3 target = new Vector3(xAccel, 0, zAccel) * CurrentRunSpeed;
 
             velocity = target;
-            if (CurrentState == CharacterState.Dashing) velocity = new Vector3(dashVelocity.x, 0f, dashVelocity.z);
+            if (IsDashing) velocity = dashVelocity;
         }
     }
 
-    private void Accel(ref float accel, float axis)
+    private void Accel(ref float accel, float axis, Vector2 fullVector)
     {
         if (axis != 0)
         {
@@ -196,7 +189,11 @@ public class Character : MonoBehaviour
         {
             accel /= CurrentDecelSpeed;
         }
-        accel = Mathf.Clamp(accel, -1f, 1f);
+
+        float magnitude = fullVector.magnitude;
+        float normalizedMax = 1 / magnitude;
+
+        accel = Mathf.Clamp(accel, -normalizedMax, normalizedMax);
 
         if (Mathf.Abs(accel) < 0.001f) accel = 0f;
     }
@@ -221,6 +218,8 @@ public class Character : MonoBehaviour
         body.velocity = FinalVelocity;
     }
 
+    #endregion
+
     #region Input
 
     public void InputAxis(Vector2 axis)
@@ -228,9 +227,40 @@ public class Character : MonoBehaviour
         this.axis = axis;
     }
 
+    private float spacebarCharge = 0f;
+    private bool wasSpacebar = false;
     public void InputSpacebar(bool space)
     {
+        wasSpacebar = spacebar;
         spacebar = space;
+
+
+        if (CurrentState != CharacterState.Jumping)
+        {
+            if (space)
+            {
+                spacebarCharge += Time.deltaTime * m.jumpChargeSpeed;
+            }
+        }
+
+        spacebarCharge = Mathf.Clamp01(spacebarCharge);
+
+        if (wasSpacebar && !spacebar && hasReleasedJump)
+        {
+            hasReleasedJump = true;
+            Jump(spacebarCharge < 0.5f);
+            spacebarCharge = 0f;
+        }
+
+        if (space)
+        {
+            hasReleasedJump = false;
+        }
+
+        if (spacebarCharge > 1f)
+        {
+
+        }
     }
 
     #endregion
@@ -242,10 +272,26 @@ public class Character : MonoBehaviour
         TryStopCoyote();
         yVelocity = 0f;
         ResetJumpCount();
-        animator.Land();
+
+        if (shouldLandAnim)
+        {
+            animator.Land();
+        }
+
+        else
+            shouldLandAnim = true;
+
         animator.Grounded(true);
         if (m.resetDashOnLand) resetDash = true;
+        ResetWallclimb();
+    }
+
+    private void ResetWallclimb()
+    {
         canWallClimb = true;
+        wallClimbProgress = 0f;
+        canUseWallClimbThreshold = true;
+        OnWallclimbReady?.Invoke();
     }
 
     private Vector3 wallSlideVector;
@@ -313,11 +359,16 @@ public class Character : MonoBehaviour
     #endregion
 
     #region Jump
+    private bool hasReleasedJump = true;
+    private bool shortJump = false;
+    private float CurrentJumpStrength => shortJump ? m.shortJumpStrength : m.jumpStrength;
+    private bool isJumping => CurrentState == CharacterState.Jumping;
 
-    public void Jump()
+    public void Jump(bool shortJump = false)
     {
-        if (jumpLeft > 0 && CurrentState != CharacterState.Dashing)
+        if (jumpLeft > 0 && !IsDashing && !isImpulsing)
         {
+            this.shortJump = shortJump;
             stateMachine.ChangeState(CharacterState.Jumping);
         }
     }
@@ -327,19 +378,19 @@ public class Character : MonoBehaviour
         if (axis.magnitude != 0)
             LastCamRotation = CamRotation;
 
-        if (!CastWall())
-            jumpLeft--;
+        //if (!CastWall())
+        animator.Jump(jumpLeft < 2);
+        jumpLeft--;
         SnapAccelToAxis();
         if (m.resetVelocityOnJump) ResetVelocity();
         jumpProgress = 0f;
-        animator.Jump();
         animator.Grounded(false);
     }
 
     private void Jumping_Update()
     {
         jumpProgress += Time.deltaTime * m.jumpProgressSpeed;
-        yVelocity = m.jumpCurve.Evaluate(jumpProgress) * m.jumpStrength;
+        yVelocity = m.jumpCurve.Evaluate(jumpProgress) * CurrentJumpStrength;
         if (jumpProgress >= 1f)
         {
             stateMachine.ChangeState(CharacterState.Falling);
@@ -381,7 +432,7 @@ public class Character : MonoBehaviour
     private Vector2 dashAxis;
     private bool resetDash = true;
     private bool cooldownDashDone = true;
-    public bool CanDash => resetDash && cooldownDashDone;
+    public bool CanDash => resetDash && cooldownDashDone && !isImpulsing;
     private float dashCooldownProgress = 1f;
     public float DashCooldownProgress => dashCooldownProgress;
     public bool ResetDash => resetDash;
@@ -391,7 +442,7 @@ public class Character : MonoBehaviour
     {
         if (CanDash)
         {
-            OnDash?.Invoke();
+            OnStartDash?.Invoke();
             stateMachine.ChangeState(CharacterState.Dashing);
         }
     }
@@ -409,6 +460,7 @@ public class Character : MonoBehaviour
         cooldownDashDone = false;
         resetDash = false;
         feedbacks.Play("Dash");
+        animator.Dash();
     }
 
     private void Dashing_Update()
@@ -421,7 +473,6 @@ public class Character : MonoBehaviour
         }
     }
 
-
     private void DashCooldown()
     {
         if (!cooldownDashDone)
@@ -433,6 +484,7 @@ public class Character : MonoBehaviour
 
             else
             {
+                OnDashReady?.Invoke();
                 cooldownDashDone = true;
             }
         }
@@ -440,48 +492,69 @@ public class Character : MonoBehaviour
 
     #endregion
 
-    #region Wall
+    #region Wallclimb
 
     private Vector3 WallNormal => hits.Length > 0 ? hits[0].normal : Vector3.zero;
     private Vector3 WallUp => Vector3.Cross(WallNormal, -Right);
     private float wallClimbProgress;
+    public float WallClimbCharge => 1 - wallClimbProgress;
     private bool canWallClimb = true;
+    private bool canUseWallClimbThreshold = true;
 
     private void CheckWallClimb()
     {
-        if (CastWall() && canWallClimb)
+        if (CastWall() && canWallClimb || CastLedge())
         {
             if (CurrentState != CharacterState.WallClimbing && spacebar)
             {
                 stateMachine.ChangeState(CharacterState.WallClimbing);
             }
         }
-
-        if(CastLedge() && !canWallClimb)
-        {
-            canWallClimb = true;
-        }
     }
 
     private void WallClimbing_Enter()
     {
-        wallClimbProgress = 0f;
         if (m.resetDashOnWallclimb) resetDash = true;
         animator.WallClimb(true);
+        //SnapToWall();
+        OnStartWallclimb?.Invoke();
+    }
+
+    private void SnapToWall()
+    {
+        if (hits.Length > 0)
+        {
+            Vector3 hitPos = hits[0].point + hits[0].normal * Radius;
+            transform.position = new Vector3(hitPos.x, transform.position.y, hitPos.z);
+        }
     }
 
     private void WallClimbing_Update()
     {
         wallClimbProgress += Time.deltaTime / m.wallClimbDuration;
-        Debug.Log(wallClimbProgress);
         if (!spacebar || !CastWall())
         {
             jumpLeft++;
             Jump();
-            canWallClimb = false;
+
+            /*
+            //Threshold when accidentally wallclimbing as small step and not getting the ground reset
+            if (wallClimbProgress > m.wallClimbConsumeThreshold)
+            {
+                canWallClimb = false;
+            }
+
+            else
+            {
+                if (!canUseWallClimbThreshold)
+                    canWallClimb = false;
+                else
+                    canUseWallClimbThreshold = false;
+            }
+            */
         }
 
-        if(wallClimbProgress > 1f)
+        if (wallClimbProgress > 1f)
         {
             canWallClimb = false;
             stateMachine.ChangeState(CharacterState.Falling);
@@ -498,7 +571,7 @@ public class Character : MonoBehaviour
 
     public bool CastWall()
     {
-        RaycastHit[] down = Physics.RaycastAll(transform.position, DesiredVelocity, m.wallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
+        RaycastHit[] down = Physics.RaycastAll(transform.position + Vector3.up * 0.05f, DesiredVelocity, m.wallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
         RaycastHit[] up = Physics.RaycastAll(transform.position + Vector3.up * 1.2f, DesiredVelocity, m.wallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
         List<RaycastHit> final = new List<RaycastHit>();
         for (int i = 0; i < down.Length; i++)
@@ -518,10 +591,14 @@ public class Character : MonoBehaviour
 
     public bool CastLedge()
     {
-        RaycastHit[] down = Physics.RaycastAll(transform.position, DesiredVelocity, m.wallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
-        RaycastHit[] up = Physics.RaycastAll(transform.position + Vector3.up * m.ledgeCastHeight, DesiredVelocity, m.wallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
+        RaycastHit[] down = Physics.RaycastAll(transform.position + Vector3.up * m.ledgeCastMinHeight, DesiredVelocity, m.wallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
+        RaycastHit[] up = Physics.RaycastAll(transform.position + Vector3.up * m.ledgeCastMaxHeight, DesiredVelocity, m.wallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
         return down.Length > 0 && up.Length == 0;
     }
+
+    #endregion
+
+    #region WallJump
 
     #endregion
 
@@ -589,9 +666,15 @@ public class Character : MonoBehaviour
 
     #region Attack
 
-    public bool CanAttack => CurrentState != CharacterState.WallClimbing && !isAttacking && !HasFlag && !InDashMovement;
+    public bool CanAttack => CurrentState != CharacterState.WallClimbing && !isAttacking && !HasFlag && !InDashMovement && !isImpulsing && cooldownAttackDone;
+    private bool cooldownAttackDone = true;
     private Coroutine attackDelay;
     private Coroutine attackDuration;
+    private float impulseProgress = 0f;
+    private Vector3 impulseVelocity;
+    private Vector3 impulseDir;
+    private bool isImpulsing => CurrentState == CharacterState.Impulsing;
+    private bool shouldLandAnim = true;
 
     public void CancelAttack()
     {
@@ -599,21 +682,28 @@ public class Character : MonoBehaviour
         if (attackDuration != null) StopCoroutine(attackDuration);
         isStartingAttack = false;
         isAttacking = false;
+        cooldownAttackDone = true;
     }
 
     public void TryAttack()
     {
         if (CanAttack)
         {
+            if (!isTPS) sword.SetActive(true);
+
             animator.Attack();
             if (attackDelay != null) StopCoroutine(attackDelay);
             attackDelay = StartCoroutine(AttackDelay());
+
+            if(grounded)
+                stateMachine.ChangeState(CharacterState.Impulsing);
         }
     }
 
     [HideInInspector] public bool isStartingAttack;
     private IEnumerator AttackDelay()
     {
+        cooldownAttackDone = false;
         isStartingAttack = true;
 
         yield return new WaitForSeconds(m.attackDelay);
@@ -635,7 +725,7 @@ public class Character : MonoBehaviour
 
         Vector3 center = transform.position + Vector3.up * 1.8f + playerCamera.transform.forward * m.attackLength / 2f;
         Vector3 halfExtents = new Vector3(m.attackWidth, m.attackHeight, m.attackLength) / 2f;
-        RaycastHit[] hits = Physics.BoxCastAll(center, halfExtents, Vector3.forward, Quaternion.identity, m.attackLength);
+        RaycastHit[] hits = Physics.BoxCastAll(center, halfExtents, Vector3.forward, CamRotation, m.attackLength);
 
         if (hits.Length > 0)
         {
@@ -684,6 +774,42 @@ public class Character : MonoBehaviour
     {
         yield return new WaitForSeconds(m.attackDuration);
         isAttacking = false;
+
+        yield return new WaitForSeconds(m.attackCooldown);
+
+        cooldownAttackDone = true;
+    }
+
+    public void DisableWeapon()
+    {
+        if (!isTPS) sword.SetActive(false);
+    }
+
+    private void Impulsing_Enter()
+    {
+        shouldLandAnim = false;
+        impulseProgress = 0;
+        impulseDir = Forward;
+    }
+
+    private void Impulsing_Update()
+    {
+        impulseProgress += Time.deltaTime / m.impulseDuration;
+        impulseVelocity = m.impulseCurve.Evaluate(impulseProgress) * impulseDir * m.impulseStrength;
+
+        if (impulseProgress > 1f)
+        {
+            xAccel = 0f;
+            zAccel = 0f;
+
+            if (CastGround())
+                stateMachine.ChangeState(CharacterState.Grounded);
+            else
+            {
+                shouldLandAnim = true;
+                stateMachine.ChangeState(CharacterState.Falling);
+            }
+        }
     }
 
     #endregion
@@ -730,15 +856,24 @@ public class Character : MonoBehaviour
         bool newTPS = !isTPS;
         isTPS = newTPS;
         playerCamera.ToggleTPS(newTPS);
-
-        fps.SetActive(!newTPS);
+        DisableWeapon();
         tps.SetActive(newTPS);
     }
 
     private void OrientModel()
     {
         if (Forward != Vector3.zero)
-            tps.transform.forward = Forward;
+        {
+            if (CurrentState == CharacterState.WallClimbing && hits.Length > 0)
+            {
+                tps.transform.forward = -hits[0].normal;
+            }
+
+            else
+            {
+                tps.transform.forward = Forward;
+            }
+        }
     }
 
     #endregion
@@ -749,6 +884,8 @@ public class Character : MonoBehaviour
     public Flag Flag { get => flag; }
     public int TeamIndex => player == null ? -1 : player.TeamIndex;
     public bool HasFlag { get { if (NPlayer != null) return NPlayer.networkObject.hasFlag; else return flag != null; } }
+
+    public int JumpLeft { get => jumpLeft; set => jumpLeft = value; }
 
     public void Capture(Flag flag)
     {
@@ -792,7 +929,7 @@ public class Character : MonoBehaviour
         flag = null;
     }
 
-    private void ToggleFlagVisuals(bool value)
+    public void ToggleFlagVisuals(bool value)
     {
         for (int i = 0; i < flagVisuals.Length; i++)
         {
@@ -816,6 +953,32 @@ public class Character : MonoBehaviour
         }
     }
 
+    private Vector3 currentVelAnim;
+    private Vector3 animVelocity;
+    private float smoothAnim = 0.05f;
+
+    private void Animations()
+    {
+        isRunning = velocity.magnitude != 0f;
+        Vector3 target = velocity / CurrentRunSpeed;
+        if (target.z != 0)
+        {
+            if (target.x > 0) target.x = Mathf.Sign(target.x);
+            else target.x = 0;
+            target.z = Mathf.Sign(target.z);
+        }
+        animVelocity = Vector3.SmoothDamp(animVelocity, target, ref currentVelAnim, smoothAnim);
+
+        if (velocity.magnitude != 0)
+        {
+            animator.Velocity(animVelocity);
+        }
+
+        animator.Run(isRunning);
+        animator.IsFalling(CurrentState == CharacterState.Falling);
+        animator.Jumping(isJumping);
+    }
+
     #endregion
 }
 
@@ -826,5 +989,7 @@ public enum CharacterState
     Falling,
     WallClimbing,
     Dashing,
-    Knockbacked
+    Knockbacked,
+    Impulsing,
+    Walljumping
 }

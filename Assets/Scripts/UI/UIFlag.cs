@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using BeardedManStudios.Forge.Networking;
+using BeardedManStudios.Forge.Networking.Unity;
+using BeardedManStudios.Forge.Networking.Generated;
 
-public class UIFlag : UI360
+public class UIFlag : MonoBehaviour
 {
     [Header("UI Ping")]
     public FlagZoneType type;
@@ -13,16 +16,16 @@ public class UIFlag : UI360
 
     public TextMeshProUGUI text;
 
-    private bool SameTeam => teamIndex == UIManager.Instance.Player.TeamIndex;
+    private bool SameTeam => Local ? teamIndex == UIManager.Instance.Player.TeamIndex : teamIndex == UIManager.Instance.NetworkedPlayer.networkObject.teamIndex;
     private bool Local => NetworkedGameManager.Instance == null;
 
-    public override void Update()
+    public void Update()
     {
-        base.Update();
+        //base.Update();
         UpdateText();
     }
 
-    private bool PlayerHasFlag => Local ? UIManager.Instance.Player.Character.HasFlag : UIManager.Instance.NetworkedPlayer.HasFlag;
+    private bool PlayerHasFlag => Local ? UIManager.Instance.Player.Character.HasFlag : UIManager.Instance.NetworkedPlayer.networkObject.hasFlag;
 
     private void UpdateText()
     {

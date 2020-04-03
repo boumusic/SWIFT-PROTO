@@ -13,6 +13,8 @@ public class Timer
     private float timeLeft = 0f;
     private bool isFinished = false;
 
+    public float TimeLeft { get => timeLeft; set => timeLeft = value; }
+
     public Timer(int minutes, int seconds, Action action = null)
     {
         this.minutes = minutes;

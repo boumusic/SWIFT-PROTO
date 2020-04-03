@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedRPC("{\"types\":[[][\"string\"][][][\"string\", \"int\"][\"uint\", \"string\", \"int\", \"Vector3\"][\"int\", \"Vector3\"][\"bool\"][\"Vector3\"][][]]")]
-	[GeneratedRPCVariableNames("{\"types\":[[][\"\"][][][\"killerName\", \"killerTeam\"][\"id\", \"killerName\", \"killerTeam\", \"viewDir\"][\"\", \"\"][\"\"][\"direction\"][][]]")]
+	[GeneratedRPC("{\"types\":[[][\"string\"][\"bool\"][][\"string\", \"int\"][\"uint\", \"string\", \"int\", \"Vector3\"][\"int\", \"Vector3\"][\"bool\"][\"Vector3\"][][][][]]")]
+	[GeneratedRPCVariableNames("{\"types\":[[][\"\"][\"doubleJump\"][][\"killerName\", \"killerTeam\"][\"id\", \"killerName\", \"killerTeam\", \"viewDir\"][\"\", \"\"][\"\"][\"direction\"][][][][]]")]
 	public abstract partial class NetworkedPlayerBehavior : NetworkBehavior
 	{
 		public const byte RPC_ATTACK = 0 + 5;
@@ -19,6 +19,8 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		public const byte RPC_KNOCKBACK = 8 + 5;
 		public const byte RPC_DEBUG_ATTACK = 9 + 5;
 		public const byte RPC_HITMARKER = 10 + 5;
+		public const byte RPC_RESPAWN = 11 + 5;
+		public const byte RPC_DASH = 12 + 5;
 		
 		public NetworkedPlayerNetworkObject networkObject = null;
 
@@ -34,7 +36,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			base.SetupHelperRpcs(networkObject);
 			networkObject.RegisterRpc("Attack", Attack);
 			networkObject.RegisterRpc("ChangeName", ChangeName, typeof(string));
-			networkObject.RegisterRpc("Jump", Jump);
+			networkObject.RegisterRpc("Jump", Jump, typeof(bool));
 			networkObject.RegisterRpc("Land", Land);
 			networkObject.RegisterRpc("Die", Die, typeof(string), typeof(int));
 			networkObject.RegisterRpc("TryHit", TryHit, typeof(uint), typeof(string), typeof(int), typeof(Vector3));
@@ -43,6 +45,8 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			networkObject.RegisterRpc("Knockback", Knockback, typeof(Vector3));
 			networkObject.RegisterRpc("DebugAttack", DebugAttack);
 			networkObject.RegisterRpc("Hitmarker", Hitmarker);
+			networkObject.RegisterRpc("Respawn", Respawn);
+			networkObject.RegisterRpc("Dash", Dash);
 
 			networkObject.onDestroy += DestroyGameObject;
 
@@ -163,6 +167,14 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		/// Arguments:
 		/// </summary>
 		public abstract void Hitmarker(RpcArgs args);
+		/// <summary>
+		/// Arguments:
+		/// </summary>
+		public abstract void Respawn(RpcArgs args);
+		/// <summary>
+		/// Arguments:
+		/// </summary>
+		public abstract void Dash(RpcArgs args);
 
 		// DO NOT TOUCH, THIS GETS GENERATED PLEASE EXTEND THIS CLASS IF YOU WISH TO HAVE CUSTOM CODE ADDITIONS
 	}

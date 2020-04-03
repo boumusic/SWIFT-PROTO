@@ -72,10 +72,11 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  dotSpeedMultiplier: 0.9
   flagMultiplier: 0.95
   jumpCount: 2
-  jumpStrength: 13
+  shortJumpStrength: 2
+  jumpStrength: 14
+  jumpChargeSpeed: 10
   jumpProgressSpeed: 3.4
   jumpCurve:
     serializedVersion: 2
@@ -202,7 +203,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   dashCooldown: 3
-  dashFlagCooldown: 5
+  dashFlagCooldown: 6
   dashProgressSpeed: 4
   resetDashOnLand: 1
   resetDashOnWallclimb: 1
@@ -257,15 +258,72 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  wallCastLength: 0.8
-  ledgeCastHeight: 2
+  wallCastLength: 1.1
+  ledgeCastMaxHeight: 2.6
+  ledgeCastMinHeight: 1
+  wallClimbConsumeThreshold: 0.07
   healthPoints: 1
-  attackDelay: 0.03
+  attackDelay: 0.08
+  attackDuration: 0.08
+  attackCooldown: 0.7
   damage: 1
   attackWidth: 1.5
   attackLength: 2
   attackHeight: 2
-  attackDuration: 0.7
+  impulseStrength: 40
+  impulseFall: 2
+  impulseDuration: 0.3
+  impulseCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.1536028
+      value: 0.95560634
+      inSlope: -1.1707716
+      outSlope: -1.1707716
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.21374476
+      value: 0.38292587
+      inSlope: -0.672694
+      outSlope: -0.672694
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.09865375
+    - serializedVersion: 3
+      time: 0.8849327
+      value: 0.13435408
+      inSlope: -0.07264461
+      outSlope: -0.07264461
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -0.91275924
+      outSlope: -0.91275924
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.59174806
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   kbStrengthVerti: 10
   kbStrengthHoriz: 40
   kbCurveHoriz:

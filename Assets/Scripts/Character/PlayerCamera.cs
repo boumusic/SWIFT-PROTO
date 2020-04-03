@@ -26,9 +26,12 @@ public class PlayerCamera : MonoBehaviour
 
     [Header("TPS")]
     public float tpsDistance = 10f;
+    public float tpsSide = 10f;
     public float smoothnessCamZ = 0.1f;
     private float targetCamZ;
+    private float targetCamX;
     private float currentVelCamZ;
+    private float currentVelCamX;
 
     public Quaternion Forward => Quaternion.AngleAxis(transform.eulerAngles.y, Vector3.up);
     private Vector2 mouse;
@@ -70,12 +73,14 @@ public class PlayerCamera : MonoBehaviour
     {
         isTPS = on;
         targetCamZ = isTPS ? -tpsDistance:0f;
+        targetCamX = isTPS ? -tpsSide:0f;
     }
 
     private void UpdateTPS()
     {
         float newZ = Mathf.SmoothDamp(cam.transform.localPosition.z, targetCamZ, ref currentVelCamZ, smoothnessCamZ);
-        cam.transform.localPosition = new Vector3(cam.transform.localPosition.x, cam.transform.localPosition.y, newZ);
+        float newX = Mathf.SmoothDamp(cam.transform.localPosition.x, targetCamX, ref currentVelCamX, smoothnessCamZ);
+        cam.transform.localPosition = new Vector3(newX, cam.transform.localPosition.y, newZ);
     }
 
     public void InputMouse(Vector2 mouse)

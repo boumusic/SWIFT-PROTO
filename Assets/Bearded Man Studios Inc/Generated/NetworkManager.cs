@@ -12,13 +12,14 @@ namespace BeardedManStudios.Forge.Networking.Unity
 
 		public GameObject[] BasicCubeNetworkObject = null;
 		public GameObject[] ChatManagerNetworkObject = null;
+		public GameObject[] CTFGameStateNetworkObject = null;
 		public GameObject[] CubeForgeGameNetworkObject = null;
 		public GameObject[] ExampleProximityPlayerNetworkObject = null;
 		public GameObject[] NetworkCameraNetworkObject = null;
 		public GameObject[] NetworkedFlagNetworkObject = null;
 		public GameObject[] NetworkedPlayerNetworkObject = null;
+		public GameObject[] NetworkedUIFlagNetworkObject = null;
 		public GameObject[] TestNetworkObject = null;
-		public GameObject[] CTFGameStateNetworkObject = null;
 
 		protected virtual void SetupObjectCreatedEvent()
 		{
@@ -70,6 +71,29 @@ namespace BeardedManStudios.Forge.Networking.Unity
 						{
 							var go = Instantiate(ChatManagerNetworkObject[obj.CreateCode]);
 							newObj = go.GetComponent<ChatManagerBehavior>();
+						}
+					}
+
+					if (newObj == null)
+						return;
+						
+					newObj.Initialize(obj);
+
+					if (objectInitialized != null)
+						objectInitialized(newObj, obj);
+				});
+			}
+			else if (obj is CTFGameStateNetworkObject)
+			{
+				MainThreadManager.Run(() =>
+				{
+					NetworkBehavior newObj = null;
+					if (!NetworkBehavior.skipAttachIds.TryGetValue(obj.NetworkId, out newObj))
+					{
+						if (CTFGameStateNetworkObject.Length > 0 && CTFGameStateNetworkObject[obj.CreateCode] != null)
+						{
+							var go = Instantiate(CTFGameStateNetworkObject[obj.CreateCode]);
+							newObj = go.GetComponent<CTFGameStateBehavior>();
 						}
 					}
 
@@ -197,17 +221,18 @@ namespace BeardedManStudios.Forge.Networking.Unity
 						objectInitialized(newObj, obj);
 				});
 			}
-			else if (obj is TestNetworkObject)
+            /*
+			else if (obj is NetworkedUIFlagNetworkObject)
 			{
 				MainThreadManager.Run(() =>
 				{
 					NetworkBehavior newObj = null;
 					if (!NetworkBehavior.skipAttachIds.TryGetValue(obj.NetworkId, out newObj))
 					{
-						if (TestNetworkObject.Length > 0 && TestNetworkObject[obj.CreateCode] != null)
+						if (NetworkedUIFlagNetworkObject.Length > 0 && NetworkedUIFlagNetworkObject[obj.CreateCode] != null)
 						{
-							var go = Instantiate(TestNetworkObject[obj.CreateCode]);
-							newObj = go.GetComponent<TestBehavior>();
+							var go = Instantiate(NetworkedUIFlagNetworkObject[obj.CreateCode]);
+							newObj = go.GetComponent<NetworkedUIFlagBehavior>();
 						}
 					}
 
@@ -220,17 +245,18 @@ namespace BeardedManStudios.Forge.Networking.Unity
 						objectInitialized(newObj, obj);
 				});
 			}
-			else if (obj is CTFGameStateNetworkObject)
+            */
+			else if (obj is TestNetworkObject)
 			{
 				MainThreadManager.Run(() =>
 				{
 					NetworkBehavior newObj = null;
 					if (!NetworkBehavior.skipAttachIds.TryGetValue(obj.NetworkId, out newObj))
 					{
-						if (CTFGameStateNetworkObject.Length > 0 && CTFGameStateNetworkObject[obj.CreateCode] != null)
+						if (TestNetworkObject.Length > 0 && TestNetworkObject[obj.CreateCode] != null)
 						{
-							var go = Instantiate(CTFGameStateNetworkObject[obj.CreateCode]);
-							newObj = go.GetComponent<CTFGameStateBehavior>();
+							var go = Instantiate(TestNetworkObject[obj.CreateCode]);
+							newObj = go.GetComponent<TestBehavior>();
 						}
 					}
 
@@ -272,6 +298,18 @@ namespace BeardedManStudios.Forge.Networking.Unity
 			var netBehavior = go.GetComponent<ChatManagerBehavior>();
 			var obj = netBehavior.CreateNetworkObject(Networker, index);
 			go.GetComponent<ChatManagerBehavior>().networkObject = (ChatManagerNetworkObject)obj;
+
+			FinalizeInitialization(go, netBehavior, obj, position, rotation, sendTransform);
+			
+			return netBehavior;
+		}
+		[Obsolete("Use InstantiateCTFGameState instead, its shorter and easier to type out ;)")]
+		public CTFGameStateBehavior InstantiateCTFGameStateNetworkObject(int index = 0, Vector3? position = null, Quaternion? rotation = null, bool sendTransform = true)
+		{
+			var go = Instantiate(CTFGameStateNetworkObject[index]);
+			var netBehavior = go.GetComponent<CTFGameStateBehavior>();
+			var obj = netBehavior.CreateNetworkObject(Networker, index);
+			go.GetComponent<CTFGameStateBehavior>().networkObject = (CTFGameStateNetworkObject)obj;
 
 			FinalizeInitialization(go, netBehavior, obj, position, rotation, sendTransform);
 			
@@ -337,6 +375,20 @@ namespace BeardedManStudios.Forge.Networking.Unity
 			
 			return netBehavior;
 		}
+        /*
+		[Obsolete("Use InstantiateNetworkedUIFlag instead, its shorter and easier to type out ;)")]
+		public NetworkedUIFlagBehavior InstantiateNetworkedUIFlagNetworkObject(int index = 0, Vector3? position = null, Quaternion? rotation = null, bool sendTransform = true)
+		{
+			var go = Instantiate(NetworkedUIFlagNetworkObject[index]);
+			var netBehavior = go.GetComponent<NetworkedUIFlagBehavior>();
+			var obj = netBehavior.CreateNetworkObject(Networker, index);
+			go.GetComponent<NetworkedUIFlagBehavior>().networkObject = (NetworkedUIFlagNetworkObject)obj;
+
+			FinalizeInitialization(go, netBehavior, obj, position, rotation, sendTransform);
+			
+			return netBehavior;
+		}
+        */
 		[Obsolete("Use InstantiateTest instead, its shorter and easier to type out ;)")]
 		public TestBehavior InstantiateTestNetworkObject(int index = 0, Vector3? position = null, Quaternion? rotation = null, bool sendTransform = true)
 		{
@@ -344,18 +396,6 @@ namespace BeardedManStudios.Forge.Networking.Unity
 			var netBehavior = go.GetComponent<TestBehavior>();
 			var obj = netBehavior.CreateNetworkObject(Networker, index);
 			go.GetComponent<TestBehavior>().networkObject = (TestNetworkObject)obj;
-
-			FinalizeInitialization(go, netBehavior, obj, position, rotation, sendTransform);
-			
-			return netBehavior;
-		}
-		[Obsolete("Use InstantiateCTFGameState instead, its shorter and easier to type out ;)")]
-		public CTFGameStateBehavior InstantiateCTFGameStateNetworkObject(int index = 0, Vector3? position = null, Quaternion? rotation = null, bool sendTransform = true)
-		{
-			var go = Instantiate(CTFGameStateNetworkObject[index]);
-			var netBehavior = go.GetComponent<CTFGameStateBehavior>();
-			var obj = netBehavior.CreateNetworkObject(Networker, index);
-			go.GetComponent<CTFGameStateBehavior>().networkObject = (CTFGameStateNetworkObject)obj;
 
 			FinalizeInitialization(go, netBehavior, obj, position, rotation, sendTransform);
 			
@@ -471,6 +511,63 @@ namespace BeardedManStudios.Forge.Networking.Unity
 			}
 
 			go.GetComponent<ChatManagerBehavior>().networkObject = (ChatManagerNetworkObject)obj;
+
+			FinalizeInitialization(go, netBehavior, obj, position, rotation, sendTransform);
+			
+			return netBehavior;
+		}
+		/// <summary>
+		/// Instantiate an instance of CTFGameState
+		/// </summary>
+		/// <returns>
+		/// A local instance of CTFGameStateBehavior
+		/// </returns>
+		/// <param name="index">The index of the CTFGameState prefab in the NetworkManager to Instantiate</param>
+		/// <param name="position">Optional parameter which defines the position of the created GameObject</param>
+		/// <param name="rotation">Optional parameter which defines the rotation of the created GameObject</param>
+		/// <param name="sendTransform">Optional Parameter to send transform data to other connected clients on Instantiation</param>
+		public CTFGameStateBehavior InstantiateCTFGameState(int index = 0, Vector3? position = null, Quaternion? rotation = null, bool sendTransform = true)
+		{
+			if (CTFGameStateNetworkObject.Length <= index)
+			{
+				Debug.Log("Prefab(s) missing for: CTFGameState. Add them at the NetworkManager prefab.");
+				return null;
+			}
+			
+			var go = Instantiate(CTFGameStateNetworkObject[index]);
+			var netBehavior = go.GetComponent<CTFGameStateBehavior>();
+
+			NetworkObject obj = null;
+			if (!sendTransform && position == null && rotation == null)
+				obj = netBehavior.CreateNetworkObject(Networker, index);
+			else
+			{
+				metadata.Clear();
+
+				if (position == null && rotation == null)
+				{
+					byte transformFlags = 0x1 | 0x2;
+					ObjectMapper.Instance.MapBytes(metadata, transformFlags);
+					ObjectMapper.Instance.MapBytes(metadata, go.transform.position, go.transform.rotation);
+				}
+				else
+				{
+					byte transformFlags = 0x0;
+					transformFlags |= (byte)(position != null ? 0x1 : 0x0);
+					transformFlags |= (byte)(rotation != null ? 0x2 : 0x0);
+					ObjectMapper.Instance.MapBytes(metadata, transformFlags);
+
+					if (position != null)
+						ObjectMapper.Instance.MapBytes(metadata, position.Value);
+
+					if (rotation != null)
+						ObjectMapper.Instance.MapBytes(metadata, rotation.Value);
+				}
+
+				obj = netBehavior.CreateNetworkObject(Networker, index, metadata.CompressBytes());
+			}
+
+			go.GetComponent<CTFGameStateBehavior>().networkObject = (CTFGameStateNetworkObject)obj;
 
 			FinalizeInitialization(go, netBehavior, obj, position, rotation, sendTransform);
 			
@@ -761,6 +858,66 @@ namespace BeardedManStudios.Forge.Networking.Unity
 			
 			return netBehavior;
 		}
+
+        /*
+		/// <summary>
+		/// Instantiate an instance of NetworkedUIFlag
+		/// </summary>
+		/// <returns>
+		/// A local instance of NetworkedUIFlagBehavior
+		/// </returns>
+		/// <param name="index">The index of the NetworkedUIFlag prefab in the NetworkManager to Instantiate</param>
+		/// <param name="position">Optional parameter which defines the position of the created GameObject</param>
+		/// <param name="rotation">Optional parameter which defines the rotation of the created GameObject</param>
+		/// <param name="sendTransform">Optional Parameter to send transform data to other connected clients on Instantiation</param>
+		public NetworkedUIFlagBehavior InstantiateNetworkedUIFlag(int index = 0, Vector3? position = null, Quaternion? rotation = null, bool sendTransform = true)
+		{
+			if (NetworkedUIFlagNetworkObject.Length <= index)
+			{
+				Debug.Log("Prefab(s) missing for: NetworkedUIFlag. Add them at the NetworkManager prefab.");
+				return null;
+			}
+			
+			var go = Instantiate(NetworkedUIFlagNetworkObject[index]);
+			var netBehavior = go.GetComponent<NetworkedUIFlagBehavior>();
+
+			NetworkObject obj = null;
+			if (!sendTransform && position == null && rotation == null)
+				obj = netBehavior.CreateNetworkObject(Networker, index);
+			else
+			{
+				metadata.Clear();
+
+				if (position == null && rotation == null)
+				{
+					byte transformFlags = 0x1 | 0x2;
+					ObjectMapper.Instance.MapBytes(metadata, transformFlags);
+					ObjectMapper.Instance.MapBytes(metadata, go.transform.position, go.transform.rotation);
+				}
+				else
+				{
+					byte transformFlags = 0x0;
+					transformFlags |= (byte)(position != null ? 0x1 : 0x0);
+					transformFlags |= (byte)(rotation != null ? 0x2 : 0x0);
+					ObjectMapper.Instance.MapBytes(metadata, transformFlags);
+
+					if (position != null)
+						ObjectMapper.Instance.MapBytes(metadata, position.Value);
+
+					if (rotation != null)
+						ObjectMapper.Instance.MapBytes(metadata, rotation.Value);
+				}
+
+				obj = netBehavior.CreateNetworkObject(Networker, index, metadata.CompressBytes());
+			}
+
+			go.GetComponent<NetworkedUIFlagBehavior>().networkObject = (NetworkedUIFlagNetworkObject)obj;
+
+			FinalizeInitialization(go, netBehavior, obj, position, rotation, sendTransform);
+			
+			return netBehavior;
+		}
+        */
 		/// <summary>
 		/// Instantiate an instance of Test
 		/// </summary>
@@ -813,63 +970,6 @@ namespace BeardedManStudios.Forge.Networking.Unity
 			}
 
 			go.GetComponent<TestBehavior>().networkObject = (TestNetworkObject)obj;
-
-			FinalizeInitialization(go, netBehavior, obj, position, rotation, sendTransform);
-			
-			return netBehavior;
-		}
-		/// <summary>
-		/// Instantiate an instance of CTFGameState
-		/// </summary>
-		/// <returns>
-		/// A local instance of CTFGameStateBehavior
-		/// </returns>
-		/// <param name="index">The index of the CTFGameState prefab in the NetworkManager to Instantiate</param>
-		/// <param name="position">Optional parameter which defines the position of the created GameObject</param>
-		/// <param name="rotation">Optional parameter which defines the rotation of the created GameObject</param>
-		/// <param name="sendTransform">Optional Parameter to send transform data to other connected clients on Instantiation</param>
-		public CTFGameStateBehavior InstantiateCTFGameState(int index = 0, Vector3? position = null, Quaternion? rotation = null, bool sendTransform = true)
-		{
-			if (CTFGameStateNetworkObject.Length <= index)
-			{
-				Debug.Log("Prefab(s) missing for: CTFGameState. Add them at the NetworkManager prefab.");
-				return null;
-			}
-			
-			var go = Instantiate(CTFGameStateNetworkObject[index]);
-			var netBehavior = go.GetComponent<CTFGameStateBehavior>();
-
-			NetworkObject obj = null;
-			if (!sendTransform && position == null && rotation == null)
-				obj = netBehavior.CreateNetworkObject(Networker, index);
-			else
-			{
-				metadata.Clear();
-
-				if (position == null && rotation == null)
-				{
-					byte transformFlags = 0x1 | 0x2;
-					ObjectMapper.Instance.MapBytes(metadata, transformFlags);
-					ObjectMapper.Instance.MapBytes(metadata, go.transform.position, go.transform.rotation);
-				}
-				else
-				{
-					byte transformFlags = 0x0;
-					transformFlags |= (byte)(position != null ? 0x1 : 0x0);
-					transformFlags |= (byte)(rotation != null ? 0x2 : 0x0);
-					ObjectMapper.Instance.MapBytes(metadata, transformFlags);
-
-					if (position != null)
-						ObjectMapper.Instance.MapBytes(metadata, position.Value);
-
-					if (rotation != null)
-						ObjectMapper.Instance.MapBytes(metadata, rotation.Value);
-				}
-
-				obj = netBehavior.CreateNetworkObject(Networker, index, metadata.CompressBytes());
-			}
-
-			go.GetComponent<CTFGameStateBehavior>().networkObject = (CTFGameStateNetworkObject)obj;
 
 			FinalizeInitialization(go, netBehavior, obj, position, rotation, sendTransform);
 			

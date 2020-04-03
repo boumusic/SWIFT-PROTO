@@ -421,6 +421,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7969278892242438025}
   - component: {fileID: 115064270149681730}
+  - component: {fileID: 7930258184128615135}
   m_Layer: 5
   m_Name: UIFlag
   m_TagString: Untagged
@@ -463,13 +464,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eaf76c54274b80a4cb6ba664efbc71a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rect: {fileID: 7969278892242438025}
-  arrow: {fileID: 6175151819489948067}
-  dotThreshold: 0.5
-  height: 400
-  width: 600
-  maxDiffY: 150
-  maxDiffX: 20
   type: 0
   teamIndex: 0
   images:
@@ -477,3 +471,22 @@ MonoBehaviour:
   - {fileID: 1307025730311184969}
   - {fileID: 5844812222958661871}
   text: {fileID: 7295324078202072757}
+--- !u!114 &7930258184128615135
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8664592799690796207}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7451d7b168d6dc41924838f2664e544, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rect: {fileID: 7969278892242438025}
+  arrow: {fileID: 6175151819489948067}
+  dotThreshold: 0.2
+  height: 400
+  width: 800
+  maxDiffY: 5
+  maxDiffX: 5
