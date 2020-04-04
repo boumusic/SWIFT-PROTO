@@ -513,6 +513,7 @@ MonoBehaviour:
   animator: {fileID: 244405698797949281}
   textKiller: {fileID: 8564099082224717021}
   textKilled: {fileID: 6730880419797846140}
+  rect: {fileID: 116420485934048718}
 --- !u!95 &244405698797949281
 Animator:
   serializedVersion: 3
