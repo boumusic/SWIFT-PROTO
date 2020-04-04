@@ -59,15 +59,44 @@ public class NetworkedGameManager : MonoBehaviour
                     Debug.Log("red team is " + teams[0].Count + " players/ blue team is " + teams[1].Count + " players");
                 }
             };
+
+
+            //Handle disconnection
+            NetworkManager.Instance.Networker.playerDisconnected += (player, sender) =>
+            {
+                MainThreadManager.Run(() =>
+                {
+                    //Loop through all players and find the player who disconnected, store all it's networkobjects to a list
+                    List<NetworkObject> toDelete = new List<NetworkObject>();
+                    foreach (var no in sender.NetworkObjectList)
+                    {
+                        if (no.Owner == player)
+                        {
+                            //Found him
+                            toDelete.Add(no);
+                        }
+                    }
+
+                    //Remove the actual network object outside of the foreach loop, as we would modify the collection at runtime elsewise. (could also use a return, too late)
+                    if (toDelete.Count > 0)
+                    {
+                        for (int i = toDelete.Count - 1; i >= 0; i--)
+                        {
+                            sender.NetworkObjectList.Remove(toDelete[i]);
+                            toDelete[i].Destroy();
+                        }
+                    }
+                });
+            };
         }
 
-        if (!NetworkManager.Instance.IsServer)
+        if (PlayerInfoManager.Instance.name == "spectator")
         {
-            CreatePlayer();
+            NetworkManager.Instance.InstantiateNetworkCamera();
         }
         else
         {
-            NetworkManager.Instance.InstantiateNetworkCamera();
+            CreatePlayer();
         }
     }
 
