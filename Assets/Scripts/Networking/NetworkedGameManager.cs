@@ -61,7 +61,14 @@ public class NetworkedGameManager : MonoBehaviour
             };
         }
 
-        CreatePlayer();
+        if (!NetworkManager.Instance.IsServer)
+        {
+            CreatePlayer();
+        }
+        else
+        {
+            NetworkManager.Instance.InstantiateNetworkCamera();
+        }
     }
 
     private void OnPlayerJoin(NetworkingPlayer player, NetWorker sender)
@@ -77,12 +84,12 @@ public class NetworkedGameManager : MonoBehaviour
 
     void CreatePlayer()
     {
-        NetworkedPlayerBehavior playerBehavior = NetworkManager.Instance.InstantiateNetworkedPlayer();
+        NetworkManager.Instance.InstantiateNetworkedPlayer();
     }
 
     int GetTeamIndex()
     {
-        return teams[0].Count >= 4 ? 1 : 0;
+        return teams[0].Count > teams[1].Count ? 1 : 0;
     }
 
     void OnPlayerQuit(NetworkingPlayer player)
