@@ -61,7 +61,14 @@ public class NetworkedGameManager : MonoBehaviour
             };
         }
 
-        CreatePlayer();
+        if (!NetworkManager.Instance.IsServer)
+        {
+            CreatePlayer();
+        }
+        else
+        {
+            NetworkManager.Instance.InstantiateNetworkCamera();
+        }
     }
 
     private void OnPlayerJoin(NetworkingPlayer player, NetWorker sender)
@@ -77,7 +84,7 @@ public class NetworkedGameManager : MonoBehaviour
 
     void CreatePlayer()
     {
-        NetworkedPlayerBehavior playerBehavior = NetworkManager.Instance.InstantiateNetworkedPlayer();
+        NetworkManager.Instance.InstantiateNetworkedPlayer();
     }
 
     int GetTeamIndex()
