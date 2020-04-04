@@ -106,9 +106,9 @@ public class Character : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Vector3 center = transform.position + Vector3.up * 1.8f + playerCamera.transform.forward * m.attackLength / 2f;
-        Vector3 halfExtents = new Vector3(m.attackWidth, m.attackHeight, m.attackLength) / 2f;
-        Gizmos.DrawWireCube(transform.position + Vector3.up * 1.8f + playerCamera.transform.forward * m.attackLength / 2f, new Vector3(m.attackWidth, m.attackHeight, m.attackLength));
+        Vector3 center = transform.position + m.attackCenter + playerCamera.transform.forward * m.attackLength / 2f;
+        Vector3 size = new Vector3(m.attackWidth, m.attackSizeY, m.attackLength);
+        Gizmos.DrawWireCube(center, size);
     }
 
     private void Awake()
@@ -136,10 +136,13 @@ public class Character : MonoBehaviour
         OrientModel();
         DashCooldown();
 
-        //if(Input.GetKeyDown(KeyCode.K))
-        //{
-        //    Knockbacked((-Forward + Vector3.up).normalized);
-        //}
+#if UNITY_EDITOR
+        if (Input.GetKeyDown(KeyCode.K))
+        {
+            Knockbacked((-Forward + Vector3.up).normalized);
+        }
+
+#endif
     }
     
     private void FixedUpdate()
@@ -723,8 +726,8 @@ public class Character : MonoBehaviour
             if (!myNetworkerPlayer.networkObject.alive) yield return null;
         }
 
-        Vector3 center = transform.position + Vector3.up * 1.8f + playerCamera.transform.forward * m.attackLength / 2f;
-        Vector3 halfExtents = new Vector3(m.attackWidth, m.attackHeight, m.attackLength) / 2f;
+        Vector3 center = transform.position + m.attackCenter + playerCamera.transform.forward * m.attackLength / 2f;
+        Vector3 halfExtents = new Vector3(m.attackWidth, m.attackSizeY, m.attackLength) / 2f;
         RaycastHit[] hits = Physics.BoxCastAll(center, halfExtents, Vector3.forward, CamRotation, m.attackLength);
 
         if (hits.Length > 0)

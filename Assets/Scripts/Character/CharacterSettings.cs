@@ -78,7 +78,8 @@ public class CharacterSettings : ScriptableObject
     public int damage = 1;
     public float attackWidth = 2f;
     public float attackLength = 2f;
-    public float attackHeight = 2f;
+    public float attackSizeY = 2f;
+    public Vector3 attackCenter;
 
     [Header("Attack Impulse")]
     public float impulseStrength = 2f;
