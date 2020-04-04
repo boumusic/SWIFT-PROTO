@@ -268,10 +268,10 @@ MonoBehaviour:
   attackCooldown: 0.7
   damage: 1
   attackWidth: 1.32
-  attackLength: 1.13
+  attackLength: 1.84
   attackSizeY: 1.21
-  attackCenter: {x: 0, y: 1.05, z: 0.46}
-  impulseStrength: 15
+  attackCenter: {x: 0, y: 1.05, z: 0.19}
+  impulseStrength: 25
   impulseFall: 2
   impulseDuration: 0.3
   impulseCurve:
