@@ -90,7 +90,7 @@ public class NetworkedGameManager : MonoBehaviour
             };
         }
 
-        if (PlayerInfoManager.Instance.name == "spectator")
+        if (PlayerInfoManager.Instance.playerName == "spectator")
         {
             NetworkManager.Instance.InstantiateNetworkCamera();
         }
