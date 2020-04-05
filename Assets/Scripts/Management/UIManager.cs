@@ -58,6 +58,11 @@ public class UIManager : MonoBehaviour
     [Header("Sensitivity")]
     public TextMeshProUGUI sensText;
 
+    private void Start()
+    {
+        if (NetworkedGameManager.Instance == null) AssignPlayer(FindObjectOfType<Player>());
+    }
+
     public void AssignPlayer(Player p)
     {
         player = p;

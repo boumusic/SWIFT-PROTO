@@ -10,6 +10,7 @@ public class UIKillFeed : MonoBehaviour
     public Animator animator;
     public TextMeshProUGUI textKiller;
     public TextMeshProUGUI textKilled;
+    public RectTransform rect;
 
     private Vector3 targetPos;
     private Vector3 currentVelPos;
@@ -21,7 +22,7 @@ public class UIKillFeed : MonoBehaviour
 
     private void Update()
     {
-        transform.localPosition = Vector3.SmoothDamp(transform.localPosition, targetPos, ref currentVelPos, smoothnessPos);
+        rect.anchoredPosition = Vector3.SmoothDamp(rect.anchoredPosition, targetPos, ref currentVelPos, smoothnessPos);
     }
 
     public void Init(Character killer, Character killed)
@@ -44,7 +45,7 @@ public class UIKillFeed : MonoBehaviour
 
     public void UpdatePosition(Vector3 pos)
     {
-        targetPos = new Vector3(transform.localPosition.x, pos.y, 0);
+        targetPos = new Vector3(rect.anchoredPosition.x, pos.y, 0);
     }
 
     private IEnumerator LifeTime()

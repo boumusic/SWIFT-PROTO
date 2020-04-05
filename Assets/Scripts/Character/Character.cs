@@ -106,9 +106,14 @@ public class Character : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Vector3 center = transform.position + Vector3.up * 1.8f + playerCamera.transform.forward * m.attackLength / 2f;
-        Vector3 halfExtents = new Vector3(m.attackWidth, m.attackHeight, m.attackLength) / 2f;
-        Gizmos.DrawWireCube(transform.position + Vector3.up * 1.8f + playerCamera.transform.forward * m.attackLength / 2f, new Vector3(m.attackWidth, m.attackHeight, m.attackLength));
+        Vector3 center = transform.position + m.attackCenter + playerCamera.transform.forward * m.attackLength / 2f;
+        Vector3 size = new Vector3(m.attackWidth, m.attackSizeY, m.attackLength);
+        Gizmos.DrawWireCube(center, size);
+
+        Vector3 ledgeOrigin = transform.position + Vector3.up * m.ledgeCastMinHeight;
+        Gizmos.DrawLine(ledgeOrigin, ledgeOrigin + DesiredVelocity * m.wallCastLength);
+        Vector3 ledgeUpOrigin = transform.position + Vector3.up * m.ledgeCastMaxHeight - DesiredVelocity * Radius * 1.2f;
+        Gizmos.DrawLine(ledgeUpOrigin, ledgeUpOrigin + DesiredVelocity * m.wallCastLength);
     }
 
     private void Awake()
@@ -130,18 +135,22 @@ public class Character : MonoBehaviour
         stateMachine.UpdateManually();
         CalculateHorizontalVelocity();
 
+
         Animations();
 
         CheckWallClimb();
         OrientModel();
         DashCooldown();
 
-        //if(Input.GetKeyDown(KeyCode.K))
-        //{
-        //    Knockbacked((-Forward + Vector3.up).normalized);
-        //}
+#if UNITY_EDITOR
+        if (Input.GetKeyDown(KeyCode.K))
+        {
+            Knockbacked((-Forward + Vector3.up).normalized);
+        }
+
+#endif
     }
-    
+
     private void FixedUpdate()
     {
         ApplyVelocity();
@@ -156,7 +165,7 @@ public class Character : MonoBehaviour
     {
         this.player = player;
     }
-    
+
     #region Velocity
 
     private float xAccel = 0f;
@@ -288,7 +297,6 @@ public class Character : MonoBehaviour
 
     private void ResetWallclimb()
     {
-        canWallClimb = true;
         wallClimbProgress = 0f;
         canUseWallClimbThreshold = true;
         OnWallclimbReady?.Invoke();
@@ -344,7 +352,7 @@ public class Character : MonoBehaviour
     {
         if (Physics.BoxCast(FeetOrigin, CastBox * m.groundCastRadius, -Vector3.up, out hit, Quaternion.identity, m.groundRaycastDown, m.groundMask))
         {
-            //Debug.Log("Hit " + hit.collider.gameObject.name);
+            //Debug.Log("Hit " + hit.collider.gameObject.name, hit.collider.gameObject);
             SnapToGround();
             return true;
         }
@@ -368,7 +376,7 @@ public class Character : MonoBehaviour
     {
         if (jumpLeft > 0 && !IsDashing && !isImpulsing)
         {
-            this.shortJump = shortJump;
+            this.shortJump = false;
             stateMachine.ChangeState(CharacterState.Jumping);
         }
     }
@@ -498,7 +506,7 @@ public class Character : MonoBehaviour
     private Vector3 WallUp => Vector3.Cross(WallNormal, -Right);
     private float wallClimbProgress;
     public float WallClimbCharge => 1 - wallClimbProgress;
-    private bool canWallClimb = true;
+    private bool canWallClimb => wallClimbProgress < 1;
     private bool canUseWallClimbThreshold = true;
 
     private void CheckWallClimb()
@@ -537,6 +545,8 @@ public class Character : MonoBehaviour
             jumpLeft++;
             Jump();
 
+
+        
             /*
             //Threshold when accidentally wallclimbing as small step and not getting the ground reset
             if (wallClimbProgress > m.wallClimbConsumeThreshold)
@@ -554,9 +564,8 @@ public class Character : MonoBehaviour
             */
         }
 
-        if (wallClimbProgress > 1f)
+        if (!canWallClimb)
         {
-            canWallClimb = false;
             stateMachine.ChangeState(CharacterState.Falling);
         }
 
@@ -592,8 +601,10 @@ public class Character : MonoBehaviour
     public bool CastLedge()
     {
         RaycastHit[] down = Physics.RaycastAll(transform.position + Vector3.up * m.ledgeCastMinHeight, DesiredVelocity, m.wallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
-        RaycastHit[] up = Physics.RaycastAll(transform.position + Vector3.up * m.ledgeCastMaxHeight, DesiredVelocity, m.wallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
-        return down.Length > 0 && up.Length == 0;
+        RaycastHit[] up = Physics.RaycastAll(transform.position + Vector3.up * m.ledgeCastMaxHeight - Forward * Radius * 1.2f, DesiredVelocity, m.wallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
+        bool cast = down.Length > 0 && up.Length == 0;
+        Debug.Log(cast);
+        return cast;
     }
 
     #endregion
@@ -695,7 +706,7 @@ public class Character : MonoBehaviour
             if (attackDelay != null) StopCoroutine(attackDelay);
             attackDelay = StartCoroutine(AttackDelay());
 
-            if(grounded)
+            if (grounded)
                 stateMachine.ChangeState(CharacterState.Impulsing);
         }
     }
@@ -723,8 +734,8 @@ public class Character : MonoBehaviour
             if (!myNetworkerPlayer.networkObject.alive) yield return null;
         }
 
-        Vector3 center = transform.position + Vector3.up * 1.8f + playerCamera.transform.forward * m.attackLength / 2f;
-        Vector3 halfExtents = new Vector3(m.attackWidth, m.attackHeight, m.attackLength) / 2f;
+        Vector3 center = transform.position + m.attackCenter + playerCamera.transform.forward * m.attackLength / 2f;
+        Vector3 halfExtents = new Vector3(m.attackWidth, m.attackSizeY, m.attackLength) / 2f;
         RaycastHit[] hits = Physics.BoxCastAll(center, halfExtents, Vector3.forward, CamRotation, m.attackLength);
 
         if (hits.Length > 0)

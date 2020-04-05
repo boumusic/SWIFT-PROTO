@@ -159,7 +159,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  dashStrength: 30
+  dashStrength: 27
   dashCurve:
     serializedVersion: 2
     m_Curve:
@@ -263,14 +263,15 @@ MonoBehaviour:
   ledgeCastMinHeight: 1
   wallClimbConsumeThreshold: 0.07
   healthPoints: 1
-  attackDelay: 0.08
+  attackDelay: 0.07
   attackDuration: 0.08
   attackCooldown: 0.7
   damage: 1
-  attackWidth: 1.5
-  attackLength: 2
-  attackHeight: 2
-  impulseStrength: 40
+  attackWidth: 1.32
+  attackLength: 1.84
+  attackSizeY: 1.21
+  attackCenter: {x: 0, y: 1.05, z: 0.19}
+  impulseStrength: 25
   impulseFall: 2
   impulseDuration: 0.3
   impulseCurve:
@@ -324,8 +325,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  kbStrengthVerti: 10
-  kbStrengthHoriz: 40
+  kbStrengthVerti: 15
+  kbStrengthHoriz: 35
   kbCurveHoriz:
     serializedVersion: 2
     m_Curve:

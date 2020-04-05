@@ -139,7 +139,6 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
             networkObject.viewDir = playerCamera.transform.forward;
 
             //DebugParry();
-
         }
     }
 
