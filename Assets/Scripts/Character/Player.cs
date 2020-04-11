@@ -127,7 +127,7 @@ public class Player : MonoBehaviour
         float x = Input.GetAxis("Mouse X");
         float y = Input.GetAxis("Mouse Y");
         mouse += new Vector2(x, y) * Time.deltaTime * 1000 * sensitivity;
-        mouse.y = Mathf.Clamp(mouse.y, -90, 90);
+        mouse.y = Mathf.Clamp(mouse.y, -89, 89);
         character.playerCamera.InputMouse(mouse);
     }
 }
