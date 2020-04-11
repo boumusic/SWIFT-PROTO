@@ -28,6 +28,7 @@ public class Character : MonoBehaviour
     private NetworkedPlayer nPlayer;
     public NetworkedPlayer NPlayer { get { if (nPlayer == null) nPlayer = GetComponentInParent<NetworkedPlayer>(); return nPlayer; } }
     public string PlayerName => player != null ? player.PlayerName : "NPC";
+    
     public Color TeamColor => player != null ? player.TeamColor : Color.white;
 
     #region Movement
