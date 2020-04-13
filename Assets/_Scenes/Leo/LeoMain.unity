@@ -35689,6 +35689,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1905689438}
   - component: {fileID: 1905689439}
+  - component: {fileID: 1905689440}
   m_Layer: 0
   m_Name: GameState
   m_TagString: Untagged
@@ -35722,6 +35723,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89d6bd2ce91dc3a4b9d4a47b8e5f3b5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1905689440
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1905689437}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d61f7f0aaf8de2489beee413926ed2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hostAddress: 82.66.74.114
+  hostPort: 15959
+  isLocalTesting: 0
+  MicQuality: 12000
 --- !u!43 &1910670857
 Mesh:
   m_ObjectHideFlags: 0

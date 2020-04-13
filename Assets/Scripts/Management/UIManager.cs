@@ -70,6 +70,13 @@ public class UIManager : MonoBehaviour
         {
             dashJauge.Init(ref character.OnStartDash, ref character.OnDashReady);
             wallJauge.Init(ref character.OnStartWallclimb, ref character.OnWallclimbReady);
+
+
+            //arg
+            foreach (var item in FindObjectsOfType<UI360>())
+            {
+                item.AssignPlayer();
+            }
         }
     }
 

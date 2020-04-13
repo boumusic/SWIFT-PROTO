@@ -604,7 +604,7 @@ public class Character : MonoBehaviour
         RaycastHit[] down = Physics.RaycastAll(transform.position + Vector3.up * m.ledgeCastMinHeight, DesiredVelocity, m.wallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
         RaycastHit[] up = Physics.RaycastAll(transform.position + Vector3.up * m.ledgeCastMaxHeight - Forward * Radius * 1.2f, DesiredVelocity, m.wallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
         bool cast = down.Length > 0 && up.Length == 0;
-        Debug.Log(cast);
+        //Debug.Log(cast);
         return cast;
     }
 
