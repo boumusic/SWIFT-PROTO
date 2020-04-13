@@ -27,7 +27,7 @@ public class UIPlayerScoreboard : MonoBehaviour
     [Header("Texts")]
     public PlayerScoreboardText[] texts;
     private Player player;
-    public PlayerScore Score => player.score;
+    //public PlayerScore Score => player.score;
 
     /*
     private void OnDrawGizmosSelected()
@@ -42,9 +42,26 @@ public class UIPlayerScoreboard : MonoBehaviour
         }
     }
     */
+
+    private void Update()
+    {
+        UpdateScore();
+    }
+
     public void Initialize(Player player)
     {
         this.player = player;
+    }
+    //PlayerScore S => player.score;
+
+    public void UpdateScore()
+    {
+        //UpdateText(PlayerScoreboardTextType.Name, player.PlayerName);
+        //UpdateText(PlayerScoreboardTextType.Kills, S.kills.ToString());
+        //UpdateText(PlayerScoreboardTextType.Deaths, S.deaths.ToString());
+        //UpdateText(PlayerScoreboardTextType.Captured, S.captured.ToString());
+        //UpdateText(PlayerScoreboardTextType.Scored, S.scored.ToString());
+        //UpdateText(PlayerScoreboardTextType.Retreived, S.retreived.ToString());
     }
 
     public void UpdateText(PlayerScoreboardTextType type, string newText)

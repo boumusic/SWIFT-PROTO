@@ -121,9 +121,9 @@ public static class CustomEditorUtility
         return rect;
     }
 
-    public static Rect GetPropertyRect(int index, Rect position, float offset, float widthMul)
+    public static Rect GetPropertyRect(int index, Rect position, float offset, float widthMul, float propertyWidth = 0)
     {
-        Rect rect = new Rect(position.position + LineOffsetVertical(index) + LineOffsetHorizontal(offset), RectSize(widthMul, offset > 0 ? 30 : 5));
+        Rect rect = new Rect(position.position + LineOffsetVertical(index) + LineOffsetHorizontal(offset), RectSize(widthMul, offset > 0 ? 30 : 5, propertyWidth));
         return rect;
     }
 
@@ -142,14 +142,15 @@ public static class CustomEditorUtility
         return RectSize(1, 0);
     }
 
-    public static Vector2 RectSize(float widthMul, int offset)
+    public static Vector2 RectSize(float widthMul, int offset, float propertyWidth = 0)
     {
-        return new Vector2(EditorGUIUtility.currentViewWidth * widthMul - offset, EditorGUIUtility.singleLineHeight);
+        float usedWidth = propertyWidth == 0 ? EditorGUIUtility.currentViewWidth : propertyWidth;
+        return new Vector2(propertyWidth * widthMul - offset, EditorGUIUtility.singleLineHeight);
     }
 
-    public static void QuickSerializeRelativeGUI(string name, SerializedProperty property, Rect position, int index, float offset, float widthMul)
+    public static void QuickSerializeRelativeGUI(string name, SerializedProperty property, Rect position, int index, float offset, float widthMul, float propertyWidth = 0)
     {
-        Rect rect = GetPropertyRect(index, position, offset, widthMul);
+        Rect rect = GetPropertyRect(index, position, offset, widthMul, propertyWidth);
         QuickSerializeRelativeGUI(name, property, rect);
     }
 

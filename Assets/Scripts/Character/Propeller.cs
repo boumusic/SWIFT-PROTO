@@ -9,10 +9,14 @@ public class Propulsion
     public float strength = 5f;
     public AnimationCurve curve;
     public float duration = 1f;
-    public float gravity = 1f;
+    public float airControl = 0f;
     public Vector3 direction = Vector3.one;
-    public int priority = 0;
-
+    public int priority = 0;    
+    public bool separateAxes = false;
+    public float strengthHoriz = 5f;
+    public AnimationCurve curveHoriz;
+    public float strengthVerti = 5f;
+    public AnimationCurve curveVerti;
 
     private Vector3 chosenDir;
     private float progress = 0f;
@@ -26,14 +30,19 @@ public class Propulsion
         this.strength = copy.strength;
         this.curve = copy.curve;
         this.duration = copy.duration;
-        this.gravity = copy.gravity;
+        this.airControl = copy.airControl;
         this.direction = copy.direction;
         this.priority = copy.priority;
+        this.strengthHoriz = copy.strengthHoriz;
+        this.strengthVerti = copy.strengthVerti;
+        this.curveHoriz = copy.curveHoriz;
+        this.curveVerti = copy.curveVerti;
+        this.separateAxes = copy.separateAxes;
     }
 
     public void Start(Action action = null, Propeller propeller = null)
     {
-        Start(Vector3.zero ,action, propeller);
+        Start(Vector3.zero, action, propeller);
     }
 
     public void Start(Vector3 dir, Action action = null, Propeller propeller = null)
@@ -53,7 +62,17 @@ public class Propulsion
             if (progress < 1f)
             {
                 progress += Time.deltaTime / duration;
-                vector = chosenDir * strength * curve.Evaluate(progress);
+                if (separateAxes)
+                {
+                    float x = chosenDir.x * strengthHoriz * curveHoriz.Evaluate(progress);
+                    float y = chosenDir.y * strengthVerti * curveVerti.Evaluate(progress);
+                    float z = chosenDir.z * strengthHoriz * curveHoriz.Evaluate(progress);
+                    vector = new Vector3(x,y,z);
+                }
+                else
+                {
+                    vector = chosenDir * strength * curve.Evaluate(progress);
+                }
             }
 
             else
@@ -95,7 +114,7 @@ public class Propeller : MonoBehaviour
 
     public void RemovePropulsion(Propulsion propulsion)
     {
-        Debug.Log("Remove");
+        //Debug.Log("Remove");
         propulsions.Remove(propulsion);
     }
 
