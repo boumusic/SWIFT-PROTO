@@ -6,16 +6,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
+using BeardedManStudios.Forge.Networking.Frame;
 
 public class MultiplayerMenu : MonoBehaviour
 {
+    public RectTransform serversContainer;
+    public GameObject serverElementPrefab;
 	public InputField ipAddress = null;
 	public InputField portNumber = null;
     public InputField playerName;
 	public bool DontChangeSceneOnConnect = false;
 	public string masterServerHost = string.Empty;
 	public ushort masterServerPort = 15940;
-	public string natServerHost = string.Empty;
+    public string natServerHost = string.Empty;
 	public ushort natServerPort = 15941;
 	public bool connectUsingMatchmaking = false;
 	public bool useElo = false;
@@ -35,13 +39,13 @@ public class MultiplayerMenu : MonoBehaviour
 	public bool getLocalNetworkConnections = false;
 
 	public bool useTCP = false;
+    bool lan = false;
 
 	private void Start()
 	{
-		ipAddress.text = "82.66.74.114";
-		portNumber.text = "15937";
+        portNumber.text = "16000";
 
-		for (int i = 0; i < ToggledButtons.Length; ++i)
+        for (int i = 0; i < ToggledButtons.Length; ++i)
 		{
 			Button btn = ToggledButtons[i].GetComponent<Button>();
 			if (btn != null)
@@ -55,23 +59,165 @@ public class MultiplayerMenu : MonoBehaviour
 		}
 
 		if (useMainThreadManagerForRPCs)
-			Rpc.MainThreadRunner = MainThreadManager.Instance;
+        {
+            Rpc.MainThreadRunner = MainThreadManager.Instance;
+        }
 
 		if (getLocalNetworkConnections)
 		{
 			NetWorker.localServerLocated += LocalServerLocated;
-			NetWorker.RefreshLocalUdpListings(ushort.Parse(portNumber.text));
 		}
-	}
 
-	private void LocalServerLocated(NetWorker.BroadcastEndpoints endpoint, NetWorker sender)
+
+        Refresh();
+    }
+
+    void ClearServers()
+    {
+        for (int i = 0; i < serversContainer.childCount; i++)
+        {
+            Destroy(serversContainer.GetChild(i).gameObject);
+        }
+    }
+
+    void AddServer(string name, string adress, int playerCount)
+    {
+        ServerElement serverElement = Instantiate(serverElementPrefab).GetComponent<ServerElement>();
+
+        serverElement.Init(name, adress, playerCount, serversContainer);
+
+        Button serverButton = serverElement.GetComponent<Button>();
+
+        serverButton.onClick.AddListener(() =>
+        {
+            ipAddress.text = adress;
+            Connect();
+        });
+    }
+
+    public void Online()
+    {
+        lan = false;
+        Refresh();
+    }
+
+    public void Lan()
+    {
+        lan = true;
+        Refresh();
+    }
+
+    public void Refresh()
+    {
+        ClearServers();
+
+        if (lan)
+        {
+            NetWorker.RefreshLocalUdpListings(ushort.Parse(portNumber.text));
+            return;
+        }
+
+        // The Master Server communicates over TCP
+        TCPMasterClient client = new TCPMasterClient();
+
+        // Once this client has been accepted by the master server it should sent it's get request
+        client.serverAccepted += x =>
+        {
+            try
+            {
+                // The overall game id to select from
+                string gameId = "myGame";
+
+                // The game type to choose from, if "any" then all types will be returned
+                string gameType = "any";
+
+                // The game mode to choose from, if "all" then all game modes will be returned
+                string gameMode = "all";
+
+                // Create the get request with the desired filters
+                JSONNode sendData = JSONNode.Parse("{}");
+                JSONClass getData = new JSONClass();
+
+                // The id of the game to get
+                getData.Add("id", gameId);
+                getData.Add("type", gameType);
+                getData.Add("mode", gameMode);
+
+                sendData.Add("get", getData);
+
+                // Send the request to the server
+                client.Send(BeardedManStudios.Forge.Networking.Frame.Text.CreateFromString(client.Time.Timestep, sendData.ToString(), true, Receivers.Server, MessageGroupIds.MASTER_SERVER_GET, true));
+            }
+            catch
+            {
+                // If anything fails, then this client needs to be disconnected
+                client.Disconnect(true);
+                client = null;
+            }
+        };
+
+        // An event that is raised when the server responds with hosts
+        client.textMessageReceived += (player, frame, sender) =>
+        {
+            try
+            {
+                // Get the list of hosts to iterate through from the frame payload
+                JSONNode data = JSONNode.Parse(frame.ToString());
+                if (data["hosts"] != null)
+                {
+                    // Create a C# object for the response from the master server
+                    MasterServerResponse response = new MasterServerResponse(data["hosts"].AsArray);
+
+                    if (response != null && response.serverResponse.Count > 0)
+                    {
+                        // Go through all of the available hosts and add them to the server browser
+                        foreach (MasterServerResponse.Server server in response.serverResponse)
+                        {
+                            Debug.Log("Found server " + server.Name);
+
+                            // Update UI
+
+                            MainThreadManager.Run(() =>
+                            {
+                                AddServer(server.Name, server.Address, server.PlayerCount);
+                            });
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                if (client != null)
+                {
+                    // If we succeed or fail the client needs to disconnect from the Master Server
+                    client.Disconnect(true);
+                    client = null;
+                }
+            }
+        };
+
+        client.Connect(masterServerHost, (ushort)masterServerPort);
+    }
+
+
+    private void LocalServerLocated(NetWorker.BroadcastEndpoints endpoint, NetWorker sender)
 	{
 		Debug.Log("Found endpoint: " + endpoint.Address + ":" + endpoint.Port);
-	}
+        MainThreadManager.Run(() =>
+        {
+            AddServer("Local Game", endpoint.Address, -1);
+        });
+    }
 
-	public void Connect()
+    bool connecting = false;
+
+    public void Connect()
 	{
-		if (connectUsingMatchmaking)
+        if (connecting) return;
+
+        connecting = true;
+
+        if (connectUsingMatchmaking)
 		{
 			ConnectToMatchmaking();
 			return;
@@ -134,6 +280,14 @@ public class MultiplayerMenu : MonoBehaviour
 		});
 	}
 
+    public void LANHost()
+    {
+        masterServerHost = string.Empty;
+        ipAddress.text = "localhost";
+
+        Host();
+    }
+
 	public void Host()
 	{
 		if (useTCP)
@@ -175,6 +329,8 @@ public class MultiplayerMenu : MonoBehaviour
 		}*/
 	}
 
+
+
 	private void TestLocalServerFind(NetWorker.BroadcastEndpoints endpoint, NetWorker sender)
 	{
 		Debug.Log("Address: " + endpoint.Address + ", Port: " + endpoint.Port + ", Server? " + endpoint.IsServer);
@@ -202,7 +358,7 @@ public class MultiplayerMenu : MonoBehaviour
 		if (!string.IsNullOrEmpty(masterServerHost))
 		{
 			string serverId = "myGame";
-			string serverName = "Forge Game";
+            string serverName = PlayerInfoManager.Instance.playerName;
 			string type = "Deathmatch";
 			string mode = "Teams";
 			string comment = "Demo comment...";
@@ -210,7 +366,14 @@ public class MultiplayerMenu : MonoBehaviour
 			masterServerData = mgr.MasterServerRegisterData(networker, serverId, serverName, type, mode, comment, useElo, eloRequired);
 		}
 
-		mgr.Initialize(networker, masterServerHost, masterServerPort, masterServerData);
+        if (lan)
+        {
+            mgr.Initialize(networker, string.Empty, masterServerPort, masterServerData);
+        }
+        else
+        {
+            mgr.Initialize(networker, masterServerHost, masterServerPort, masterServerData);
+        }
 
 		if (useInlineChat && networker.IsServer)
 			SceneManager.sceneLoaded += CreateInlineChat;

@@ -44,8 +44,6 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
     {
         base.NetworkStart();
 
-        Init(networkObject.teamIndex, networkObject.position);
-
         if (!networkObject.IsOwner)
         {
             playerRb.isKinematic = true;
@@ -62,9 +60,23 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
                 lookat.cam = Camera.main.transform;
             }
 
+            Init(networkObject.teamIndex, networkObject.position);
+
         }
         else
         {
+            networkObject.teamIndex = PlayerInfoManager.Instance.playerTeam;
+
+            Debug.Log("flag zones count : " + NetworkedGameManager.Instance.flagZones.Count);
+
+            Vector3 spawnPos = NetworkedGameManager.Instance.flagZones.Find(f =>
+                (f.networkObject.teamIndex == networkObject.teamIndex) && (f.networkObject.type == (int)FlagZoneType.Shrine)
+            ).transform.position + Vector3.up;
+
+            networkObject.spawnPos = spawnPos;
+
+            networkObject.SendRpc(RPC_INIT, Receivers.AllBuffered, networkObject.teamIndex, networkObject.spawnPos);
+
             playerCamera.SetActive(true);
 
             foreach (var lookat in FindObjectsOfType<LookAtCamera>())
@@ -349,6 +361,7 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
 
         for (int i = 0; i < flagVisualsRend.Length; i++)
         {
+            if (flagVisualsRend[i] == null) continue;
             flagVisualsRend[i].material.SetColor("_Color", TeamManager.Instance.GetOppositeTeamColor(teamIndex));
         }
     }

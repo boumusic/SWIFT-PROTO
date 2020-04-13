@@ -20,7 +20,7 @@ public class VoipStarter : MonoBehaviour
 		voip.IsLocalTesting = isLocalTesting;
 
 		if (NetworkManager.Instance.IsServer)
-			voip.StartServer(32);
+			voip.StartServer(32, hostAddress, hostPort);
 		else
 			voip.StartClient(hostAddress, hostPort);
 	}

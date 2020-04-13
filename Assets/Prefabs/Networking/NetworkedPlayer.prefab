@@ -62,6 +62,7 @@ MonoBehaviour:
   - {fileID: 2670349730746946581}
   flagVisualsRend:
   - {fileID: 169010896810093605}
+  - {fileID: 5599244125923543121}
 --- !u!1001 &7210525686735752730
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -209,6 +210,12 @@ MonoBehaviour:
 --- !u!1 &5956535183448673370 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3943239951749333568, guid: cd71e6b2ab118ad49beea1339ceaf6be,
+    type: 3}
+  m_PrefabInstance: {fileID: 7210525686735752730}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &5599244125923543121 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 3000642228401686091, guid: cd71e6b2ab118ad49beea1339ceaf6be,
     type: 3}
   m_PrefabInstance: {fileID: 7210525686735752730}
   m_PrefabAsset: {fileID: 0}

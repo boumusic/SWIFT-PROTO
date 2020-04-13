@@ -30,13 +30,17 @@ public class UI360 : MonoBehaviour
         targetGo = target;
     }
 
-    private void Start()
+    public void AssignPlayer()
     {
         player = UIManager.Instance.Player;
     }
 
     private void Pos()
     {
+        if (player == null)
+        {
+            return;
+        }
         // temp fix
         if (Cam == null)
         {
