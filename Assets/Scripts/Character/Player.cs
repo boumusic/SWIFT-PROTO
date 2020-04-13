@@ -11,7 +11,6 @@ public class Player : MonoBehaviour
     [Header("Components")]
     [SerializeField] private Character character;
     [SerializeField] private TextMeshPro nameText;
-    public PlayerScore score;
 
     [Header("Mouse")]
     public float sensitivity = 1f;

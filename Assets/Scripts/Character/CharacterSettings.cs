@@ -34,7 +34,6 @@ public class CharacterSettings : ScriptableObject
     public float fallStrength = 2f;
     public float fallProgressSpeed = 1f;
     public AnimationCurve fallCurve;
-    public float wallSlideSpeedMul = 0.5f;
 
     [Header("Dash")]
     public Propulsion dash;
@@ -47,8 +46,9 @@ public class CharacterSettings : ScriptableObject
     public float groundCastRadius = 0.3f;
     public float castBoxWidth = 0.2f;
     public LayerMask groundMask;
-    
+
     [Header("Wall Climb")]
+    public float wallClimbHorizSpeedMultiplier = 0.3f;
     public float wallClimbSpeed = 1f;
     public float wallClimbDuration = 1.8f;
     public AnimationCurve curveWallClimb;
@@ -56,6 +56,10 @@ public class CharacterSettings : ScriptableObject
     public float ledgeCastMaxHeight = 2.6f;
     public float ledgeCastMinHeight = 1f;
     public float wallClimbConsumeThreshold = 0.01f;
+
+    [Header("WallSlide")]
+    public float wallSlideSpeed = 10f;
+
 
     [Header("Walljump")]
     public Propulsion wallJump;

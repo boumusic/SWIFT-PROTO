@@ -50,12 +50,12 @@ public class Character : MonoBehaviour
     private RaycastHit[] hits = new RaycastHit[5];
 
     private StateMachine<CharacterState> stateMachine;
-    public CharacterState CurrentState => stateMachine.State;
+    public CharacterState CurrentState => stateMachine != null ? stateMachine.State : CharacterState.Grounded;
     public Vector3 Velocity => new Vector3(velocity.x, yVelocity, velocity.z);
 
     public Vector3 Forward => new Vector3(playerCamera.transform.forward.x, 0, playerCamera.transform.forward.z).normalized;
     public Vector3 Right => new Vector3(playerCamera.transform.right.x, 0, playerCamera.transform.right.z);
-  
+
     public Vector3 FinalVelocity
     {
         get
@@ -72,7 +72,7 @@ public class Character : MonoBehaviour
     public Quaternion CamRotation => playerCamera.Forward;
 
     public bool IsRunning { get => isRunning; }
-    public bool IsinAir => CurrentState == CharacterState.Jumping || isFalling;
+    public bool IsinAir => CurrentState == CharacterState.Jumping || CurrentState == CharacterState.Falling;
 
     public Vector3 FeetOrigin => transform.position + Vector3.up * m.groundRaycastUp;
     public Vector3 FeetDestination => FeetOrigin - Vector3.up * m.groundRaycastDown;
@@ -100,14 +100,9 @@ public class Character : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Vector3 center = transform.position + m.attackCenter + playerCamera.transform.forward * m.attackLength / 2f;
-        Vector3 size = new Vector3(m.attackWidth, m.attackSizeY, m.attackLength);
-        Gizmos.DrawWireCube(center, size);
-
-        Vector3 ledgeOrigin = transform.position + Vector3.up * m.ledgeCastMinHeight;
-        Gizmos.DrawLine(ledgeOrigin, ledgeOrigin + DesiredDirection * m.wallCastLength);
-        Vector3 ledgeUpOrigin = transform.position + Vector3.up * m.ledgeCastMaxHeight - DesiredDirection * Radius * 1.2f;
-        Gizmos.DrawLine(ledgeUpOrigin, ledgeUpOrigin + DesiredDirection * m.wallCastLength);
+        Gizmos.color = Color.green;
+        Vector3 origin = transform.position;
+        Gizmos.DrawLine(origin, origin + WallNormal * 5);
     }
 
     private void Awake()
@@ -129,7 +124,6 @@ public class Character : MonoBehaviour
         stateMachine.UpdateManually();
         CalculateHorizontalVelocity();
         Animations();
-        UpdateFalling();
         CheckWallClimb();
         OrientModel();
         DashCooldown();
@@ -167,15 +161,13 @@ public class Character : MonoBehaviour
     private void CalculateHorizontalVelocity()
     {
         if (axis.magnitude != 0) LastCamRotation = CamRotation;
-        if (CurrentState != CharacterState.WallClimbing)
-        {
-            Vector2 usedAxis = axis;
-            Accel(ref xAccel, usedAxis.x, usedAxis);
-            Accel(ref zAccel, usedAxis.y, usedAxis);
-            Vector3 target = new Vector3(xAccel, 0, zAccel) * CurrentRunSpeed;
 
-            velocity = target;
-        }
+        Vector2 usedAxis = axis;
+        Accel(ref xAccel, usedAxis.x, usedAxis);
+        Accel(ref zAccel, usedAxis.y, usedAxis);
+        Vector3 target = new Vector3(xAccel, 0, zAccel) * CurrentRunSpeed;
+        if (CurrentState == CharacterState.WallClimbing) target *= m.wallClimbHorizSpeedMultiplier;
+        velocity = target;
     }
 
     private void Accel(ref float accel, float axis, Vector2 fullVector)
@@ -301,7 +293,7 @@ public class Character : MonoBehaviour
         if (!CastGround())
         {
             if (coyote == null) coyote = StartCoroutine(CoyoteTime());
-            StartFalling();
+            stateMachine.ChangeState(CharacterState.Falling);
         }
 
         CastWall();
@@ -365,7 +357,7 @@ public class Character : MonoBehaviour
 
     public void Jump(bool shortJump = false)
     {
-        if(wallSliding)
+        if (CurrentState == CharacterState.WallSliding)
         {
             WallJump();
             return;
@@ -373,7 +365,6 @@ public class Character : MonoBehaviour
 
         if (jumpLeft > 0 && !isDashing && !isImpulsing)
         {
-            StopFalling();
             this.shortJump = false;
 
             if (wallSliding) wallJumpDir = WallNormal;
@@ -403,7 +394,7 @@ public class Character : MonoBehaviour
         if (wallJumpDir.magnitude != 0) velocity = wallJumpDir * yVelocity;
         if (jumpProgress >= 1f)
         {
-            StartFalling();
+            stateMachine.ChangeState(CharacterState.Falling);
         }
     }
 
@@ -416,42 +407,35 @@ public class Character : MonoBehaviour
 
     #region Falling
 
-    private bool wallSliding = false;
     private float fallInitVelocityY;
-    private bool isFalling = false;
 
-    private void StartFalling()
+    private void Falling_Enter()
     {
-        if(!isFalling && !propeller.IsPropelling)
-        {
-            Debug.Log("Start Falling");
-            isFalling = true;
-            fallInitVelocityY = body.velocity.y;
-            fallProgress = 0f;
-        }
+        Debug.Log("Start Falling");
+        fallInitVelocityY = body.velocity.y;
+        fallProgress = 0f;
     }
 
-    private void UpdateFalling()
+    private void Falling_Update()
     {
-        if(isFalling)
+        if (!propeller.IsPropelling)
         {
             fallProgress += Time.deltaTime * m.fallProgressSpeed;
-            float mul = wallSliding ? m.wallSlideSpeedMul : 1;
-            yVelocity = Mathf.Lerp(fallInitVelocityY, -m.fallStrength, Mathf.Clamp01(m.fallCurve.Evaluate(fallProgress))) * mul;
+            yVelocity = Mathf.Lerp(fallInitVelocityY, -m.fallStrength, Mathf.Clamp01(m.fallCurve.Evaluate(fallProgress)));
             if (CastGround())
             {
-                StopFalling();
                 stateMachine.ChangeState(CharacterState.Grounded);
             }
 
-            wallSliding = CastWall();
+            if (CastWall())
+            {
+                stateMachine.ChangeState(CharacterState.WallSliding);
+            }
         }
     }
 
-    private void StopFalling()
+    private void Falling_Exit()
     {
-        wallSliding = false;
-        isFalling = false;
         yVelocity = 0f;
         fallProgress = 0f;
     }
@@ -482,7 +466,6 @@ public class Character : MonoBehaviour
             propeller.RegisterPropulsion(CamRotation * dashAxis, m.dash, EndDash);
             isDashing = true;
             OnStartDash?.Invoke();
-            StopFalling();
 
             dashCooldownProgress = 0f;
             cooldownDashDone = false;
@@ -494,7 +477,7 @@ public class Character : MonoBehaviour
     private void EndDash()
     {
         isDashing = false;
-        StartFalling();
+        stateMachine.ChangeState(CharacterState.Falling);
     }
 
     private void DashCooldown()
@@ -522,16 +505,19 @@ public class Character : MonoBehaviour
     private Vector3 WallUp => Vector3.Cross(WallNormal, -Right);
     private float wallClimbProgress;
     public float WallClimbCharge => 1 - wallClimbProgress;
-    private bool canWallClimb => wallClimbProgress < 1;
+    private bool canWallClimb => WallClimbCharge > 0f;
     private bool canUseWallClimbThreshold = true;
 
     private void CheckWallClimb()
     {
-        if (CastWall() && canWallClimb || CastLedge())
+        if(CurrentState != CharacterState.WallClimbing)
         {
-            if (CurrentState != CharacterState.WallClimbing && spacebar)
+            if (CastWall() && canWallClimb || CastLedge())
             {
-                stateMachine.ChangeState(CharacterState.WallClimbing);
+                if (spacebar)
+                {
+                    stateMachine.ChangeState(CharacterState.WallClimbing);
+                }
             }
         }
     }
@@ -541,7 +527,6 @@ public class Character : MonoBehaviour
         animator.WallClimb(true);
         //SnapToWall();
         OnStartWallclimb?.Invoke();
-        StopFalling();
     }
 
     private void SnapToWall()
@@ -556,6 +541,8 @@ public class Character : MonoBehaviour
     private void WallClimbing_Update()
     {
         wallClimbProgress += Time.deltaTime / m.wallClimbDuration;
+        yVelocity = m.wallClimbSpeed * m.curveWallClimb.Evaluate(wallClimbProgress);
+
         if (!spacebar || !CastWall())
         {
             jumpLeft++;
@@ -578,13 +565,12 @@ public class Character : MonoBehaviour
             */
         }
 
-        if (!canWallClimb)
+        if (!canWallClimb && !CastLedge())
         {
-            StartFalling();
+            stateMachine.ChangeState(CharacterState.Falling);
         }
 
-        yVelocity = m.wallClimbSpeed * m.curveWallClimb.Evaluate(wallClimbProgress);
-        velocity = Vector3.zero;
+        //velocity = Vector3.zero;
     }
 
     private void WallClimbing_Exit()
@@ -592,11 +578,13 @@ public class Character : MonoBehaviour
         animator.WallClimb(false);
     }
 
+    private float CurrentWallCastLength => m.wallCastLength * axis.magnitude;
+
     public bool CastWall()
     {
-        Vector3 origin = transform.position + Vector3.up * 0.05f + Forward * Radius;
-        RaycastHit[] down = Physics.RaycastAll(origin, Forward, m.wallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
-        RaycastHit[] up = Physics.RaycastAll(origin, Forward, m.wallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
+        Vector3 origin = transform.position + Vector3.up * 0.05f /*+ Forward * Radius*/;
+        RaycastHit[] down = Physics.RaycastAll(origin, Forward, CurrentWallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
+        RaycastHit[] up = Physics.RaycastAll(origin, Forward, CurrentWallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
         List<RaycastHit> final = new List<RaycastHit>();
         for (int i = 0; i < down.Length; i++)
         {
@@ -615,28 +603,55 @@ public class Character : MonoBehaviour
 
     public bool CastLedge()
     {
-        RaycastHit[] down = Physics.RaycastAll(transform.position + Vector3.up * m.ledgeCastMinHeight, DesiredDirection, m.wallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
-        RaycastHit[] up = Physics.RaycastAll(transform.position + Vector3.up * m.ledgeCastMaxHeight - Forward * Radius * 1.2f, DesiredDirection, m.wallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
+        RaycastHit[] down = Physics.RaycastAll(transform.position + Vector3.up * m.ledgeCastMinHeight, Forward, m.wallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
+        RaycastHit[] up = Physics.RaycastAll(transform.position + Vector3.up * m.ledgeCastMaxHeight, Forward, m.wallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
         bool cast = down.Length > 0 && up.Length == 0;
+        if (cast) Debug.Log("Ledge");
         return cast;
     }
 
     #endregion
 
+    #region WallSlide
+
+    private bool wallSliding => CurrentState == CharacterState.WallSliding;
+    private float wallSlideTime = 0f;
+
+    private void WallSliding_Enter()
+    {
+        wallSlideTime = Time.time;
+    }
+
+    private void WallSliding_Update()
+    {
+        yVelocity = Mathf.Lerp(yVelocity, -m.wallSlideSpeed, Mathf.Clamp01(Time.time - wallSlideTime));
+        if (!CastWall())
+        {
+            stateMachine.ChangeState(CharacterState.Falling);
+        }
+
+        if (CastGround())
+        {
+            stateMachine.ChangeState(CharacterState.Grounded);
+        }
+    }
+
+    #endregion
+
     #region WallJump
+
     private bool isWallJumping = false;
     private void WallJump()
     {
-        /*
         isWallJumping = true;
-        Vector3 dir = new Vector3(WallNormal.x, 1, WallNormal.y);
+        Vector3 dir = new Vector3(WallNormal.x, 1, WallNormal.z);
         propeller.RegisterPropulsion(dir, m.wallJump, EndWallJump);
-        */
     }
 
     private void EndWallJump()
     {
         isWallJumping = false;
+        stateMachine.ChangeState(CharacterState.Falling);
     }
 
     #endregion
@@ -835,7 +850,7 @@ public class Character : MonoBehaviour
     {
         if (!isTPS) sword.SetActive(false);
     }
-    
+
     #endregion
 
     #region Knockback
@@ -845,7 +860,6 @@ public class Character : MonoBehaviour
 
     public void Knockbacked(Vector3 direction)
     {
-        StopFalling();
         kbDir = new Vector3(direction.x, 0, direction.z).normalized;
         propeller.RegisterPropulsion(kbDir, m.knockback, EndKnockback);
         feedbacks.Play("Parried");
@@ -855,7 +869,7 @@ public class Character : MonoBehaviour
     private void EndKnockback()
     {
         isKnockbacked = false;
-        StartFalling();
+        stateMachine.ChangeState(CharacterState.Falling);
     }
 
     #endregion
@@ -987,7 +1001,7 @@ public class Character : MonoBehaviour
         }
 
         animator.Run(isRunning);
-        animator.IsFalling(isFalling);
+        animator.IsFalling(CurrentState == CharacterState.Falling);
         animator.Jumping(isJumping);
     }
 
@@ -1000,5 +1014,6 @@ public enum CharacterState
     Jumping,
     WallClimbing,
     Impulsing,
-    Walljumping
+    WallSliding,
+    Falling
 }

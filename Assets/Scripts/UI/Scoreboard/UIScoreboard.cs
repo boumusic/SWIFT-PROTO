@@ -9,8 +9,8 @@ public class UIScoreboard : MonoBehaviour
 
     public void RegisterPlayer(Player player)
     {
-        //GameObject newScore = Instantiate(playerScorePrefab, parents[player.TeamIndex]);
-        //UIPlayerScoreboard ui = newScore.GetComponent<UIPlayerScoreboard>();
-        //ui.Initialize(player);
+        GameObject newScore = Instantiate(playerScorePrefab, parents[player.TeamIndex]);
+        UIPlayerScoreboard ui = newScore.GetComponent<UIPlayerScoreboard>();
+        ui.Initialize(player);
     }
 }
