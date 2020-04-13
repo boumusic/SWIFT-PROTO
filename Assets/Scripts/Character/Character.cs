@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using MonsterLove.StateMachine;
 using System;
+using System.Linq;
 using BeardedManStudios.Forge.Networking;
 using BeardedManStudios.Forge.Networking.Unity;
 using BeardedManStudios.Forge.Networking.Generated;
-
 public class Character : MonoBehaviour
 {
     [Header("Components")]
@@ -41,7 +41,6 @@ public class Character : MonoBehaviour
     private Vector3 velocity;
     private bool isRunning;
     private float yVelocity;
-    private bool spacebar;
 
     private float jumpProgress = 0f;
     private float fallProgress = 0f;
@@ -72,7 +71,7 @@ public class Character : MonoBehaviour
     public Quaternion CamRotation => playerCamera.Forward;
 
     public bool IsRunning { get => isRunning; }
-    public bool IsinAir => CurrentState == CharacterState.Jumping || CurrentState == CharacterState.Falling;
+    public bool IsInAir => CurrentState == CharacterState.Jumping || CurrentState == CharacterState.Falling;
 
     public Vector3 FeetOrigin => transform.position + Vector3.up * m.groundRaycastUp;
     public Vector3 FeetDestination => FeetOrigin - Vector3.up * m.groundRaycastDown;
@@ -167,6 +166,8 @@ public class Character : MonoBehaviour
         Accel(ref zAccel, usedAxis.y, usedAxis);
         Vector3 target = new Vector3(xAccel, 0, zAccel) * CurrentRunSpeed;
         if (CurrentState == CharacterState.WallClimbing) target *= m.wallClimbHorizSpeedMultiplier;
+        else if (IsInAir && shortJump) target *= m.shortJumpSpeedMul;
+        if (isInFlowState) target *= m.flowSpeedMul;
         velocity = target;
     }
 
@@ -221,37 +222,40 @@ public class Character : MonoBehaviour
 
     private float spacebarCharge = 0f;
     private bool wasSpacebar = false;
+    private bool spacebar;
+    private bool waitForReleaseSpace = false;
+    public float SpacebarCharge => spacebarCharge;
+
     public void InputSpacebar(bool space)
     {
         wasSpacebar = spacebar;
         spacebar = space;
 
-
-        if (CurrentState != CharacterState.Jumping)
+        if (spacebar && !waitForReleaseSpace)
         {
-            if (space)
-            {
-                spacebarCharge += Time.deltaTime * m.jumpChargeSpeed;
-            }
+            spacebarCharge += Time.deltaTime * m.jumpChargeSpeed;
         }
 
         spacebarCharge = Mathf.Clamp01(spacebarCharge);
 
-        if (wasSpacebar && !spacebar && hasReleasedJump)
+        //Release Input
+        if (wasSpacebar && !spacebar)
         {
-            hasReleasedJump = true;
-            Jump(spacebarCharge < 0.5f);
+            if (!waitForReleaseSpace)
+            {
+                Jump(spacebarCharge <= 0.5f);
+                spacebarCharge = 0f;
+                wasSpacebar = false;
+            }
+            else
+                waitForReleaseSpace = false;
+        }
+
+        if (spacebarCharge > 0.5f)
+        {
+            Jump();
+            waitForReleaseSpace = true;
             spacebarCharge = 0f;
-        }
-
-        if (space)
-        {
-            hasReleasedJump = false;
-        }
-
-        if (spacebarCharge > 1f)
-        {
-
         }
     }
 
@@ -285,6 +289,8 @@ public class Character : MonoBehaviour
     }
 
     private Vector3 wallSlideVector;
+    private float lastYaw;
+    private float currentYaw;
 
     private Coroutine coyote;
 
@@ -296,27 +302,25 @@ public class Character : MonoBehaviour
             stateMachine.ChangeState(CharacterState.Falling);
         }
 
-        CastWall();
-
-        /*
-        if (hits.Length > 0 && m.slideAgainstWalls)
+        if (velocity.magnitude >= m.runSpeed)
         {
-            Vector3 wallNormal = hits[0].normal;
-            float angle = Vector3.SignedAngle(wallNormal, Forward, Vector3.up);
-            float mul = angle >= 0 ? 1f : -1f;
-            Vector3 cross = Vector3.Cross(mul * Vector3.up, wallNormal);
-
-            float dot = Vector3.Dot(Forward.normalized, wallNormal.normalized);
-            dot = Mathf.Clamp(dot, -1f, 0f);
-            Debug.Log(dot);
-            WallSlideRotation = Quaternion.AngleAxis(m.curveWallSlide.Evaluate(-dot) * m.maxSlideWallSpeed, Vector3.up);
-
-            // wallSlideVector = cross.normalized * m.runSpeed * Mathf.Lerp(m.minSlideWallSpeed, m.maxSlideWallSpeed, dot);
+            EarnFlow(m.flowPerSecondRun * Time.deltaTime);
         }
 
         else
-            WallSlideRotation = Quaternion.identity;
-        */
+        {
+            ResetFlow();
+        }
+
+
+        lastYaw = currentYaw;
+        currentYaw = playerCamera.Mouse.x;
+        float currDiff = Mathf.Abs(currentYaw - lastYaw);
+        Debug.Log(currDiff);
+        if (currDiff > m.flowCamYawDiff)
+        {
+            ResetFlow();
+        }
     }
 
     private void TryStopCoyote()
@@ -348,6 +352,65 @@ public class Character : MonoBehaviour
 
     #endregion
 
+    #region Flow
+
+    public float CurrentFlow => currentFlow;
+    private float currentFlow = 0f;
+    private bool isInFlowState = false;
+    private bool wasInFlowState = false;
+
+    private void EarnFlow(float flow)
+    {
+        currentFlow += flow;
+        if (currentFlow >= m.flowStateThreshold)
+        {
+            isInFlowState = true;
+            if (!wasInFlowState)
+            {
+                wasInFlowState = true;
+                //Feedback enter flow
+            }
+        }
+    }
+
+    public List<Vector2> test = new List<Vector2>();
+
+    [ContextMenu("AAA")]
+    private void RandomSort()
+    {
+        test = test.OrderBy(emp => Guid.NewGuid()).ToList();
+    }
+
+    private void LoseFlow(float flow)
+    {
+
+
+        currentFlow -= flow;
+        if (currentFlow < m.flowStateThreshold)
+        {
+            isInFlowState = false;
+            CheckLeaveFlow();
+        }
+    }
+
+    private void CheckLeaveFlow()
+    {
+        if (wasInFlowState)
+        {
+            wasInFlowState = false;
+            //Feedback leave flow
+        }
+    }
+
+    private void ResetFlow()
+    {
+        currentFlow = 0f;
+        isInFlowState = false;
+        CheckLeaveFlow();
+    }
+
+    #endregion
+
     #region Jump
     private bool hasReleasedJump = true;
     private bool shortJump = false;
@@ -359,13 +422,17 @@ public class Character : MonoBehaviour
     {
         if (CurrentState == CharacterState.WallSliding)
         {
-            WallJump();
+            if (shortJump)
+                WallJump();
             return;
         }
 
         if (jumpLeft > 0 && !isDashing && !isImpulsing)
         {
-            this.shortJump = false;
+            if (!IsInAir)
+                this.shortJump = shortJump;
+            else
+                this.shortJump = false;
 
             if (wallSliding) wallJumpDir = WallNormal;
             else wallJumpDir = Vector3.zero;
@@ -510,7 +577,7 @@ public class Character : MonoBehaviour
 
     private void CheckWallClimb()
     {
-        if(CurrentState != CharacterState.WallClimbing)
+        if (CurrentState != CharacterState.WallClimbing)
         {
             if (CastWall() && canWallClimb || CastLedge())
             {
@@ -643,6 +710,7 @@ public class Character : MonoBehaviour
     private bool isWallJumping = false;
     private void WallJump()
     {
+        Debug.Log("Wall Jump");
         isWallJumping = true;
         Vector3 dir = new Vector3(WallNormal.x, 1, WallNormal.z);
         propeller.RegisterPropulsion(dir, m.wallJump, EndWallJump);

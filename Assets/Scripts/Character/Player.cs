@@ -83,7 +83,7 @@ public class Player : MonoBehaviour
             character.InputSpacebar(Input.GetKey(jump));
             if (Input.GetKeyDown(jump))
             {
-                character.Jump();
+                //character.Jump();
             }
 
             if (Input.GetKeyDown(attack))

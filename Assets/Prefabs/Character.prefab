@@ -11759,6 +11759,10 @@ MonoBehaviour:
   - {fileID: 8950871504053647860}
   sword: {fileID: 6771474065835644983}
   startTps: 0
+  test:
+  - {x: 2, y: 0}
+  - {x: 1, y: 0}
+  - {x: 0, y: 3}
   isDashing: 0
   isStartingAttack: 0
 --- !u!54 &7145732497896530454

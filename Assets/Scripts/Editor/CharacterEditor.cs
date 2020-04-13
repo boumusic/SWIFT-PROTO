@@ -25,7 +25,6 @@ public class CharacterEditor : Editor
         EditorGUILayout.LabelField("WallClimb : " + t.WallClimbCharge.ToString());
         EditorGUILayout.LabelField("Cast Ledge : " + t.CastLedge().ToString());
         EditorGUILayout.LabelField("Cast Wall : " + t.CastWall().ToString());
-        
 
         EditorGUILayout.EndVertical();
 

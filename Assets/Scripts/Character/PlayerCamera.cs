@@ -35,6 +35,7 @@ public class PlayerCamera : MonoBehaviour
 
     public Quaternion Forward => Quaternion.AngleAxis(transform.eulerAngles.y, Vector3.up);
     private Vector2 mouse;
+    public Vector2 Mouse => mouse;
 
     private void Update()
     {
