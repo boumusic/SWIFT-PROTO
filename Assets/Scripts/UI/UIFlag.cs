@@ -21,6 +21,8 @@ public class UIFlag : MonoBehaviour
 
     public void Update()
     {
+        if (!Local && UIManager.Instance.Player == null) return;
+
         //base.Update();
         UpdateText();
     }

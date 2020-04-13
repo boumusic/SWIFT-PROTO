@@ -57,6 +57,13 @@ public class Zone : NetworkedFlagBehavior, ITeamAffilitation
     {
         base.NetworkStart();
 
+        StartCoroutine(Init());
+    }
+
+    IEnumerator Init()
+    {
+        if (!networkObject.IsOwner) yield return new WaitForSeconds(.5f);
+
         teamIndex = networkObject.teamIndex;
         type = (FlagZoneType)networkObject.type;
         radius = networkObject.radius;
@@ -64,6 +71,8 @@ public class Zone : NetworkedFlagBehavior, ITeamAffilitation
         UpdateAffiliation();
         UpdateRadius();
         UIManager.Instance.RegisterFlagZone(this);
+
+        NetworkedGameManager.Instance.flagZones.Add(this);
     }
 
     public void UpdateAffiliation()

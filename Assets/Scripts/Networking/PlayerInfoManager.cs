@@ -7,6 +7,7 @@ public class PlayerInfoManager : MonoBehaviour
     public static PlayerInfoManager Instance;
 
     public string playerName;
+    public int playerTeam;
 
     private void Awake()
     {
@@ -18,5 +19,10 @@ public class PlayerInfoManager : MonoBehaviour
     public void ChangeName(string name)
     {
         playerName = name;
+    }
+
+    public void ChangeTeam(int team)
+    {
+        playerTeam = team;
     }
 }

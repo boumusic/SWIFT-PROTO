@@ -31,8 +31,6 @@ public class NetworkedGameManager : MonoBehaviour
         {
             ReplaceFlags();
 
-            ((UDPServer)NetworkManager.Instance.Networker).playerAccepted += OnPlayerJoin;
-
             NetworkManager.Instance.objectInitialized += (x,y) =>
             {
                 if (y is NetworkedPlayerNetworkObject)
@@ -41,22 +39,14 @@ public class NetworkedGameManager : MonoBehaviour
 
                     obj.AuthorityUpdateMode = true;
 
-                    int teamIndex = GetTeamIndex();
-                    obj.teamIndex = teamIndex;
+                    //int teamIndex = GetTeamIndex();
+                    //obj.teamIndex = teamIndex;
 
-                    teams[teamIndex].Add(obj);
+                    //teams[teamIndex].Add(obj);
 
-                    Vector3 spawnPos = flagZones.Find(f => 
-                        (f.networkObject.teamIndex == teamIndex) && (f.networkObject.type == (int)FlagZoneType.Shrine)
-                    ).transform.position + Vector3.up;
+                    //obj.spawnPos = spawnPos;
+                    //obj.SendRpc(NetworkedPlayerBehavior.RPC_INIT, Receivers.AllBuffered, teamIndex, spawnPos);
 
-                    obj.spawnPos = spawnPos;
-                    obj.SendRpc(NetworkedPlayerBehavior.RPC_INIT, Receivers.AllBuffered, teamIndex, spawnPos);
-
-                    NetworkedPlayerBehavior behavior = obj.AttachedBehavior as NetworkedPlayerBehavior;
-                    behavior.GetComponent<NetworkedPlayer>().Init(teamIndex, spawnPos);
-                    
-                    Debug.Log("red team is " + teams[0].Count + " players/ blue team is " + teams[1].Count + " players");
                 }
             };
 
@@ -90,7 +80,14 @@ public class NetworkedGameManager : MonoBehaviour
             };
         }
 
-        if (PlayerInfoManager.Instance.playerName == "spectator")
+        StartCoroutine(SpawnPlayer());
+    }
+
+    IEnumerator SpawnPlayer()
+    {
+        yield return new WaitForSeconds(1);
+
+        if (PlayerInfoManager.Instance.playerTeam == 2 || PlayerInfoManager.Instance.playerTeam == -1)
         {
             NetworkManager.Instance.InstantiateNetworkCamera();
         }
@@ -98,17 +95,6 @@ public class NetworkedGameManager : MonoBehaviour
         {
             CreatePlayer();
         }
-    }
-
-    private void OnPlayerJoin(NetworkingPlayer player, NetWorker sender)
-    {
-        MainThreadManager.Run(() =>
-        {
-            player.disconnected += x =>
-            {
-                OnPlayerQuit(player);
-            };
-        });
     }
 
     void CreatePlayer()
@@ -119,23 +105,6 @@ public class NetworkedGameManager : MonoBehaviour
     int GetTeamIndex()
     {
         return teams[0].Count > teams[1].Count ? 1 : 0;
-    }
-
-    void OnPlayerQuit(NetworkingPlayer player)
-    {
-        return;
-
-        for (int i = 0; i < 2; i++)
-        {
-            for (int j = 0; j < teams[i].Count; j++)
-            {
-                if (teams[i][j].NetworkId == player.NetworkId)
-                {
-                    teams[i][j].Destroy();
-                    teams[i].RemoveAt(j);
-                }
-            }
-        }
     }
 
     void ReplaceFlags()
@@ -149,8 +118,6 @@ public class NetworkedGameManager : MonoBehaviour
             flag.networkObject.teamIndex = allFlagZoneSpawns[i].teamIndex;
             flag.networkObject.type = (int)allFlagZoneSpawns[i].type;
             flag.networkObject.radius = allFlagZoneSpawns[i].radius;
-
-            flagZones.Add(flag.GetComponent<Zone>());
         }
     }
 }
