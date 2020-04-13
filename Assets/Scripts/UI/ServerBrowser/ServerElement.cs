@@ -16,7 +16,7 @@ public class ServerElement : MonoBehaviour
     {
         this.nameText.text = name;
         this.adressText.text = adress;
-        this.playerCountText.text = playerCount + "/8";
+        this.playerCountText.text = playerCount == -1 ? "?/8" : playerCount + "/8";
 
         rectTransform.SetParent(parent, false);
     }

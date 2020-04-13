@@ -39,6 +39,7 @@ public class MultiplayerMenu : MonoBehaviour
 	public bool getLocalNetworkConnections = false;
 
 	public bool useTCP = false;
+    bool lan = false;
 
 	private void Start()
 	{
@@ -65,7 +66,6 @@ public class MultiplayerMenu : MonoBehaviour
 		if (getLocalNetworkConnections)
 		{
 			NetWorker.localServerLocated += LocalServerLocated;
-			NetWorker.RefreshLocalUdpListings(ushort.Parse(portNumber.text));
 		}
 
 
@@ -92,14 +92,30 @@ public class MultiplayerMenu : MonoBehaviour
         {
             ipAddress.text = adress;
             Connect();
-
-            connecting = true;
         });
+    }
+
+    public void Online()
+    {
+        lan = false;
+        Refresh();
+    }
+
+    public void Lan()
+    {
+        lan = true;
+        Refresh();
     }
 
     public void Refresh()
     {
         ClearServers();
+
+        if (lan)
+        {
+            NetWorker.RefreshLocalUdpListings(ushort.Parse(portNumber.text));
+            return;
+        }
 
         // The Master Server communicates over TCP
         TCPMasterClient client = new TCPMasterClient();
@@ -187,7 +203,11 @@ public class MultiplayerMenu : MonoBehaviour
     private void LocalServerLocated(NetWorker.BroadcastEndpoints endpoint, NetWorker sender)
 	{
 		Debug.Log("Found endpoint: " + endpoint.Address + ":" + endpoint.Port);
-	}
+        MainThreadManager.Run(() =>
+        {
+            AddServer("Local Game", endpoint.Address, -1);
+        });
+    }
 
     bool connecting = false;
 
@@ -195,7 +215,9 @@ public class MultiplayerMenu : MonoBehaviour
 	{
         if (connecting) return;
 
-		if (connectUsingMatchmaking)
+        connecting = true;
+
+        if (connectUsingMatchmaking)
 		{
 			ConnectToMatchmaking();
 			return;
@@ -257,6 +279,14 @@ public class MultiplayerMenu : MonoBehaviour
 			}
 		});
 	}
+
+    public void LANHost()
+    {
+        masterServerHost = string.Empty;
+        ipAddress.text = "localhost";
+
+        Host();
+    }
 
 	public void Host()
 	{
@@ -336,7 +366,14 @@ public class MultiplayerMenu : MonoBehaviour
 			masterServerData = mgr.MasterServerRegisterData(networker, serverId, serverName, type, mode, comment, useElo, eloRequired);
 		}
 
-		mgr.Initialize(networker, masterServerHost, masterServerPort, masterServerData);
+        if (lan)
+        {
+            mgr.Initialize(networker, string.Empty, masterServerPort, masterServerData);
+        }
+        else
+        {
+            mgr.Initialize(networker, masterServerHost, masterServerPort, masterServerData);
+        }
 
 		if (useInlineChat && networker.IsServer)
 			SceneManager.sceneLoaded += CreateInlineChat;

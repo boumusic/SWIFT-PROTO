@@ -361,6 +361,7 @@ public class NetworkedPlayer : NetworkedPlayerBehavior
 
         for (int i = 0; i < flagVisualsRend.Length; i++)
         {
+            if (flagVisualsRend[i] == null) continue;
             flagVisualsRend[i].material.SetColor("_Color", TeamManager.Instance.GetOppositeTeamColor(teamIndex));
         }
     }
