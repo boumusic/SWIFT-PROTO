@@ -7,6 +7,8 @@ using System.Linq;
 using BeardedManStudios.Forge.Networking;
 using BeardedManStudios.Forge.Networking.Unity;
 using BeardedManStudios.Forge.Networking.Generated;
+using UnityEngine.Rendering.PostProcessing;
+
 public class Character : MonoBehaviour
 {
     [Header("Components")]
@@ -29,6 +31,9 @@ public class Character : MonoBehaviour
     private NetworkedPlayer nPlayer;
     public NetworkedPlayer NPlayer { get { if (nPlayer == null) nPlayer = GetComponentInParent<NetworkedPlayer>(); return nPlayer; } }
     public string PlayerName => player != null ? player.PlayerName : "NPC";
+
+    [Header("Flow")]
+    public PostProcessVolume flowPP;
 
     public Color TeamColor => player != null ? player.TeamColor : Color.white;
 
@@ -167,7 +172,12 @@ public class Character : MonoBehaviour
         Vector3 target = new Vector3(xAccel, 0, zAccel) * CurrentRunSpeed;
         if (CurrentState == CharacterState.WallClimbing) target *= m.wallClimbHorizSpeedMultiplier;
         else if (IsInAir && shortJump) target *= m.shortJumpSpeedMul;
-        if (isInFlowState) target *= m.flowSpeedMul;
+        else if (IsInAir && !shortJump) target *= m.jumpAirDrag;
+
+        float flowValue = Mathf.Clamp01((currentFlow / 100 - 1f));
+        target *= Mathf.Lerp(1, m.flowSpeedMul, flowValue);
+        flowPP.weight = flowValue;
+
         velocity = target;
     }
 
@@ -302,12 +312,17 @@ public class Character : MonoBehaviour
             stateMachine.ChangeState(CharacterState.Falling);
         }
 
-        if (velocity.magnitude >= m.runSpeed)
+        if (FinalVelocity.magnitude * FacingVelocity >= m.runSpeed * m.earnFlowRunSpeedThreshold)
         {
-            EarnFlow(m.flowPerSecondRun * Time.deltaTime);
+            EarnFlow(m.flowPerSecondRun);
         }
 
         else
+        {
+            LoseFlow(m.flowLostPerSecondsStrafe);
+        }
+
+        if(axis.magnitude == 0)
         {
             ResetFlow();
         }
@@ -316,7 +331,6 @@ public class Character : MonoBehaviour
         lastYaw = currentYaw;
         currentYaw = playerCamera.Mouse.x;
         float currDiff = Mathf.Abs(currentYaw - lastYaw);
-        Debug.Log(currDiff);
         if (currDiff > m.flowCamYawDiff)
         {
             ResetFlow();
@@ -358,39 +372,40 @@ public class Character : MonoBehaviour
     private float currentFlow = 0f;
     private bool isInFlowState = false;
     private bool wasInFlowState = false;
+    public bool WasInFlowState => wasInFlowState;
+    public bool IsInFlowState => isInFlowState;
 
-    private void EarnFlow(float flow)
+    private void EarnFlow(float flow, bool deltaTime = true)
     {
-        currentFlow += flow;
+        float mul = deltaTime ? Time.deltaTime : 1;
+        currentFlow += flow * mul;
         if (currentFlow >= m.flowStateThreshold)
         {
             isInFlowState = true;
             if (!wasInFlowState)
             {
                 wasInFlowState = true;
-                //Feedback enter flow
+                feedbacks.Play("EnterFlow");
             }
         }
-    }
 
-    public List<Vector2> test = new List<Vector2>();
-
-    [ContextMenu("AAA")]
-    private void RandomSort()
-    {
-        test = test.OrderBy(emp => Guid.NewGuid()).ToList();
+        ClampFlow();
     }
 
     private void LoseFlow(float flow)
     {
-
-
-        currentFlow -= flow;
+        currentFlow -= flow * Time.deltaTime;
         if (currentFlow < m.flowStateThreshold)
         {
             isInFlowState = false;
             CheckLeaveFlow();
         }
+        ClampFlow();
+    }
+
+    private void ClampFlow()
+    {
+        currentFlow = Mathf.Clamp(currentFlow, 0, m.maxFlow);
     }
 
     private void CheckLeaveFlow()
@@ -398,7 +413,7 @@ public class Character : MonoBehaviour
         if (wasInFlowState)
         {
             wasInFlowState = false;
-            //Feedback leave flow
+            feedbacks.Play("LeaveFlow");
         }
     }
 
@@ -406,6 +421,7 @@ public class Character : MonoBehaviour
     {
         currentFlow = 0f;
         isInFlowState = false;
+        flowPP.weight = 0f;
         CheckLeaveFlow();
     }
 
@@ -416,11 +432,10 @@ public class Character : MonoBehaviour
     private bool shortJump = false;
     private float CurrentJumpStrength => shortJump ? m.shortJumpStrength : m.jumpStrength;
     private bool isJumping => CurrentState == CharacterState.Jumping;
-    private Vector3 wallJumpDir = Vector3.zero;
 
     public void Jump(bool shortJump = false)
     {
-        if (CurrentState == CharacterState.WallSliding)
+        if (CurrentState == CharacterState.WallSliding || CurrentState == CharacterState.WallClimbing)
         {
             if (shortJump)
                 WallJump();
@@ -434,15 +449,13 @@ public class Character : MonoBehaviour
             else
                 this.shortJump = false;
 
-            if (wallSliding) wallJumpDir = WallNormal;
-            else wallJumpDir = Vector3.zero;
-
             stateMachine.ChangeState(CharacterState.Jumping);
         }
     }
 
     private void Jumping_Enter()
     {
+        propeller.Clear();
         if (axis.magnitude != 0)
             LastCamRotation = CamRotation;
 
@@ -458,7 +471,7 @@ public class Character : MonoBehaviour
     {
         jumpProgress += Time.deltaTime * m.jumpProgressSpeed;
         yVelocity = m.jumpCurve.Evaluate(jumpProgress) * CurrentJumpStrength;
-        if (wallJumpDir.magnitude != 0) velocity = wallJumpDir * yVelocity;
+        EarnFlow(m.flowPerSecondFall);
         if (jumpProgress >= 1f)
         {
             stateMachine.ChangeState(CharacterState.Falling);
@@ -475,11 +488,11 @@ public class Character : MonoBehaviour
     #region Falling
 
     private float fallInitVelocityY;
+    public float FallInitVelocityY => fallInitVelocityY;
 
     private void Falling_Enter()
     {
-        Debug.Log("Start Falling");
-        fallInitVelocityY = body.velocity.y;
+        fallInitVelocityY = FinalVelocity.y;
         fallProgress = 0f;
     }
 
@@ -498,6 +511,8 @@ public class Character : MonoBehaviour
             {
                 stateMachine.ChangeState(CharacterState.WallSliding);
             }
+
+            EarnFlow(m.flowPerSecondFall);
         }
     }
 
@@ -610,26 +625,15 @@ public class Character : MonoBehaviour
         wallClimbProgress += Time.deltaTime / m.wallClimbDuration;
         yVelocity = m.wallClimbSpeed * m.curveWallClimb.Evaluate(wallClimbProgress);
 
-        if (!spacebar || !CastWall())
+        if (!CastWall())
         {
-            jumpLeft++;
-            Jump();
+            WallClimbJump();
+            return;
+        }
 
-            /*
-            //Threshold when accidentally wallclimbing a small step and not getting the ground reset
-            if (wallClimbProgress > m.wallClimbConsumeThreshold)
-            {
-                canWallClimb = false;
-            }
-
-            else
-            {
-                if (!canUseWallClimbThreshold)
-                    canWallClimb = false;
-                else
-                    canUseWallClimbThreshold = false;
-            }
-            */
+        if (!spacebar)
+        {
+            stateMachine.ChangeState(CharacterState.WallSliding);
         }
 
         if (!canWallClimb && !CastLedge())
@@ -638,6 +642,13 @@ public class Character : MonoBehaviour
         }
 
         //velocity = Vector3.zero;
+    }
+
+    private void WallClimbJump()
+    {
+        jumpLeft++;
+        stateMachine.ChangeState(CharacterState.Jumping);
+        Debug.Log("Should jump");
     }
 
     private void WallClimbing_Exit()
@@ -651,7 +662,7 @@ public class Character : MonoBehaviour
     {
         Vector3 origin = transform.position + Vector3.up * 0.05f /*+ Forward * Radius*/;
         RaycastHit[] down = Physics.RaycastAll(origin, Forward, CurrentWallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
-        RaycastHit[] up = Physics.RaycastAll(origin, Forward, CurrentWallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
+        RaycastHit[] up = Physics.RaycastAll(origin + Vector3.up * m.wallCastUpHeight, Forward, CurrentWallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
         List<RaycastHit> final = new List<RaycastHit>();
         for (int i = 0; i < down.Length; i++)
         {
@@ -682,16 +693,19 @@ public class Character : MonoBehaviour
     #region WallSlide
 
     private bool wallSliding => CurrentState == CharacterState.WallSliding;
-    private float wallSlideTime = 0f;
+    private float wallSlideProgress = 0f;
 
     private void WallSliding_Enter()
     {
-        wallSlideTime = Time.time;
+        fallInitVelocityY = FinalVelocity.y;
+        wallSlideProgress = 0f;
     }
 
     private void WallSliding_Update()
     {
-        yVelocity = Mathf.Lerp(yVelocity, -m.wallSlideSpeed, Mathf.Clamp01(Time.time - wallSlideTime));
+        wallSlideProgress += Time.deltaTime * m.wallSlideProgressSpeed;
+        yVelocity = Mathf.Lerp(fallInitVelocityY, -m.wallSlideSpeed, m.wallSlideCurve.Evaluate(Mathf.Clamp01(wallSlideProgress)));
+        LoseFlow(m.flowLostPerSecondsWallSlide);
         if (!CastWall())
         {
             stateMachine.ChangeState(CharacterState.Falling);
@@ -712,6 +726,7 @@ public class Character : MonoBehaviour
     {
         Debug.Log("Wall Jump");
         isWallJumping = true;
+        EarnFlow(m.flowPerWallJump, false);
         Vector3 dir = new Vector3(WallNormal.x, 1, WallNormal.z);
         propeller.RegisterPropulsion(dir, m.wallJump, EndWallJump);
     }

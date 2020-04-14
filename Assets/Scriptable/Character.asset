@@ -75,15 +75,18 @@ MonoBehaviour:
   flagMultiplier: 0.95
   flowStateThreshold: 100
   maxFlow: 200
-  flowCamYawDiff: 20
+  flowCamYawDiff: 10
+  flowLostPerSecondsWallSlide: 35
+  flowLostPerSecondsStrafe: 40
   flowPerSecondRun: 25
+  flowSpeedMul: 1.1
+  earnFlowRunSpeedThreshold: 0.9
   flowFallDelay: 1
   flowPerSecondFall: 50
   flowPerWallJump: 20
-  flowSpeedMul: 1.4
   jumpCount: 2
   jumpStrength: 15
-  jumpChargeSpeed: 10
+  jumpChargeSpeed: 7
   jumpProgressSpeed: 3.4
   jumpCurve:
     serializedVersion: 2
@@ -137,9 +140,10 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   resetVelocityOnJump: 1
+  jumpAirDrag: 0.9
   coyoteTime: 0.3
   shortJumpStrength: 7
-  shortJumpSpeedMul: 1.4
+  shortJumpSpeedMul: 1
   jumpDecelerationAmount: 1.05
   jumpAccelerationTime: 0.28
   fallStrength: 28
@@ -295,10 +299,36 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   wallCastLength: 1.1
+  wallCastUpHeight: 0.8
   ledgeCastMaxHeight: 2.6
   ledgeCastMinHeight: 0.3
   wallClimbConsumeThreshold: 0.07
   wallSlideSpeed: 5
+  wallSlideProgressSpeed: 1.5
+  wallSlideCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0.060231734
+      outSlope: 0.060231734
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.09379968
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1.830679
+      outSlope: 1.463605
+      tangentMode: 65
+      weightedMode: 0
+      inWeight: 0.052464247
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   wallJump:
     strength: 20
     curve:
@@ -343,12 +373,12 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    duration: 0.6
+    duration: 0.8
     airControl: 0
     direction: {x: 0, y: 0, z: 0}
     priority: 0
     separateAxes: 1
-    strengthHoriz: 25
+    strengthHoriz: 30
     curveHoriz:
       serializedVersion: 2
       m_Curve:
