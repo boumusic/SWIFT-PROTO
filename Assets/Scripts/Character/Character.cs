@@ -69,7 +69,7 @@ public class Character : MonoBehaviour
             else return LastCamRotation * Velocity;
         }
     }
-    public float FacingVelocity => Mathf.Clamp01(Vector3.Dot(Forward, FinalVelocity));
+    public float DotFacingVelocity => Mathf.Clamp01(Vector3.Dot(Forward, FinalVelocity));
     public float CameraRoll => Vector3.Dot(Right, FinalVelocity.normalized) * (CurrentState == CharacterState.Jumping ? 3.5f : 1f);
 
     private Quaternion LastCamRotation;
@@ -312,7 +312,7 @@ public class Character : MonoBehaviour
             stateMachine.ChangeState(CharacterState.Falling);
         }
 
-        if (FinalVelocity.magnitude * FacingVelocity >= m.runSpeed * m.earnFlowRunSpeedThreshold)
+        if (body.velocity.magnitude * DotFacingVelocity >= m.runSpeed * m.earnFlowRunSpeedThreshold)
         {
             EarnFlow(m.flowPerSecondRun);
         }
@@ -392,9 +392,10 @@ public class Character : MonoBehaviour
         ClampFlow();
     }
 
-    private void LoseFlow(float flow)
+    private void LoseFlow(float flow, bool deltaTime = true)
     {
-        currentFlow -= flow * Time.deltaTime;
+        float mul = deltaTime ? Time.deltaTime : 1;
+        currentFlow -= flow * mul;
         if (currentFlow < m.flowStateThreshold)
         {
             isInFlowState = false;
@@ -835,9 +836,13 @@ public class Character : MonoBehaviour
             if (attackDelay != null) StopCoroutine(attackDelay);
             attackDelay = StartCoroutine(AttackDelay());
 
+            if(grounded)
+            {
+                LoseFlow(m.flowLostOnAttack, false);
+            }
+
             if (grounded)
             {
-                Debug.Log(Forward);
                 propeller.RegisterPropulsion(Forward, m.attackImpulse, EndImpulse);
                 isImpulsing = true;
             }
@@ -892,6 +897,7 @@ public class Character : MonoBehaviour
                             player.networkObject.SendRpc(NetworkedPlayerBehavior.RPC_TRY_HIT, Receivers.Server,
                                 myNetworkerPlayer.networkObject.NetworkId, myNetworkerPlayer.playerName, myNetworkerPlayer.teamIndex, myNetworkerPlayer.playerCamera.transform.forward);
 
+                            feedbacks.Play("Kill");
                         }
                     }
                 }
@@ -912,6 +918,7 @@ public class Character : MonoBehaviour
                             chara.TakeDamage(m.damage);
                             UIManager.Instance.DisplayKillFeed(this, chara);
                             UIManager.Instance.HitMarker();
+                            feedbacks.Play("Kill");
                         }
                     }
                 }
@@ -947,6 +954,7 @@ public class Character : MonoBehaviour
         propeller.RegisterPropulsion(kbDir, m.knockback, EndKnockback);
         feedbacks.Play("Parried");
         isKnockbacked = true;
+        LoseFlow(m.flowLostOnParry, false);
     }
 
     private void EndKnockback()

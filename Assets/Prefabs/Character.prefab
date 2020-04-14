@@ -10852,7 +10852,7 @@ GameObject:
   - component: {fileID: 3768081252134519554}
   - component: {fileID: 3411816689680932764}
   m_Layer: 8
-  m_Name: Feedback_MaxFlow
+  m_Name: Feedback_Kill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10884,7 +10884,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 978532ae3005bbd4494b02fe71c31c9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  feedbackName: MaxFlow
+  feedbackName: Kill
   generalDelay: 0
   useShake: 0
   shakeFeedback:
@@ -10934,7 +10934,7 @@ MonoBehaviour:
     duration: 1
     intensity: 2
     interpolation: 0
-  useZoom: 0
+  useZoom: 1
   zoomFeedback:
     delay: 0
     curve:
@@ -10950,8 +10950,26 @@ MonoBehaviour:
         inWeight: 0
         outWeight: 0
       - serializedVersion: 3
-        time: 0.5
-        value: 1
+        time: 0.10888672
+        value: 0.80134964
+        inSlope: 2.8127418
+        outSlope: 2.8127418
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0.3362887
+      - serializedVersion: 3
+        time: 0.30512893
+        value: 0.93912905
+        inSlope: -3.7479541
+        outSlope: -3.7479541
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.38026124
+        value: -0.15282592
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -10959,14 +10977,23 @@ MonoBehaviour:
         inWeight: 0
         outWeight: 0
       - serializedVersion: 3
-        time: 0.8
-        value: -0.1
-        inSlope: 0
-        outSlope: 0
+        time: 0.48569095
+        value: 0.069643795
+        inSlope: 0.36947316
+        outSlope: 0.36947316
         tangentMode: 0
         weightedMode: 0
-        inWeight: 0
-        outWeight: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.701044
+        value: -0.038834535
+        inSlope: -0.17302842
+        outSlope: -0.17302842
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
         value: 0
@@ -10979,8 +11006,8 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    duration: 0.15
-    multiplier: 0.5
+    duration: 0.4
+    multiplier: 0.7
   usePostProcess: 1
   postProcessFeedback:
     delay: 0
@@ -10993,32 +11020,50 @@ MonoBehaviour:
         value: 0
         inSlope: 0
         outSlope: 0
-        tangentMode: 0
+        tangentMode: 136
         weightedMode: 0
-        inWeight: 0
-        outWeight: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
       - serializedVersion: 3
-        time: 0.5
+        time: 0.1603117
         value: 1
+        inSlope: 0.031869143
+        outSlope: 0.031869143
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.31765014
+        value: 1.0025308
         inSlope: 0
         outSlope: 0
-        tangentMode: 0
+        tangentMode: 136
         weightedMode: 0
-        inWeight: 0
-        outWeight: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.41401964
+        value: 0.3345734
+        inSlope: -1.4692328
+        outSlope: -1.4692328
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
         value: 0
         inSlope: 0
         outSlope: 0
-        tangentMode: 0
+        tangentMode: 136
         weightedMode: 0
-        inWeight: 0
-        outWeight: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    duration: 0.2
+    duration: 0.4
   useParticleSystem: 0
   particleFeedback:
     delay: 0
@@ -11219,11 +11264,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b9a305e18de0c04dbd257a21cd47087, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sharedProfile: {fileID: 0}
+  sharedProfile: {fileID: 11400000, guid: 26f8b02ed04686e46bdb6b37b75272dc, type: 2}
   isGlobal: 1
   blendDistance: 0
   weight: 0
-  priority: 1
+  priority: 3
 --- !u!54 &3740747632033705133
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -12261,6 +12306,7 @@ MonoBehaviour:
   - {fileID: 8876964876175716383}
   - {fileID: 5524713610545929496}
   - {fileID: 5080511075648774241}
+  - {fileID: 3768081252134519554}
 --- !u!114 &1631009585311805780
 MonoBehaviour:
   m_ObjectHideFlags: 0
