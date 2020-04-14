@@ -57,7 +57,7 @@ public class PlayerCamera : MonoBehaviour
 
     private void UpdateFOV()
     {
-        float target = Utility.Interpolate(minFov, maxFov, 0f, maxSpeedFov, character.Velocity.magnitude * character.FacingVelocity);
+        float target = Utility.Interpolate(minFov, maxFov, 0f, maxSpeedFov, character.Velocity.magnitude * character.DotFacingVelocity);
         float currentFov = Mathf.SmoothDamp(cam.fieldOfView, target, ref currentVelFov, fovSmooth);
 
         if(!QuikFeedbackManager.instance.IsZooming)

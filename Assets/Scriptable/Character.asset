@@ -78,6 +78,9 @@ MonoBehaviour:
   flowCamYawDiff: 10
   flowLostPerSecondsWallSlide: 35
   flowLostPerSecondsStrafe: 40
+  flowLostOnStop: 50
+  flowLostOnParry: 100
+  flowLostOnAttack: 50
   flowPerSecondRun: 25
   flowSpeedMul: 1.1
   earnFlowRunSpeedThreshold: 0.9

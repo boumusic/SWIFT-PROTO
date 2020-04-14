@@ -21,6 +21,10 @@ public class CharacterSettings : ScriptableObject
     public float flowCamYawDiff = 0.8f;
     public float flowLostPerSecondsWallSlide = 35;
     public float flowLostPerSecondsStrafe = 40;
+    public float flowLostOnStop = 50;
+    public float flowLostOnParry = 100;
+    public float flowLostOnAttack = 50;
+
     [Header("Flow Run")]
     [Tooltip("How many flow per second earned when running forward.")] public float flowPerSecondRun = 25f;
     public float flowSpeedMul = 1.1f;
