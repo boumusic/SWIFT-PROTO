@@ -19,6 +19,7 @@
 
 using BeardedManStudios.Forge.Networking.Frame;
 using BeardedManStudios.SimpleJSON;
+using UnityEngine;
 
 namespace BeardedManStudios.Forge.Networking.Nat
 {
@@ -64,7 +65,9 @@ namespace BeardedManStudios.Forge.Networking.Nat
 			Client = new UDPClient();
 			Client.Connect(natServer, natPort, pendCreates: true);
 
-			NetWorker.BaseNetworkEvent accepted = (NetWorker sender) =>
+            Debug.Log("Connecting to nat server");
+
+            NetWorker.BaseNetworkEvent accepted = (NetWorker sender) =>
 			{
 				// Send the data to the nat server with the host address and port that this client
 				// is trying to connect to so that it can punch a hole in the network for this client
@@ -76,7 +79,17 @@ namespace BeardedManStudios.Forge.Networking.Nat
 				// Send the message to the NAT server
 				Text connect = Text.CreateFromString(Client.Time.Timestep, sendJson.ToString(), false, Receivers.Server, MessageGroupIds.NAT_SERVER_CONNECT, false);
 				Client.Send(connect, true);
-				Client.messageConfirmed += (player, packet) => { if (packet.uniqueId == connect.UniqueId) { Client.Disconnect(false); } };
+
+                Debug.Log("Connected to NAT server and sent info for NAT punching");
+
+                Client.messageConfirmed += (player, packet) => 
+                {
+                    if (packet.uniqueId == connect.UniqueId)
+                    {
+                        Client.Disconnect(false);
+                        Debug.Log("Disconnecting from NAT server");
+                    }
+                };
 			};
 
 			Client.serverAccepted += accepted;
@@ -96,6 +109,7 @@ namespace BeardedManStudios.Forge.Networking.Nat
 
 			// Connect to the NAT server
 			Client = new UDPClient();
+            Debug.LogFormat("Registration to NAT server at adress {0}:{1}", natServer, natPort);
 			Client.Connect(natServer, natPort, pendCreates: true);
 
 			// When connected, request for this server to be registered to the NAT lookup for clients
@@ -110,7 +124,9 @@ namespace BeardedManStudios.Forge.Networking.Nat
 				// Send the message to the NAT server
 				Text register = Text.CreateFromString(Client.Time.Timestep, sendJson.ToString(), false, Receivers.Target, MessageGroupIds.NAT_SERVER_REGISTER, false);
 				Client.Send(register, true);
-			};
+
+                Debug.Log("Connected to NAT server and sent frame");
+            };
 
 			Client.serverAccepted += accepted;
 
@@ -129,7 +145,9 @@ namespace BeardedManStudios.Forge.Networking.Nat
 			Logging.BMSLog.Log("PLAYER CONNECTION REQUEST");
 			Logging.BMSLog.Log(frame.ToString());
 
-			try
+            Debug.Log("Client requested connection by NAT");
+
+            try
 			{
 				// This is a Text frame with JSON so parse it all
 				var json = JSON.Parse(frame.ToString());
