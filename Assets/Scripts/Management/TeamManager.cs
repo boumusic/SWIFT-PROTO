@@ -122,10 +122,10 @@ public class TeamManager : MonoBehaviour
 
         if (teams.Count > 0)
         {
-            if(i < teams.Count && i >0)
+            if(i < teams.Count && i >= 0)
                 return teams[i].Color;
         }
-
+        
         return Color.white;
     }
 

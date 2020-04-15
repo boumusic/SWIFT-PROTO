@@ -34,6 +34,7 @@ public class Character : MonoBehaviour
 
     [Header("Flow")]
     public PostProcessVolume flowPP;
+    public PostProcessVolume maxFlowPP;
 
     public Color TeamColor => player != null ? player.TeamColor : Color.white;
 
@@ -131,6 +132,8 @@ public class Character : MonoBehaviour
         CheckWallClimb();
         OrientModel();
         DashCooldown();
+        CheckYawDiff();
+        UpdateFlow();
 
 #if UNITY_EDITOR
         if (Input.GetKeyDown(KeyCode.K))
@@ -139,6 +142,17 @@ public class Character : MonoBehaviour
         }
 
 #endif
+    }
+
+    private void CheckYawDiff()
+    {
+        lastYaw = currentYaw;
+        currentYaw = playerCamera.Mouse.x;
+        float currDiff = Mathf.Abs(currentYaw - lastYaw);
+        if (currDiff > m.flowCamYawDiff)
+        {
+            ResetFlow();
+        }
     }
 
     private void FixedUpdate()
@@ -171,10 +185,9 @@ public class Character : MonoBehaviour
         Accel(ref zAccel, usedAxis.y, usedAxis);
         Vector3 target = new Vector3(xAccel, 0, zAccel) * CurrentRunSpeed;
         if (CurrentState == CharacterState.WallClimbing) target *= m.wallClimbHorizSpeedMultiplier;
-        else if (IsInAir && shortJump) target *= m.shortJumpSpeedMul;
-        else if (IsInAir && !shortJump) target *= m.jumpAirDrag;
+        else if (IsInAir && shortJump) target *= Mathf.Lerp(1, m.flowShortJumpAirDragMax, flowValue);
+        else if (IsInAir && !shortJump) target *= Mathf.Lerp(m.jumpAirDrag, m.flowHighJumpAirDragMax, flowValue);
 
-        float flowValue = Mathf.Clamp01((currentFlow / 100 - 1f));
         target *= Mathf.Lerp(1, m.flowSpeedMul, flowValue);
         flowPP.weight = flowValue;
 
@@ -275,6 +288,9 @@ public class Character : MonoBehaviour
 
     private void Grounded_Enter()
     {
+        if (fallReachedFlowThreshold)
+            techLandBuffer = StartCoroutine(TechLandBuffer());
+
         TryStopCoyote();
         yVelocity = 0f;
         ResetJumpCount();
@@ -312,28 +328,27 @@ public class Character : MonoBehaviour
             stateMachine.ChangeState(CharacterState.Falling);
         }
 
-        if (body.velocity.magnitude * DotFacingVelocity >= m.runSpeed * m.earnFlowRunSpeedThreshold)
+        if (body.velocity.magnitude >= m.runSpeed * m.earnFlowRunSpeedThreshold)
         {
             EarnFlow(m.flowPerSecondRun);
         }
 
         else
         {
+            if(axis.magnitude != 0)
+            {
+                ResetFlow();
+            }
+        }
+
+        if (DotFacingVelocity < 0.3f)
+        {
             LoseFlow(m.flowLostPerSecondsStrafe);
         }
 
-        if(axis.magnitude == 0)
+        if (axis.magnitude == 0)
         {
-            ResetFlow();
-        }
-
-
-        lastYaw = currentYaw;
-        currentYaw = playerCamera.Mouse.x;
-        float currDiff = Mathf.Abs(currentYaw - lastYaw);
-        if (currDiff > m.flowCamYawDiff)
-        {
-            ResetFlow();
+            LoseFlow(m.flowLostPerSecondsOnStop);
         }
     }
 
@@ -374,6 +389,12 @@ public class Character : MonoBehaviour
     private bool wasInFlowState = false;
     public bool WasInFlowState => wasInFlowState;
     public bool IsInFlowState => isInFlowState;
+    private float flowValue => Mathf.Clamp01((currentFlow / 100 - 1f));
+
+    private void UpdateFlow()
+    {
+        maxFlowPP.gameObject.SetActive(currentFlow >= 200);
+    }
 
     private void EarnFlow(float flow, bool deltaTime = true)
     {
@@ -448,8 +469,11 @@ public class Character : MonoBehaviour
             if (!IsInAir)
                 this.shortJump = shortJump;
             else
+            {
                 this.shortJump = false;
+            }
 
+            if(shortJump && !IsInAir) TechLand();
             stateMachine.ChangeState(CharacterState.Jumping);
         }
     }
@@ -472,7 +496,6 @@ public class Character : MonoBehaviour
     {
         jumpProgress += Time.deltaTime * m.jumpProgressSpeed;
         yVelocity = m.jumpCurve.Evaluate(jumpProgress) * CurrentJumpStrength;
-        EarnFlow(m.flowPerSecondFall);
         if (jumpProgress >= 1f)
         {
             stateMachine.ChangeState(CharacterState.Falling);
@@ -490,10 +513,14 @@ public class Character : MonoBehaviour
 
     private float fallInitVelocityY;
     public float FallInitVelocityY => fallInitVelocityY;
+    private float fallInitialY;
+    private float fallDistance => Mathf.Abs(fallInitialY - transform.position.y);
+    private bool fallReachedFlowThreshold => fallDistance > m.flowFallHeightThreshold;
 
     private void Falling_Enter()
     {
         fallInitVelocityY = FinalVelocity.y;
+        fallInitialY = transform.position.y;
         fallProgress = 0f;
     }
 
@@ -513,7 +540,10 @@ public class Character : MonoBehaviour
                 stateMachine.ChangeState(CharacterState.WallSliding);
             }
 
-            EarnFlow(m.flowPerSecondFall);
+            if (fallReachedFlowThreshold)
+            {
+                EarnFlow(m.flowPerSecondFall);
+            }
         }
     }
 
@@ -521,6 +551,27 @@ public class Character : MonoBehaviour
     {
         yVelocity = 0f;
         fallProgress = 0f;
+
+    }
+
+    private Coroutine techLandBuffer;
+
+    private void TechLand()
+    {
+        if (techLandBuffer != null)
+        {
+            feedbacks.Play("Tech");
+            EarnFlow(m.flowFallDistanceMultiplier * fallDistance, false);
+            StopCoroutine(techLandBuffer);
+            techLandBuffer = null;
+            //Feedback Tech
+        }
+    }
+    
+    private IEnumerator TechLandBuffer()
+    {
+        yield return new WaitForSeconds(m.flowFallJumpBuffer);
+        ResetFlow();
     }
 
     #endregion
@@ -554,6 +605,7 @@ public class Character : MonoBehaviour
             cooldownDashDone = false;
             feedbacks.Play("Dash");
             animator.Dash();
+            TechLand();
         }
     }
 
@@ -649,7 +701,6 @@ public class Character : MonoBehaviour
     {
         jumpLeft++;
         stateMachine.ChangeState(CharacterState.Jumping);
-        Debug.Log("Should jump");
     }
 
     private void WallClimbing_Exit()
@@ -836,7 +887,7 @@ public class Character : MonoBehaviour
             if (attackDelay != null) StopCoroutine(attackDelay);
             attackDelay = StartCoroutine(AttackDelay());
 
-            if(grounded)
+            if (grounded)
             {
                 LoseFlow(m.flowLostOnAttack, false);
             }
