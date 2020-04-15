@@ -5,10 +5,29 @@ using UnityEngine;
 public class LDPreviewCamera : MonoBehaviour
 {
     public Camera cam;
-
-    // Start is called before the first frame update
-    void Start()
+    public GameObject postProcess;
+    /*public GameObject essentials;
+    public GameObject player;
+    
+    private void Awake()
+    {
+        player.SetActive(true);
+        essentials.SetActive(true);
+    }
+    */
+    private void Start()
     {
         cam.enabled = false;
+        postProcess.SetActive(false);
     }
+    /*
+    [ContextMenu("Initialize")]
+    private void Initialize()
+    {
+        essentials = GameObject.Find("ESSENTIALS");
+        essentials.SetActive(false);
+        player = GameObject.Find("Player");
+        player.SetActive(false);
+    }
+    */
 }
