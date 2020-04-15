@@ -19,6 +19,7 @@ public class Character : MonoBehaviour
     public CharacterAnimator animator;
     public CharacterFeedbacks feedbacks;
     public Propeller propeller;
+    public SpeedBooster speedBooster;
 
     [Header("Visuals")]
     public GameObject tps;
@@ -189,6 +190,7 @@ public class Character : MonoBehaviour
         else if (IsInAir && !shortJump) target *= Mathf.Lerp(m.jumpAirDrag, m.flowHighJumpAirDragMax, flowValue);
 
         target *= Mathf.Lerp(1, m.flowSpeedMul, flowValue);
+        target *= speedBooster.VelocityMultiplier;
         flowPP.weight = flowValue;
 
         velocity = target;
@@ -232,6 +234,17 @@ public class Character : MonoBehaviour
     private void ApplyVelocity()
     {
         body.velocity = FinalVelocity;
+    }
+
+    #endregion
+
+    #region Boost
+
+    public void ApplyBoosterBoost(SpeedBoostSettings boost)
+    {
+        speedBooster.RegisterBoost(boost);
+        EarnFlow(boost.flowGiven, false);
+        feedbacks.Play("Boost");
     }
 
     #endregion
@@ -446,7 +459,7 @@ public class Character : MonoBehaviour
         flowPP.weight = 0f;
         CheckLeaveFlow();
     }
-
+    
     #endregion
 
     #region Jump
@@ -467,7 +480,10 @@ public class Character : MonoBehaviour
         if (jumpLeft > 0 && !isDashing && !isImpulsing)
         {
             if (!IsInAir)
+            {
                 this.shortJump = shortJump;
+                EarnFlow(m.flowEarnedOnShortHop, false);
+            }
             else
             {
                 this.shortJump = false;
@@ -572,6 +588,7 @@ public class Character : MonoBehaviour
     {
         yield return new WaitForSeconds(m.flowFallJumpBuffer);
         ResetFlow();
+        feedbacks.Play("FailTech");
     }
 
     #endregion
@@ -686,7 +703,10 @@ public class Character : MonoBehaviour
 
         if (!spacebar)
         {
-            stateMachine.ChangeState(CharacterState.WallSliding);
+            if (!CastLedge())
+                stateMachine.ChangeState(CharacterState.WallSliding);
+            else
+                WallClimbJump();
         }
 
         if (!canWallClimb && !CastLedge())

@@ -23,6 +23,7 @@ public class CharacterSettings : ScriptableObject
     public float flowLostPerSecondsStrafe = 40;
     public float flowLostPerSecondsOnStop = 50;
     public float flowLostOnParry = 100;
+    public float flowEarnedOnShortHop = 30;
     public float flowLostOnAttack = 50;
 
     [Header("Flow Run")]

@@ -80,6 +80,7 @@ MonoBehaviour:
   flowLostPerSecondsStrafe: 40
   flowLostPerSecondsOnStop: 50
   flowLostOnParry: 100
+  flowEarnedOnShortHop: 0
   flowLostOnAttack: 50
   flowPerSecondRun: 25
   flowSpeedMul: 1.1
@@ -90,7 +91,7 @@ MonoBehaviour:
   flowPerWallJump: 20
   flowPerSecondFall: 50
   flowFallHeightThreshold: 5
-  flowFallJumpBuffer: 0.08
+  flowFallJumpBuffer: 0.02
   flowFallDistanceMultiplier: 5
   jumpCount: 2
   jumpStrength: 15
