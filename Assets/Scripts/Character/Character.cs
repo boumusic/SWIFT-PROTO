@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using MonsterLove.StateMachine;
 using System;
+using System.Linq;
 using BeardedManStudios.Forge.Networking;
 using BeardedManStudios.Forge.Networking.Unity;
 using BeardedManStudios.Forge.Networking.Generated;
+using UnityEngine.Rendering.PostProcessing;
 
 public class Character : MonoBehaviour
 {
@@ -30,6 +32,9 @@ public class Character : MonoBehaviour
     public NetworkedPlayer NPlayer { get { if (nPlayer == null) nPlayer = GetComponentInParent<NetworkedPlayer>(); return nPlayer; } }
     public string PlayerName => player != null ? player.PlayerName : "NPC";
 
+    [Header("Flow")]
+    public PostProcessVolume flowPP;
+
     public Color TeamColor => player != null ? player.TeamColor : Color.white;
 
     #region Movement
@@ -41,7 +46,6 @@ public class Character : MonoBehaviour
     private Vector3 velocity;
     private bool isRunning;
     private float yVelocity;
-    private bool spacebar;
 
     private float jumpProgress = 0f;
     private float fallProgress = 0f;
@@ -65,14 +69,14 @@ public class Character : MonoBehaviour
             else return LastCamRotation * Velocity;
         }
     }
-    public float FacingVelocity => Mathf.Clamp01(Vector3.Dot(Forward, FinalVelocity));
+    public float DotFacingVelocity => Mathf.Clamp01(Vector3.Dot(Forward, FinalVelocity));
     public float CameraRoll => Vector3.Dot(Right, FinalVelocity.normalized) * (CurrentState == CharacterState.Jumping ? 3.5f : 1f);
 
     private Quaternion LastCamRotation;
     public Quaternion CamRotation => playerCamera.Forward;
 
     public bool IsRunning { get => isRunning; }
-    public bool IsinAir => CurrentState == CharacterState.Jumping || CurrentState == CharacterState.Falling;
+    public bool IsInAir => CurrentState == CharacterState.Jumping || CurrentState == CharacterState.Falling;
 
     public Vector3 FeetOrigin => transform.position + Vector3.up * m.groundRaycastUp;
     public Vector3 FeetDestination => FeetOrigin - Vector3.up * m.groundRaycastDown;
@@ -167,6 +171,13 @@ public class Character : MonoBehaviour
         Accel(ref zAccel, usedAxis.y, usedAxis);
         Vector3 target = new Vector3(xAccel, 0, zAccel) * CurrentRunSpeed;
         if (CurrentState == CharacterState.WallClimbing) target *= m.wallClimbHorizSpeedMultiplier;
+        else if (IsInAir && shortJump) target *= m.shortJumpSpeedMul;
+        else if (IsInAir && !shortJump) target *= m.jumpAirDrag;
+
+        float flowValue = Mathf.Clamp01((currentFlow / 100 - 1f));
+        target *= Mathf.Lerp(1, m.flowSpeedMul, flowValue);
+        flowPP.weight = flowValue;
+
         velocity = target;
     }
 
@@ -221,37 +232,40 @@ public class Character : MonoBehaviour
 
     private float spacebarCharge = 0f;
     private bool wasSpacebar = false;
+    private bool spacebar;
+    private bool waitForReleaseSpace = false;
+    public float SpacebarCharge => spacebarCharge;
+
     public void InputSpacebar(bool space)
     {
         wasSpacebar = spacebar;
         spacebar = space;
 
-
-        if (CurrentState != CharacterState.Jumping)
+        if (spacebar && !waitForReleaseSpace)
         {
-            if (space)
-            {
-                spacebarCharge += Time.deltaTime * m.jumpChargeSpeed;
-            }
+            spacebarCharge += Time.deltaTime * m.jumpChargeSpeed;
         }
 
         spacebarCharge = Mathf.Clamp01(spacebarCharge);
 
-        if (wasSpacebar && !spacebar && hasReleasedJump)
+        //Release Input
+        if (wasSpacebar && !spacebar)
         {
-            hasReleasedJump = true;
-            Jump(spacebarCharge < 0.5f);
+            if (!waitForReleaseSpace)
+            {
+                Jump(spacebarCharge <= 0.5f);
+                spacebarCharge = 0f;
+                wasSpacebar = false;
+            }
+            else
+                waitForReleaseSpace = false;
+        }
+
+        if (spacebarCharge > 0.5f)
+        {
+            Jump();
+            waitForReleaseSpace = true;
             spacebarCharge = 0f;
-        }
-
-        if (space)
-        {
-            hasReleasedJump = false;
-        }
-
-        if (spacebarCharge > 1f)
-        {
-
         }
     }
 
@@ -285,6 +299,8 @@ public class Character : MonoBehaviour
     }
 
     private Vector3 wallSlideVector;
+    private float lastYaw;
+    private float currentYaw;
 
     private Coroutine coyote;
 
@@ -296,27 +312,29 @@ public class Character : MonoBehaviour
             stateMachine.ChangeState(CharacterState.Falling);
         }
 
-        CastWall();
-
-        /*
-        if (hits.Length > 0 && m.slideAgainstWalls)
+        if (body.velocity.magnitude * DotFacingVelocity >= m.runSpeed * m.earnFlowRunSpeedThreshold)
         {
-            Vector3 wallNormal = hits[0].normal;
-            float angle = Vector3.SignedAngle(wallNormal, Forward, Vector3.up);
-            float mul = angle >= 0 ? 1f : -1f;
-            Vector3 cross = Vector3.Cross(mul * Vector3.up, wallNormal);
-
-            float dot = Vector3.Dot(Forward.normalized, wallNormal.normalized);
-            dot = Mathf.Clamp(dot, -1f, 0f);
-            Debug.Log(dot);
-            WallSlideRotation = Quaternion.AngleAxis(m.curveWallSlide.Evaluate(-dot) * m.maxSlideWallSpeed, Vector3.up);
-
-            // wallSlideVector = cross.normalized * m.runSpeed * Mathf.Lerp(m.minSlideWallSpeed, m.maxSlideWallSpeed, dot);
+            EarnFlow(m.flowPerSecondRun);
         }
 
         else
-            WallSlideRotation = Quaternion.identity;
-        */
+        {
+            LoseFlow(m.flowLostPerSecondsStrafe);
+        }
+
+        if(axis.magnitude == 0)
+        {
+            ResetFlow();
+        }
+
+
+        lastYaw = currentYaw;
+        currentYaw = playerCamera.Mouse.x;
+        float currDiff = Mathf.Abs(currentYaw - lastYaw);
+        if (currDiff > m.flowCamYawDiff)
+        {
+            ResetFlow();
+        }
     }
 
     private void TryStopCoyote()
@@ -348,27 +366,89 @@ public class Character : MonoBehaviour
 
     #endregion
 
+    #region Flow
+
+    public float CurrentFlow => currentFlow;
+    private float currentFlow = 0f;
+    private bool isInFlowState = false;
+    private bool wasInFlowState = false;
+    public bool WasInFlowState => wasInFlowState;
+    public bool IsInFlowState => isInFlowState;
+
+    private void EarnFlow(float flow, bool deltaTime = true)
+    {
+        float mul = deltaTime ? Time.deltaTime : 1;
+        currentFlow += flow * mul;
+        if (currentFlow >= m.flowStateThreshold)
+        {
+            isInFlowState = true;
+            if (!wasInFlowState)
+            {
+                wasInFlowState = true;
+                feedbacks.Play("EnterFlow");
+            }
+        }
+
+        ClampFlow();
+    }
+
+    private void LoseFlow(float flow, bool deltaTime = true)
+    {
+        float mul = deltaTime ? Time.deltaTime : 1;
+        currentFlow -= flow * mul;
+        if (currentFlow < m.flowStateThreshold)
+        {
+            isInFlowState = false;
+            CheckLeaveFlow();
+        }
+        ClampFlow();
+    }
+
+    private void ClampFlow()
+    {
+        currentFlow = Mathf.Clamp(currentFlow, 0, m.maxFlow);
+    }
+
+    private void CheckLeaveFlow()
+    {
+        if (wasInFlowState)
+        {
+            wasInFlowState = false;
+            feedbacks.Play("LeaveFlow");
+        }
+    }
+
+    private void ResetFlow()
+    {
+        currentFlow = 0f;
+        isInFlowState = false;
+        flowPP.weight = 0f;
+        CheckLeaveFlow();
+    }
+
+    #endregion
+
     #region Jump
     private bool hasReleasedJump = true;
     private bool shortJump = false;
     private float CurrentJumpStrength => shortJump ? m.shortJumpStrength : m.jumpStrength;
     private bool isJumping => CurrentState == CharacterState.Jumping;
-    private Vector3 wallJumpDir = Vector3.zero;
 
     public void Jump(bool shortJump = false)
     {
-        if (CurrentState == CharacterState.WallSliding)
+        if (CurrentState == CharacterState.WallSliding || CurrentState == CharacterState.WallClimbing)
         {
-            WallJump();
+            if (shortJump)
+                WallJump();
             return;
         }
 
         if (jumpLeft > 0 && !isDashing && !isImpulsing)
         {
-            this.shortJump = false;
-
-            if (wallSliding) wallJumpDir = WallNormal;
-            else wallJumpDir = Vector3.zero;
+            if (!IsInAir)
+                this.shortJump = shortJump;
+            else
+                this.shortJump = false;
 
             stateMachine.ChangeState(CharacterState.Jumping);
         }
@@ -376,6 +456,7 @@ public class Character : MonoBehaviour
 
     private void Jumping_Enter()
     {
+        propeller.Clear();
         if (axis.magnitude != 0)
             LastCamRotation = CamRotation;
 
@@ -391,7 +472,7 @@ public class Character : MonoBehaviour
     {
         jumpProgress += Time.deltaTime * m.jumpProgressSpeed;
         yVelocity = m.jumpCurve.Evaluate(jumpProgress) * CurrentJumpStrength;
-        if (wallJumpDir.magnitude != 0) velocity = wallJumpDir * yVelocity;
+        EarnFlow(m.flowPerSecondFall);
         if (jumpProgress >= 1f)
         {
             stateMachine.ChangeState(CharacterState.Falling);
@@ -408,11 +489,11 @@ public class Character : MonoBehaviour
     #region Falling
 
     private float fallInitVelocityY;
+    public float FallInitVelocityY => fallInitVelocityY;
 
     private void Falling_Enter()
     {
-        Debug.Log("Start Falling");
-        fallInitVelocityY = body.velocity.y;
+        fallInitVelocityY = FinalVelocity.y;
         fallProgress = 0f;
     }
 
@@ -431,6 +512,8 @@ public class Character : MonoBehaviour
             {
                 stateMachine.ChangeState(CharacterState.WallSliding);
             }
+
+            EarnFlow(m.flowPerSecondFall);
         }
     }
 
@@ -510,7 +593,7 @@ public class Character : MonoBehaviour
 
     private void CheckWallClimb()
     {
-        if(CurrentState != CharacterState.WallClimbing)
+        if (CurrentState != CharacterState.WallClimbing)
         {
             if (CastWall() && canWallClimb || CastLedge())
             {
@@ -543,26 +626,15 @@ public class Character : MonoBehaviour
         wallClimbProgress += Time.deltaTime / m.wallClimbDuration;
         yVelocity = m.wallClimbSpeed * m.curveWallClimb.Evaluate(wallClimbProgress);
 
-        if (!spacebar || !CastWall())
+        if (!CastWall())
         {
-            jumpLeft++;
-            Jump();
+            WallClimbJump();
+            return;
+        }
 
-            /*
-            //Threshold when accidentally wallclimbing a small step and not getting the ground reset
-            if (wallClimbProgress > m.wallClimbConsumeThreshold)
-            {
-                canWallClimb = false;
-            }
-
-            else
-            {
-                if (!canUseWallClimbThreshold)
-                    canWallClimb = false;
-                else
-                    canUseWallClimbThreshold = false;
-            }
-            */
+        if (!spacebar)
+        {
+            stateMachine.ChangeState(CharacterState.WallSliding);
         }
 
         if (!canWallClimb && !CastLedge())
@@ -571,6 +643,13 @@ public class Character : MonoBehaviour
         }
 
         //velocity = Vector3.zero;
+    }
+
+    private void WallClimbJump()
+    {
+        jumpLeft++;
+        stateMachine.ChangeState(CharacterState.Jumping);
+        Debug.Log("Should jump");
     }
 
     private void WallClimbing_Exit()
@@ -584,7 +663,7 @@ public class Character : MonoBehaviour
     {
         Vector3 origin = transform.position + Vector3.up * 0.05f /*+ Forward * Radius*/;
         RaycastHit[] down = Physics.RaycastAll(origin, Forward, CurrentWallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
-        RaycastHit[] up = Physics.RaycastAll(origin, Forward, CurrentWallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
+        RaycastHit[] up = Physics.RaycastAll(origin + Vector3.up * m.wallCastUpHeight, Forward, CurrentWallCastLength, m.groundMask, QueryTriggerInteraction.Ignore);
         List<RaycastHit> final = new List<RaycastHit>();
         for (int i = 0; i < down.Length; i++)
         {
@@ -615,16 +694,19 @@ public class Character : MonoBehaviour
     #region WallSlide
 
     private bool wallSliding => CurrentState == CharacterState.WallSliding;
-    private float wallSlideTime = 0f;
+    private float wallSlideProgress = 0f;
 
     private void WallSliding_Enter()
     {
-        wallSlideTime = Time.time;
+        fallInitVelocityY = FinalVelocity.y;
+        wallSlideProgress = 0f;
     }
 
     private void WallSliding_Update()
     {
-        yVelocity = Mathf.Lerp(yVelocity, -m.wallSlideSpeed, Mathf.Clamp01(Time.time - wallSlideTime));
+        wallSlideProgress += Time.deltaTime * m.wallSlideProgressSpeed;
+        yVelocity = Mathf.Lerp(fallInitVelocityY, -m.wallSlideSpeed, m.wallSlideCurve.Evaluate(Mathf.Clamp01(wallSlideProgress)));
+        LoseFlow(m.flowLostPerSecondsWallSlide);
         if (!CastWall())
         {
             stateMachine.ChangeState(CharacterState.Falling);
@@ -643,7 +725,9 @@ public class Character : MonoBehaviour
     private bool isWallJumping = false;
     private void WallJump()
     {
+        Debug.Log("Wall Jump");
         isWallJumping = true;
+        EarnFlow(m.flowPerWallJump, false);
         Vector3 dir = new Vector3(WallNormal.x, 1, WallNormal.z);
         propeller.RegisterPropulsion(dir, m.wallJump, EndWallJump);
     }
@@ -752,9 +836,13 @@ public class Character : MonoBehaviour
             if (attackDelay != null) StopCoroutine(attackDelay);
             attackDelay = StartCoroutine(AttackDelay());
 
+            if(grounded)
+            {
+                LoseFlow(m.flowLostOnAttack, false);
+            }
+
             if (grounded)
             {
-                Debug.Log(Forward);
                 propeller.RegisterPropulsion(Forward, m.attackImpulse, EndImpulse);
                 isImpulsing = true;
             }
@@ -809,6 +897,7 @@ public class Character : MonoBehaviour
                             player.networkObject.SendRpc(NetworkedPlayerBehavior.RPC_TRY_HIT, Receivers.Server,
                                 myNetworkerPlayer.networkObject.NetworkId, myNetworkerPlayer.playerName, myNetworkerPlayer.teamIndex, myNetworkerPlayer.playerCamera.transform.forward);
 
+                            feedbacks.Play("Kill");
                         }
                     }
                 }
@@ -829,6 +918,7 @@ public class Character : MonoBehaviour
                             chara.TakeDamage(m.damage);
                             UIManager.Instance.DisplayKillFeed(this, chara);
                             UIManager.Instance.HitMarker();
+                            feedbacks.Play("Kill");
                         }
                     }
                 }
@@ -864,6 +954,7 @@ public class Character : MonoBehaviour
         propeller.RegisterPropulsion(kbDir, m.knockback, EndKnockback);
         feedbacks.Play("Parried");
         isKnockbacked = true;
+        LoseFlow(m.flowLostOnParry, false);
     }
 
     private void EndKnockback()

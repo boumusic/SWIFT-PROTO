@@ -45,7 +45,8 @@ public class PropulsionDrawer : PropertyDrawer
             CustomEditorUtility.QuickSerializeRelativeGUI("airControl", property, position, start + 1, 0, 1, position.width);
             CustomEditorUtility.QuickSerializeRelativeGUI("direction", property, position, start + 2, 0, 1, position.width);
             CustomEditorUtility.QuickSerializeRelativeGUI("priority", property, position, start + 3, 0, 1, position.width);
-
         }
+
+        property.serializedObject.ApplyModifiedProperties();
     }
 }

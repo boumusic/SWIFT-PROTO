@@ -35,6 +35,9 @@ public class PlayerCamera : MonoBehaviour
 
     public Quaternion Forward => Quaternion.AngleAxis(transform.eulerAngles.y, Vector3.up);
     private Vector2 mouse;
+    public Vector2 Mouse => mouse;
+
+    private float maxSpeedFov => character.m.runSpeed * character.m.flowSpeedMul;
 
     private void Update()
     {
@@ -54,7 +57,7 @@ public class PlayerCamera : MonoBehaviour
 
     private void UpdateFOV()
     {
-        float target = Utility.Interpolate(minFov, maxFov, 0f, character.m.runSpeed, character.Velocity.magnitude * character.FacingVelocity);
+        float target = Utility.Interpolate(minFov, maxFov, 0f, maxSpeedFov, character.Velocity.magnitude * character.DotFacingVelocity);
         float currentFov = Mathf.SmoothDamp(cam.fieldOfView, target, ref currentVelFov, fovSmooth);
 
         if(!QuikFeedbackManager.instance.IsZooming)

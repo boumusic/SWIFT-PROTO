@@ -145,7 +145,7 @@ public static class CustomEditorUtility
     public static Vector2 RectSize(float widthMul, int offset, float propertyWidth = 0)
     {
         float usedWidth = propertyWidth == 0 ? EditorGUIUtility.currentViewWidth : propertyWidth;
-        return new Vector2(propertyWidth * widthMul - offset, EditorGUIUtility.singleLineHeight);
+        return new Vector2(usedWidth * widthMul - offset, EditorGUIUtility.singleLineHeight);
     }
 
     public static void QuickSerializeRelativeGUI(string name, SerializedProperty property, Rect position, int index, float offset, float widthMul, float propertyWidth = 0)

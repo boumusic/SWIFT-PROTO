@@ -118,6 +118,11 @@ public class Propeller : MonoBehaviour
         propulsions.Remove(propulsion);
     }
 
+    public void Clear()
+    {
+        propulsions.Clear();
+    }
+
     public Vector3 Velocity()
     {
         if (propulsions.Count == 0)
