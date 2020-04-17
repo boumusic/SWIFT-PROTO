@@ -12,6 +12,8 @@ public class ServerElement : MonoBehaviour
     public TextMeshProUGUI adressText;
     public TextMeshProUGUI playerCountText;
 
+    public string mode;
+
     public void Init(string name, string adress, int playerCount, RectTransform parent)
     {
         this.nameText.text = name;
