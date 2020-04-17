@@ -22,7 +22,7 @@ MonoBehaviour:
     defaultState: 1
   color:
     overrideState: 1
-    value: {r: 0.40837485, g: 0.48873758, b: 0.5377358, a: 0}
+    value: {r: 0.5372549, g: 0.48807323, b: 0.40784314, a: 0}
   threshold:
     overrideState: 1
     value: -0.49
@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: adb84e30e02715445aeb9959894e3b4d, type: 3}
   m_Name: ColorGrading
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   enabled:
     overrideState: 1
     value: 1
@@ -1346,40 +1346,6 @@ MonoBehaviour:
       - 0.5
       - 0.5
       - 0.5
---- !u!114 &-1176696325850450492
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b77c5407dc277943b591ade9e6b18c5, type: 3}
-  m_Name: LensDistortion
-  m_EditorClassIdentifier: 
-  active: 1
-  enabled:
-    overrideState: 1
-    value: 1
-  intensity:
-    overrideState: 1
-    value: -20
-  intensityX:
-    overrideState: 1
-    value: 1
-  intensityY:
-    overrideState: 1
-    value: 1
-  centerX:
-    overrideState: 1
-    value: 0
-  centerY:
-    overrideState: 1
-    value: 0
-  scale:
-    overrideState: 1
-    value: 1
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1396,7 +1362,6 @@ MonoBehaviour:
   - {fileID: 3397501647089819701}
   - {fileID: -1411122511520093555}
   - {fileID: 9158002581342253553}
-  - {fileID: -1176696325850450492}
   - {fileID: -6871970195691058730}
 --- !u!114 &3397501647089819701
 MonoBehaviour:

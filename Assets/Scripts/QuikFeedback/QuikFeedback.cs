@@ -95,7 +95,7 @@ namespace Pataya.QuikFeedback
         public AnimationCurve curve = new AnimationCurve(new Keyframe[] { new Keyframe(0, 1), new Keyframe(1, 0) });
         [Range(0f, 20f)] public float duration = 1f;
         [Range(0f, 5f)] public float intensity = 2f;
-        [Range(0f, 0.05f)] public float interpolation = 0f;
+        [Range(0f, 0.15f)] public float interpolation = 0f;
     }
 
     #endregion

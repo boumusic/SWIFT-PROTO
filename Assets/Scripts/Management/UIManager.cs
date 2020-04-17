@@ -55,8 +55,9 @@ public class UIManager : MonoBehaviour
     public GameObject uiFlagZonePrefab;
     private List<Zone> flagZones = new List<Zone>();
 
-    [Header("Sensitivity")]
+    [Header("Debug")]
     public TextMeshProUGUI sensText;
+    public TextMeshProUGUI flowText;
 
     private void Start()
     {
@@ -90,6 +91,7 @@ public class UIManager : MonoBehaviour
 
         scoreboard.gameObject.SetActive(player.Tab);
         sensText.text = "sensitivity : " + player.sensitivity.ToString("F3") + "/1";
+        flowText.text = "Flow : " + player.Character.CurrentFlow.ToString("F2") + "/200";
     }
 
     public void HitMarker()
