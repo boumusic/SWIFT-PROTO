@@ -301,7 +301,7 @@ public class Character : MonoBehaviour
 
     private void Grounded_Enter()
     {
-        if (fallReachedFlowThreshold)
+        if (FallReachedFlowThreshold)
             techLandBuffer = StartCoroutine(TechLandBuffer());
 
         TryStopCoyote();
@@ -483,13 +483,13 @@ public class Character : MonoBehaviour
             {
                 this.shortJump = shortJump;
                 EarnFlow(m.flowEarnedOnShortHop, false);
+                if (shortJump) TechLand();
             }
             else
             {
                 this.shortJump = false;
             }
-
-            if(shortJump && !IsInAir) TechLand();
+          
             stateMachine.ChangeState(CharacterState.Jumping);
         }
     }
@@ -531,7 +531,7 @@ public class Character : MonoBehaviour
     public float FallInitVelocityY => fallInitVelocityY;
     private float fallInitialY;
     private float fallDistance => Mathf.Abs(fallInitialY - transform.position.y);
-    private bool fallReachedFlowThreshold => fallDistance > m.flowFallHeightThreshold;
+    public bool FallReachedFlowThreshold => fallDistance > m.flowFallHeightThreshold;
 
     private void Falling_Enter()
     {
@@ -556,7 +556,7 @@ public class Character : MonoBehaviour
                 stateMachine.ChangeState(CharacterState.WallSliding);
             }
 
-            if (fallReachedFlowThreshold)
+            if (FallReachedFlowThreshold)
             {
                 EarnFlow(m.flowPerSecondFall);
             }
@@ -589,6 +589,7 @@ public class Character : MonoBehaviour
         yield return new WaitForSeconds(m.flowFallJumpBuffer);
         ResetFlow();
         feedbacks.Play("FailTech");
+        techLandBuffer = null;
     }
 
     #endregion
