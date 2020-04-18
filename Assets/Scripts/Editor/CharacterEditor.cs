@@ -30,6 +30,7 @@ public class CharacterEditor : Editor
         EditorGUILayout.LabelField("Cast Wall : " + t.CastWall().ToString());
         EditorGUILayout.LabelField("Was in flow state : " + t.WasInFlowState);
         EditorGUILayout.LabelField("Is in flow state : " + t.IsInFlowState);
+        EditorGUILayout.LabelField("Reached fall threshold : " + t.FallReachedFlowThreshold);
 
         EditorGUILayout.EndVertical();
 

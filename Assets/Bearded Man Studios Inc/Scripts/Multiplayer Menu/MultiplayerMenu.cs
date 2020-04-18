@@ -40,6 +40,7 @@ public class MultiplayerMenu : MonoBehaviour
 
 	public bool useTCP = false;
     bool lan = false;
+    bool nat = true;
 
 	private void Start()
 	{
@@ -80,7 +81,9 @@ public class MultiplayerMenu : MonoBehaviour
         }
     }
 
-    void AddServer(string name, string adress, int playerCount)
+
+
+    void AddServer(string name, string adress, int playerCount, string mode)
     {
         ServerElement serverElement = Instantiate(serverElementPrefab).GetComponent<ServerElement>();
 
@@ -91,6 +94,7 @@ public class MultiplayerMenu : MonoBehaviour
         serverButton.onClick.AddListener(() =>
         {
             ipAddress.text = adress;
+            nat = ((mode == "NAT") ? true : false);
             Connect();
         });
     }
@@ -105,6 +109,11 @@ public class MultiplayerMenu : MonoBehaviour
     {
         lan = true;
         Refresh();
+    }
+
+    public void ToggleNat()
+    {
+        nat = !nat;
     }
 
     public void Refresh()
@@ -179,7 +188,7 @@ public class MultiplayerMenu : MonoBehaviour
 
                             MainThreadManager.Run(() =>
                             {
-                                AddServer(server.Name, server.Address, server.PlayerCount);
+                                AddServer(server.Name, server.Address, server.PlayerCount, server.Mode);
                             });
                         }
                     }
@@ -205,7 +214,7 @@ public class MultiplayerMenu : MonoBehaviour
 		Debug.Log("Found endpoint: " + endpoint.Address + ":" + endpoint.Port);
         MainThreadManager.Run(() =>
         {
-            AddServer("Local Game", endpoint.Address, -1);
+            AddServer("Local Game", endpoint.Address, -1, "LOCAL");
         });
     }
 
@@ -239,7 +248,7 @@ public class MultiplayerMenu : MonoBehaviour
 		else
 		{
 			client = new UDPClient();
-			if (natServerHost.Trim().Length == 0)
+			if (natServerHost.Trim().Length == 0 || !nat)
 				((UDPClient)client).Connect(ipAddress.text, (ushort)port);
 			else
 				((UDPClient)client).Connect(ipAddress.text, (ushort)port, natServerHost, natServerPort);
@@ -299,8 +308,8 @@ public class MultiplayerMenu : MonoBehaviour
 		{
 			server = new UDPServer(64);
 
-			if (natServerHost.Trim().Length == 0)
-				((UDPServer)server).Connect(ipAddress.text, ushort.Parse(portNumber.text));
+			if (natServerHost.Trim().Length == 0 || !nat)
+				((UDPServer)server).Connect(port : ushort.Parse(portNumber.text));
 			else
 				((UDPServer)server).Connect(port: ushort.Parse(portNumber.text), natHost: natServerHost, natPort: natServerPort);
 		}
@@ -360,8 +369,8 @@ public class MultiplayerMenu : MonoBehaviour
 			string serverId = "myGame";
             string serverName = PlayerInfoManager.Instance.playerName;
 			string type = "Deathmatch";
-			string mode = "Teams";
-			string comment = "Demo comment...";
+			string mode = nat ? "NAT" : "FORWARDED";
+			string comment = "...";
 
 			masterServerData = mgr.MasterServerRegisterData(networker, serverId, serverName, type, mode, comment, useElo, eloRequired);
 		}

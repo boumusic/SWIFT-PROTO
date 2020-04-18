@@ -21,18 +21,26 @@ public class CharacterSettings : ScriptableObject
     public float flowCamYawDiff = 0.8f;
     public float flowLostPerSecondsWallSlide = 35;
     public float flowLostPerSecondsStrafe = 40;
-    public float flowLostOnStop = 50;
+    public float flowLostPerSecondsOnStop = 50;
     public float flowLostOnParry = 100;
+    public float flowEarnedOnShortHop = 30;
     public float flowLostOnAttack = 50;
 
     [Header("Flow Run")]
     [Tooltip("How many flow per second earned when running forward.")] public float flowPerSecondRun = 25f;
     public float flowSpeedMul = 1.1f;
+    public float flowHighJumpAirDragMax = 1.05f;
+    public float flowShortJumpAirDragMax = 1.1f;
     public float earnFlowRunSpeedThreshold = 0.9f;
 
     [Tooltip("How long after the beginning of a fall the character can earn flow.")] public float flowFallDelay = 1f;
-    [Tooltip("How many flow per second earned when falling.")] public float flowPerSecondFall = 50f;
     [Tooltip("Flow earned per wall Jump")] public float flowPerWallJump = 20f;
+
+    [Header("Flow Fall")]
+    [Tooltip("How many flow per second earned when falling.")] public float flowPerSecondFall = 50f;
+    public float flowFallHeightThreshold = 5;
+    public float flowFallJumpBuffer = 0.2f;
+    public float flowFallDistanceMultiplier = 5f;
 
     [Header("Jump")]
     public int jumpCount = 2;
@@ -46,7 +54,6 @@ public class CharacterSettings : ScriptableObject
 
     [Header("Short Jump")]
     public float shortJumpStrength = 5f;
-    public float shortJumpSpeedMul = 1.1f;
 
     [Range(0f, 20)] public float jumpDecelerationAmount = 1f;
     [Range(0f, 20)] public float jumpAccelerationTime = 1f;
