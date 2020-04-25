@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-[CustomEditor(typeof(Ability))]
+[CustomEditor(typeof(PowerSettings))]
 public class AbilityEditor : Editor
 {
-	private Ability t;
+	private PowerSettings t;
 
 	private void OnEnable()
 	{
-		t = target as Ability;
+		t = target as PowerSettings;
 	}
 
 	public override void OnInspectorGUI()

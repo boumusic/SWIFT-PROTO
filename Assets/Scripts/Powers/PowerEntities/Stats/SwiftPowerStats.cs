@@ -9,7 +9,7 @@ public enum SwiftPowerDirection
     Forward
 }
 
-public class SwiftPowerStats : AbilityStats
+public class SwiftPowerStats : PowerEntityStats
 {
     public float duration = 1f;
     public float speed = 1f;

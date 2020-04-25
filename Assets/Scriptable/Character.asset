@@ -90,7 +90,7 @@ MonoBehaviour:
   flowFallDelay: 1
   flowPerWallJump: 20
   flowPerSecondFall: 50
-  flowFallHeightThreshold: 5
+  flowFallHeightThreshold: 10
   flowFallJumpBuffer: 0.035
   flowFallDistanceMultiplier: 5
   jumpCount: 2
