@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
-public class AbilityStats
+public class AOE : PowerEntity<AOEStats>
 {
-    public float delay = 0f;
+    
 }

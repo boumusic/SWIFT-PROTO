@@ -46,13 +46,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   character: {fileID: 3943239952513736106}
   nameText: {fileID: 6071799687989192460}
-  score:
-    rank: 0
-    kills: 0
-    deaths: 0
-    captured: 0
-    scored: 0
-    retreived: 0
   sensitivity: 0.1
   scrollSpeed: 4
   attackSensitivity: 0.1
@@ -70,6 +63,31 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3943239951627418632}
     m_Modifications:
+    - target: {fileID: 130837097388939443, guid: 1c77f3e7343eabc48bd17749fdd18481,
+        type: 3}
+      propertyPath: m_textInfo.characterCount
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 130837097388939443, guid: 1c77f3e7343eabc48bd17749fdd18481,
+        type: 3}
+      propertyPath: m_textInfo.wordCount
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 130837097388939443, guid: 1c77f3e7343eabc48bd17749fdd18481,
+        type: 3}
+      propertyPath: m_textInfo.lineCount
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 130837097388939443, guid: 1c77f3e7343eabc48bd17749fdd18481,
+        type: 3}
+      propertyPath: m_textInfo.pageCount
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 130837097388939443, guid: 1c77f3e7343eabc48bd17749fdd18481,
+        type: 3}
+      propertyPath: m_textInfo.spaceCount
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1433880869325786208, guid: 1c77f3e7343eabc48bd17749fdd18481,
         type: 3}
       propertyPath: m_Mesh
