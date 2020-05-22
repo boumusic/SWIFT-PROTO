@@ -96,7 +96,7 @@ MonoBehaviour:
   jumpCount: 2
   jumpStrength: 15
   jumpChargeSpeed: 7
-  jumpProgressSpeed: 3.4
+  jumpProgressSpeed: 4.5
   jumpCurve:
     serializedVersion: 2
     m_Curve:
@@ -252,7 +252,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  dashCooldown: 1
+  dashCooldown: 3
   dashFlagCooldown: 6
   groundRaycastDown: 0.36
   groundRaycastUp: 0.43
