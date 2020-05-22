@@ -82,11 +82,11 @@ MonoBehaviour:
   flowLostOnParry: 100
   flowEarnedOnShortHop: 0
   flowLostOnAttack: 50
-  flowPerSecondRun: 25
+  flowPerSecondRun: 35
   flowSpeedMul: 1.1
   flowHighJumpAirDragMax: 1.03
   flowShortJumpAirDragMax: 1.05
-  earnFlowRunSpeedThreshold: 0.9
+  earnFlowRunSpeedThreshold: 0.7
   flowFallDelay: 1
   flowPerWallJump: 20
   flowPerSecondFall: 50
