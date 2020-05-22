@@ -8,10 +8,13 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 using BeardedManStudios.Forge.Networking.Frame;
+using DG.Tweening;
 
 public class MultiplayerMenu : MonoBehaviour
 {
-    public RectTransform serversContainer;
+	public CanvasGroup serversGroup;
+	public CanvasGroup usernameGroup;
+	public RectTransform serversContainer;
     public GameObject serverElementPrefab;
 	public InputField ipAddress = null;
 	public InputField portNumber = null;
@@ -338,6 +341,14 @@ public class MultiplayerMenu : MonoBehaviour
 		}*/
 	}
 
+	public void ConfirmName()
+	{
+		if (playerName.textComponent.text.Length <= 0) return;
+
+		serversGroup.interactable = true;
+		serversGroup.DOFade(1, .2f);
+		usernameGroup.DOFade(0, .2f);
+	}
 
 
 	private void TestLocalServerFind(NetWorker.BroadcastEndpoints endpoint, NetWorker sender)
