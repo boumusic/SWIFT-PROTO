@@ -13,7 +13,7 @@ public class KillZone : MonoBehaviour
         if (other.TryGetComponent(out chara))
         {
             Debug.Log(chara.PlayerName + " died in zone " + gameObject.name);
-            chara.NPlayer.networkObject.SendRpc(NetworkedPlayerBehavior.RPC_DIE, Receivers.Server);
+            chara.NPlayer.networkObject.SendRpc(NetworkedPlayerBehavior.RPC_DIE, Receivers.All, "VOID", 0);
             chara.Die();
         }
     }
