@@ -26,7 +26,7 @@ public class KillZone : MonoBehaviour
 
             if (player.flag == null) return;
 
-            player.flag.GetComponentInParent<Zone>().networkObject.SendRpc(Zone.RPC_RETRIEVED, Receivers.All, "VOID", p.playerName);
+            player.flag.GetComponentInParent<Zone>().networkObject.SendRpc(Zone.RPC_RETRIEVED, Receivers.All, "VOID", player.playerName);
 
             player.flag = null;
             player.networkObject.hasFlag = false;
