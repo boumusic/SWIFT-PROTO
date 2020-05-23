@@ -11,30 +11,27 @@ public class KillZone : MonoBehaviour
     {
         if (!NetworkManager.Instance.IsServer) return;
 
-        Character chara;
-        if (other.TryGetComponent(out chara))
+        NetworkedPlayer player = other.transform.root.GetComponent<NetworkedPlayer>();
+        if (player != null)
         {
-            NetworkedPlayer p = chara.NPlayer;
-            if (!p) return;
+            if (!player.isAlive) return;
+            Debug.Log(player.playerName + " died in zone " + gameObject.name);
 
-            if (!p.isAlive) return;
-            Debug.Log(chara.PlayerName + " died in zone " + gameObject.name);
 
-            
-            p.networkObject.alive = false;
+            player.networkObject.alive = false;
 
-            p.networkObject.SendRpc(NetworkedPlayerBehavior.RPC_DIE, Receivers.All, "VOID", 0);
+            player.networkObject.SendRpc(NetworkedPlayerBehavior.RPC_DIE, Receivers.All, "VOID", 0);
 
             // return flag
 
-            if (p.flag == null) return;
+            if (player.flag == null) return;
 
-            p.flag.GetComponentInParent<Zone>().networkObject.SendRpc(Zone.RPC_RETRIEVED, Receivers.All, "VOID", p.playerName);
+            player.flag.GetComponentInParent<Zone>().networkObject.SendRpc(Zone.RPC_RETRIEVED, Receivers.All, "VOID", p.playerName);
 
-            p.flag = null;
-            p.networkObject.hasFlag = false;
+            player.flag = null;
+            player.networkObject.hasFlag = false;
 
-            p.networkObject.SendRpc(NetworkedPlayer.RPC_TOGGLE_FLAG, true, Receivers.AllBuffered, false);
+            player.networkObject.SendRpc(NetworkedPlayer.RPC_TOGGLE_FLAG, true, Receivers.AllBuffered, false);
         }
     }
 }
