@@ -9,6 +9,8 @@ public class KillZone : MonoBehaviour
 {
     private void OnTriggerEnter(Collider other)
     {
+        if (!NetworkManager.Instance.IsServer) return;
+
         Character chara;
         if (other.TryGetComponent(out chara))
         {
